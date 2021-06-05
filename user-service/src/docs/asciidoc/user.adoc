@@ -1,0 +1,22 @@
+:basedir: {docdir}/../../../
+:snippets: {basedir}/build/generated-snippets
+
+= 회원 서비스 API
+:doctype: auth
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectnums:
+:sectlinks:
+:sectanchors:
+
+[[api]]
+==== 회원 로그인 API
+====== 요청
+include::{snippets}/user/login/http-request.adoc[]
+include::{snippets}/user/login/request-fields.adoc[]
+
+====== 응답
+include::{snippets}/user/login/http-response.adoc[]
+include::{snippets}/user/login/response-fields.adoc[]
