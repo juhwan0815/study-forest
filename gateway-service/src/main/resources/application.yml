@@ -28,11 +28,11 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/auth-service/(?<segment>.*),/$\{segment}
-        # 인증 서비스 - refresh API
+        # 인증 서비스 - refresh API, Logout API
         - id: auth-service
           uri: lb://AUTH-SERVICE
           predicates:
-            - Path=/auth-service/refresh
+            - Path=/auth-service/**
             - Method=POST
           filters:
             - RemoveRequestHeader=Cookie
