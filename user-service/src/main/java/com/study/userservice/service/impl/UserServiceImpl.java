@@ -3,6 +3,7 @@ package com.study.userservice.service.impl;
 import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
 import com.study.userservice.exception.UserException;
+import com.study.userservice.kafka.message.LogoutMessage;
 import com.study.userservice.kafka.message.RefreshTokenCreateMessage;
 import com.study.userservice.model.UserLoginRequest;
 import com.study.userservice.model.UserResponse;
@@ -62,5 +63,18 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserException("존재하지 않는 회원ID입니다."));
 
         return UserResponse.fromWithRefreshToken(findUser);
+    }
+
+    @Override
+    @Transactional
+    public void logout(LogoutMessage logoutMessage) {
+        try {
+            User findUser = userRepository.findById(logoutMessage.getUserId())
+                    .orElseThrow(() -> new UserException(logoutMessage.getUserId() + "는 존재하지 않는 회원입니다."));
+
+            findUser.logout();
+        } catch (UserException ex) {
+            log.error("{}", ex.getMessage());
+        }
     }
 }

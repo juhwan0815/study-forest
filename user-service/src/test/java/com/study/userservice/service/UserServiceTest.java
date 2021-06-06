@@ -2,6 +2,7 @@ package com.study.userservice.service;
 
 import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
+import com.study.userservice.kafka.message.LogoutMessage;
 import com.study.userservice.kafka.message.RefreshTokenCreateMessage;
 import com.study.userservice.model.UserLoginRequest;
 import com.study.userservice.model.UserResponse;
@@ -138,5 +139,26 @@ class UserServiceTest {
         assertThat(result.getThumbnailImage()).isEqualTo(user.getThumbnailImage());
         assertThat(result.getStatus()).isEqualTo(user.getStatus());
         assertThat(result.getRole()).isEqualTo(user.getRole());
+    }
+
+    @Test
+    @DisplayName("회원 로그아웃")
+    void logout(){
+        // given
+        LogoutMessage logoutMessage = new LogoutMessage();
+        logoutMessage.setUserId(1L);
+
+        User user = User.createUser(1L, "황주환", "이미지",
+                "이미지", UserRole.USER);
+        user.updateRefreshToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjI4ODU3NDEsImV4cCI6MTYyMzQ5MDU0MX0.c24V3JQxYlp9L4XgtFqfL6KR31CuTNRC5i-M0t8nMAU");
+
+        given(userRepository.findById(anyLong()))
+                .willReturn(Optional.of(user));
+
+        // when
+        userServiceImpl.logout(logoutMessage);
+
+        // then
+        assertThat(user.getRefreshToken()).isNull();;
     }
 }

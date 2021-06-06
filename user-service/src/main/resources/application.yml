@@ -32,9 +32,13 @@ kafka:
   topic:
     refresh:
       name: auth-refresh-topic
+    logout:
+      name: auth-logout-topic
   consumer:
     refresh:
       groupName: auth-refresh-consumer-group
+    logout:
+      groupName: auth-logout-consumer-group
 
 management:
   endpoints:

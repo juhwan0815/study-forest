@@ -11,6 +11,10 @@
 :sectlinks:
 :sectanchors:
 
+회원서비스 요청 URL
+
+Gateway-service 주소 : 포트 + /user-service
+
 [[api]]
 ==== 회원 로그인 API
 ===== 요청
