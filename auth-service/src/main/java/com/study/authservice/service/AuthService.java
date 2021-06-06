@@ -6,5 +6,7 @@ public interface AuthService {
 
     CreateTokenResult login(String kakaoToken);
 
-    CreateTokenResult refresh(String refreshToken);
+    CreateTokenResult refresh(String refreshToken,Long userId);
+
+    void logout(Long userId);
 }

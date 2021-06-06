@@ -24,6 +24,8 @@ kafka:
   topic:
     refresh:
       name: auth-refresh-topic
+    logout:
+      name: auth-logout-topic
 
 social:
   kakao:

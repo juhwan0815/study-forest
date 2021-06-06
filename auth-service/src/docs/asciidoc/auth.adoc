@@ -11,6 +11,11 @@
 :sectlinks:
 :sectanchors:
 
+인증서비스 요청 URL
+
+Gateway-service 주소 : 포트 + /auth-service
+
+
 [[api]]
 ==== 카카오 로그인 API
 ===== 요청
@@ -33,3 +38,12 @@ include::{snippets}/auth/refresh/request-headers.adoc[]
 include::{snippets}/auth/refresh/http-response.adoc[]
 ====== Header
 include::{snippets}/auth/refresh/response-headers.adoc[]
+
+==== 로그아웃 API
+===== 요청
+include::{snippets}/auth/logout/http-request.adoc[]
+====== Header
+include::{snippets}/auth/logout/request-headers.adoc[]
+
+===== 응답
+include::{snippets}/auth/logout/http-response.adoc[]

@@ -2,6 +2,7 @@ package com.study.authservice.service;
 
 import com.study.authservice.client.KakaoServiceClient;
 import com.study.authservice.client.UserServiceClient;
+import com.study.authservice.kafka.sender.KafkaLogoutMessageSender;
 import com.study.authservice.kafka.sender.KafkaRefreshTokenCreateMessageSender;
 import com.study.authservice.model.CreateTokenResult;
 import com.study.authservice.model.KakaoProfile;
@@ -13,10 +14,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
@@ -24,7 +23,6 @@ import java.util.Date;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -43,6 +41,9 @@ class AuthServiceTest {
 
     @Mock
     private KafkaRefreshTokenCreateMessageSender kafkaRefreshTokenCreateMessageSender;
+
+    @Mock
+    private KafkaLogoutMessageSender kafkaLogoutMessageSender;
 
 
     @Test
@@ -123,9 +124,6 @@ class AuthServiceTest {
         // given
         String refreshToken = "refreshToken";
 
-        given(jwtTokenProvider.getUserId(any()))
-                .willReturn(1L);
-
         UserResponse userResponse = new UserResponse();
         userResponse.setId(1L);
         userResponse.setKakaoId(1L);
@@ -151,11 +149,26 @@ class AuthServiceTest {
                 .send(any());
 
         // when
-        CreateTokenResult result = authServiceImpl.refresh(refreshToken);
+        CreateTokenResult result = authServiceImpl.refresh(refreshToken,1L);
 
         // then
         assertThat(result.getAccessToken()).isEqualTo(createTokenResult.getAccessToken());
         assertThat(result.getRefreshToken()).isEqualTo(createTokenResult.getRefreshToken());
+    }
+
+    @Test
+    @DisplayName("로그아웃")
+    void logout() {
+        // given
+        willDoNothing()
+                .given(kafkaLogoutMessageSender)
+                .send(any());
+
+        // when
+        authServiceImpl.logout(1L);
+
+        // then
+        then(kafkaLogoutMessageSender).should(times(1)).send(any());
     }
 
 

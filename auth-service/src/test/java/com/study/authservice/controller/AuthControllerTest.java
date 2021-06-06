@@ -1,8 +1,10 @@
 package com.study.authservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.study.authservice.config.LoginUserArgumentResolver;
 import com.study.authservice.model.CreateTokenResult;
 import com.study.authservice.service.AuthService;
+import com.study.authservice.util.JwtTokenProvider;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,28 +16,24 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Date;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.head;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureRestDocs
@@ -47,6 +45,9 @@ class AuthControllerTest {
 
     @MockBean
     private AuthService authService;
+
+    @MockBean
+    private LoginUserArgumentResolver loginUserArgumentResolver;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -118,8 +119,11 @@ class AuthControllerTest {
         createTokenResult.setAccessToken("Access토큰");
         createTokenResult.setRefreshToken("Refresh토큰");
 
-        given(authService.refresh(any()))
+        given(authService.refresh(any(), any()))
                 .willReturn(createTokenResult);
+
+        given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(1L);
 
         mockMvc.perform(post("/refresh")
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
@@ -135,7 +139,30 @@ class AuthControllerTest {
                                 headerWithName("refreshToken").description("새로 발급된 Refresh 토큰")
                         )));
 
-        then(authService).should(times(1)).refresh(any());
+        then(authService).should(times(1)).refresh(any(), any());
     }
 
+    @Test
+    @DisplayName("로그아웃 API 테스트")
+    void logout() throws Exception {
+
+        // given
+        given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(1L);
+
+        willDoNothing()
+                .given(authService)
+                .logout(any());
+
+        // when
+        mockMvc.perform(post("/logout")
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
+                .andExpect(status().isOk())
+                .andDo(document("auth/logout",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        )));
+
+        then(authService).should(times(1)).logout(any());
+    }
 }

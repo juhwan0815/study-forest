@@ -2,7 +2,9 @@ package com.study.authservice.service.Impl;
 
 import com.study.authservice.client.KakaoServiceClient;
 import com.study.authservice.client.UserServiceClient;
+import com.study.authservice.kafka.message.LogoutMessage;
 import com.study.authservice.kafka.message.RefreshTokenCreateMessage;
+import com.study.authservice.kafka.sender.KafkaLogoutMessageSender;
 import com.study.authservice.kafka.sender.KafkaRefreshTokenCreateMessageSender;
 import com.study.authservice.model.CreateTokenResult;
 import com.study.authservice.model.KakaoProfile;
@@ -23,6 +25,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserServiceClient userServiceClient;
     private final JwtTokenProvider jwtTokenProvider;
     private final KafkaRefreshTokenCreateMessageSender kafkaRefreshTokenCreateMessageSender;
+    private final KafkaLogoutMessageSender kafkaLogoutMessageSender;
 
     public CreateTokenResult login(String kakaoToken) {
         KakaoProfile kakaoProfile = kakaoServiceClient.getKakaoProfile(kakaoToken);
@@ -39,10 +42,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public CreateTokenResult refresh(String refreshToken) {
-
-        Long userId = jwtTokenProvider.getUserId(refreshToken);
-
+    public CreateTokenResult refresh(String refreshToken,Long userId) {
         // TODO Circuit Breaker 적용하기
         UserResponse user = userServiceClient.findUserById(userId);
 
@@ -52,6 +52,11 @@ public class AuthServiceImpl implements AuthService {
                 .send(RefreshTokenCreateMessage.from(user.getId(),createTokenResult.getRefreshToken()));
 
         return createTokenResult;
+    }
+
+    @Override
+    public void logout(Long userId) {
+        kafkaLogoutMessageSender.send(LogoutMessage.from(userId));
     }
 
 }

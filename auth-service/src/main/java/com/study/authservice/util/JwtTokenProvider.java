@@ -52,8 +52,8 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public Long getUserId(String refreshToken) {
-        String jwt = refreshToken.substring(7);
+    public Long getUserId(String token) {
+        String jwt = token.substring(7);
         String userId = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwt)
                 .getBody().getSubject();
         return Long.valueOf(userId);
