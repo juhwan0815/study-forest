@@ -3,6 +3,7 @@ package com.study.userservice.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.kafka.common.serialization.StringSerializer;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -29,6 +30,10 @@ public class User extends BaseEntity{
 
     private String refreshToken; // Refresh 토큰
 
+    private String profileImageStoreName; // 프로필 이미지 저장이름
+
+    private String thumbnailImageStoreName; // 썸네일 이미지 저장이름
+
     @Enumerated(EnumType.STRING)
     private UserStatus status; // 회원 상태
 
@@ -53,5 +58,15 @@ public class User extends BaseEntity{
 
     public void logout() {
         this.refreshToken = null;
+    }
+
+    public void changeThumbnailImage(String thumbnailImage, String thumbnailImageStoreName){
+        this.thumbnailImage = thumbnailImage;
+        this.thumbnailImageStoreName = thumbnailImageStoreName;
+    }
+
+    public void changeImage(String profileImage,String profileImageStoreName){
+        this.profileImage = profileImage;
+        this.profileImageStoreName = profileImageStoreName;
     }
 }

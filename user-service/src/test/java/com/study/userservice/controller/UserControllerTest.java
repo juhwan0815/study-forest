@@ -1,6 +1,7 @@
 package com.study.userservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.study.userservice.config.LoginUserArgumentResolver;
 import com.study.userservice.domain.UserRole;
 import com.study.userservice.domain.UserStatus;
 import com.study.userservice.model.UserLoginRequest;
@@ -16,12 +17,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.nio.charset.StandardCharsets;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -35,21 +39,23 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureRestDocs
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(UserController.class)
 class UserControllerTest {
 
-    private final String TEST_AUTHORIZATION = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjI4ODU3NDEsImV4cCI6MTYyMzQ5MDU0MX0.c24V3JQxYlp9L4XgtFqfL6KR31CuTNRC5i-M0t8nMAU";
+    private final String TEST_AUTHORIZATION = "Bearer 액세스토큰";
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private LoginUserArgumentResolver loginUserArgumentResolver;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -162,7 +168,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.status").value("ACTIVE"))
                 .andDo(document("user/auth",
                         requestHeaders(
-                                headerWithName("Authorization").description("액세스 토큰")
+                                headerWithName("Authorization").description("Access Token")
                         ),
                         pathParameters(
                                 parameterWithName("userId").description("회원 ID")
@@ -180,4 +186,63 @@ class UserControllerTest {
 
         then(userService).should(times(1)).findWithRefreshTokenById(any());
     }
+
+    @Test
+    @DisplayName("프로필 이미지 변경API 테스트")
+    void updateImage() throws Exception {
+
+        MockMultipartFile image = new MockMultipartFile(
+                "image",
+                "프로필사진.png",
+                "image/png",
+                "<<image>>".getBytes(StandardCharsets.UTF_8));
+
+        UserResponse userResponse = new UserResponse();
+        userResponse.setId(1L);
+        userResponse.setKakaoId(1L);
+        userResponse.setNickName("황주환");
+        userResponse.setProfileImage("이미지URL");
+        userResponse.setThumbnailImage("썸네일이미지URL");
+        userResponse.setRole(UserRole.USER);
+        userResponse.setStatus(UserStatus.ACTIVE);
+
+        given(userService.imageUpdate(any(),any()))
+                .willReturn(userResponse);
+
+        given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(1L);
+
+        mockMvc.perform(multipart("/users/image").file(image)
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.kakaoId").value(1))
+                .andExpect(jsonPath("$.nickName").value("황주환"))
+                .andExpect(jsonPath("$.profileImage").value("이미지URL"))
+                .andExpect(jsonPath("$.thumbnailImage").value("썸네일이미지URL"))
+                .andExpect(jsonPath("$.role").value("USER"))
+                .andExpect(jsonPath("$.status").value("ACTIVE"))
+                .andDo(document("user/updateImage",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        ),
+                        requestParts(
+                                partWithName("image").description("변경할 이미지 파일")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("회원 ID"),
+                                fieldWithPath("kakaoId").type(JsonFieldType.NUMBER).description("카카오 ID"),
+                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("닉네임"),
+                                fieldWithPath("profileImage").type(JsonFieldType.STRING).description("프로필 이미지"),
+                                fieldWithPath("thumbnailImage").type(JsonFieldType.STRING).description("프로필 썸네일 이미지"),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("회원 상태"),
+                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한")
+                        )));
+
+
+        then(userService).should(times(1)).imageUpdate(any(),any());
+    }
+
 }

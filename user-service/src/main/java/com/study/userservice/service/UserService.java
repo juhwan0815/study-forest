@@ -3,6 +3,7 @@ package com.study.userservice.service;
 import com.study.userservice.kafka.message.LogoutMessage;
 import com.study.userservice.kafka.message.RefreshTokenCreateMessage;
 import com.study.userservice.model.UserLoginRequest;
+import com.study.userservice.model.UserImageUpdateRequest;
 import com.study.userservice.model.UserResponse;
 
 public interface UserService {
@@ -15,5 +16,6 @@ public interface UserService {
 
     void logout(LogoutMessage logoutMessage);
 
+    UserResponse imageUpdate(Long userId, UserImageUpdateRequest request);
 
 }

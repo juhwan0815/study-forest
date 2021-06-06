@@ -1,5 +1,7 @@
 package com.study.userservice.controller;
 
+import com.study.userservice.config.LoginUser;
+import com.study.userservice.model.UserImageUpdateRequest;
 import com.study.userservice.model.UserLoginRequest;
 import com.study.userservice.model.UserResponse;
 import com.study.userservice.service.UserService;
@@ -18,14 +20,22 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/users")
-    public ResponseEntity<UserResponse> save(@RequestBody @Valid UserLoginRequest request){
+    public ResponseEntity<UserResponse> save(@RequestBody @Valid UserLoginRequest request) {
         return ResponseEntity.ok(userService.save(request));
     }
 
     @GetMapping("/users/{userId}/auth")
-    public ResponseEntity<UserResponse> findUserById(@PathVariable Long userId){
+    public ResponseEntity<UserResponse> findUserById(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.findWithRefreshTokenById(userId));
     }
+
+    @PostMapping("/users/image")
+    public ResponseEntity<UserResponse> changeProfile(@LoginUser Long userId,
+                                                      @Valid UserImageUpdateRequest request) {
+        return ResponseEntity.ok(userService.imageUpdate(userId,request));
+    }
+
+
 
 
 }

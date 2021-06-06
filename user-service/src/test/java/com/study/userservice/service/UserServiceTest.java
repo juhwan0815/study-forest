@@ -1,9 +1,14 @@
 package com.study.userservice.service;
 
+import com.amazonaws.Protocol;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
 import com.study.userservice.kafka.message.LogoutMessage;
 import com.study.userservice.kafka.message.RefreshTokenCreateMessage;
+import com.study.userservice.model.UserImageUpdateRequest;
 import com.study.userservice.model.UserLoginRequest;
 import com.study.userservice.model.UserResponse;
 import com.study.userservice.repository.UserRepository;
@@ -14,14 +19,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
@@ -33,6 +42,9 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private AmazonS3Client amazonS3Client;
 
     @Test
     @DisplayName("회원 로그인 - 신규가입")
@@ -161,4 +173,6 @@ class UserServiceTest {
         // then
         assertThat(user.getRefreshToken()).isNull();;
     }
+
+    // TODO 이미지 업로드 테스트코드 작성하기
 }

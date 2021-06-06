@@ -40,3 +40,16 @@ include::{snippets}/user/auth/path-parameters.adoc[]
 include::{snippets}/user/auth/http-response.adoc[]
 ====== Body
 include::{snippets}/user/auth/response-fields.adoc[]
+
+==== 회원 이미지 변경
+===== 요청
+include::{snippets}/user/updateImage/http-request.adoc[]
+====== Header
+include::{snippets}/user/updateImage/request-headers.adoc[]
+====== Part
+include::{snippets}/user/updateImage/request-parts.adoc[]
+
+===== 응답
+include::{snippets}/user/updateImage/http-response.adoc[]
+====== Body
+include::{snippets}/user/updateImage/response-fields.adoc[]
