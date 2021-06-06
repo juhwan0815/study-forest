@@ -5,6 +5,7 @@ import com.study.userservice.config.LoginUserArgumentResolver;
 import com.study.userservice.domain.UserRole;
 import com.study.userservice.domain.UserStatus;
 import com.study.userservice.model.UserLoginRequest;
+import com.study.userservice.model.UserNickNameUpdateRequest;
 import com.study.userservice.model.UserResponse;
 import com.study.userservice.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -41,6 +43,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -206,7 +209,7 @@ class UserControllerTest {
         userResponse.setRole(UserRole.USER);
         userResponse.setStatus(UserStatus.ACTIVE);
 
-        given(userService.imageUpdate(any(),any()))
+        given(userService.imageUpdate(any(), any()))
                 .willReturn(userResponse);
 
         given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
@@ -242,7 +245,63 @@ class UserControllerTest {
                         )));
 
 
-        then(userService).should(times(1)).imageUpdate(any(),any());
+        then(userService).should(times(1)).imageUpdate(any(), any());
+    }
+
+    @Test
+    @DisplayName("회원 닉네임 변경 API 테스트")
+    void changeNickName() throws Exception {
+
+        UserNickNameUpdateRequest userNickNameUpdateRequest = new UserNickNameUpdateRequest();
+        userNickNameUpdateRequest.setNickName("황철원");
+
+        UserResponse userResponse = new UserResponse();
+        userResponse.setId(1L);
+        userResponse.setKakaoId(1L);
+        userResponse.setNickName("황철원");
+        userResponse.setProfileImage("이미지URL");
+        userResponse.setThumbnailImage("썸네일이미지URL");
+        userResponse.setRole(UserRole.USER);
+        userResponse.setStatus(UserStatus.ACTIVE);
+
+        given(userService.nickNameUpdate(any(), any()))
+                .willReturn(userResponse);
+
+        given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(1L);
+
+        mockMvc.perform(patch("/users/nickname")
+                .header(HttpHeaders.AUTHORIZATION,TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(userNickNameUpdateRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.kakaoId").value(1))
+                .andExpect(jsonPath("$.nickName").value("황철원"))
+                .andExpect(jsonPath("$.profileImage").value("이미지URL"))
+                .andExpect(jsonPath("$.thumbnailImage").value("썸네일이미지URL"))
+                .andExpect(jsonPath("$.role").value("USER"))
+                .andExpect(jsonPath("$.status").value("ACTIVE"))
+                .andDo(document("user/updateNickName",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        ),
+                        requestFields(
+                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("변경할 닉네임")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("회원 ID"),
+                                fieldWithPath("kakaoId").type(JsonFieldType.NUMBER).description("카카오 ID"),
+                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("닉네임"),
+                                fieldWithPath("profileImage").type(JsonFieldType.STRING).description("프로필 이미지"),
+                                fieldWithPath("thumbnailImage").type(JsonFieldType.STRING).description("프로필 썸네일 이미지"),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("회원 상태"),
+                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한")
+                        )));
+
+        then(userService).should(times(1)).nickNameUpdate(any(),any());
+
     }
 
 }

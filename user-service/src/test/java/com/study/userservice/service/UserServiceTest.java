@@ -6,10 +6,12 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
+import com.study.userservice.exception.UserException;
 import com.study.userservice.kafka.message.LogoutMessage;
 import com.study.userservice.kafka.message.RefreshTokenCreateMessage;
 import com.study.userservice.model.UserImageUpdateRequest;
 import com.study.userservice.model.UserLoginRequest;
+import com.study.userservice.model.UserNickNameUpdateRequest;
 import com.study.userservice.model.UserResponse;
 import com.study.userservice.repository.UserRepository;
 import com.study.userservice.service.impl.UserServiceImpl;
@@ -28,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.*;
@@ -175,4 +178,51 @@ class UserServiceTest {
     }
 
     // TODO 이미지 업로드 테스트코드 작성하기
+
+    @Test
+    @DisplayName("회원 닉네임 변경")
+    void nickNameUpdate(){
+        // given
+        UserNickNameUpdateRequest userNickNameUpdateRequest = new UserNickNameUpdateRequest();
+        userNickNameUpdateRequest.setNickName("황철원");
+
+        User user = User.createUser(1L, "황주환", "이미지",
+                "이미지", UserRole.USER);
+
+        given(userRepository.findById(anyLong()))
+                .willReturn(Optional.of(user));
+
+        given(userRepository.findByNickName(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        UserResponse result = userServiceImpl.nickNameUpdate(1L, userNickNameUpdateRequest);
+
+        // then
+        assertThat(result.getNickName()).isEqualTo(userNickNameUpdateRequest.getNickName());
+        then(userRepository).should(times(1)).findById(anyLong());
+        then(userRepository).should(times(1)).findByNickName(any());
+    }
+
+    @Test
+    @DisplayName("회원 닉네임 변경 - 중복")
+    void nickNameDuplicateUpdate(){
+        // given
+        UserNickNameUpdateRequest userNickNameUpdateRequest = new UserNickNameUpdateRequest();
+        userNickNameUpdateRequest.setNickName("황철원");
+
+        User user1 = User.createUser(1L, "황주환", "이미지",
+                "이미지", UserRole.USER);
+
+        User user2 = User.createUser(2L, "황철원", "이미지",
+                "이미지", UserRole.USER);
+
+        given(userRepository.findById(anyLong()))
+                .willReturn(Optional.of(user1));
+
+        given(userRepository.findByNickName(any()))
+                .willReturn(Optional.of(user2));
+
+        assertThrows(UserException.class,()->userServiceImpl.nickNameUpdate(1L,userNickNameUpdateRequest));
+    }
 }

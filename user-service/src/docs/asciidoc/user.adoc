@@ -53,3 +53,17 @@ include::{snippets}/user/updateImage/request-parts.adoc[]
 include::{snippets}/user/updateImage/http-response.adoc[]
 ====== Body
 include::{snippets}/user/updateImage/response-fields.adoc[]
+
+==== 회원 닉네임 변경
+===== 요청
+include::{snippets}/user/updateNickName/http-request.adoc[]
+====== Header
+include::{snippets}/user/updateNickName/request-headers.adoc[]
+====== Body
+include::{snippets}/user/updateNickName/request-fields.adoc[]
+
+===== 응답
+include::{snippets}/user/updateNickName/http-response.adoc[]
+====== Body
+include::{snippets}/user/updateNickName/response-fields.adoc[]
+

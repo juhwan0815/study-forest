@@ -64,5 +64,20 @@ class UserRepositoryTest {
         assertThat(findUser.getStatus()).isEqualTo(user.getStatus());
     }
 
+    @Test
+    @DisplayName("회원 닉네임으로 조회")
+    void findByNickName(){
+        // given
+        User user = User.createUser(1L, "이미지", "이미지","이미지", UserRole.USER);
+        User savedUser = userRepository.save(user);
+
+        // when
+        User findUser = userRepository.findByNickName(savedUser.getNickName()).get();
+
+        // then
+        assertThat(findUser.getId()).isEqualTo(savedUser.getId());
+        assertThat(findUser.getNickName()).isEqualTo(savedUser.getNickName());
+    }
+
 
 }

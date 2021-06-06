@@ -4,7 +4,6 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.PutObjectResult;
 import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
 import com.study.userservice.exception.UserException;
@@ -12,12 +11,12 @@ import com.study.userservice.kafka.message.LogoutMessage;
 import com.study.userservice.kafka.message.RefreshTokenCreateMessage;
 import com.study.userservice.model.UserImageUpdateRequest;
 import com.study.userservice.model.UserLoginRequest;
+import com.study.userservice.model.UserNickNameUpdateRequest;
 import com.study.userservice.model.UserResponse;
 import com.study.userservice.repository.UserRepository;
 import com.study.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.coobird.thumbnailator.Thumbnailator;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
@@ -109,6 +107,21 @@ public class UserServiceImpl implements UserService {
         deleteImage(findUser);
         uploadImage(findUser, request.getImage());
         uploadThumbnailImage(findUser, request.getImage());
+
+        return UserResponse.from(findUser);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse nickNameUpdate(Long userId, UserNickNameUpdateRequest request) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(userId + "는 존재하지 않는 회원ID입니다."));
+
+        if(userRepository.findByNickName(request.getNickName()).isPresent()){
+            throw new UserException(request.getNickName() + "은 이미 사용중인 닉네임입니다.");
+        }
+
+        findUser.changeNickName(request.getNickName());
 
         return UserResponse.from(findUser);
     }
