@@ -13,10 +13,26 @@
 
 [[api]]
 ==== 회원 로그인 API
-====== 요청
-include::{snippets}/user/login/http-request.adoc[]
-include::{snippets}/user/login/request-fields.adoc[]
+===== 요청
+include::{snippets}/user/create/http-request.adoc[]
+====== Header
+include::{snippets}/user/create/request-headers.adoc[]
+====== Body
+include::{snippets}/user/create/request-fields.adoc[]
 
-====== 응답
-include::{snippets}/user/login/http-response.adoc[]
-include::{snippets}/user/login/response-fields.adoc[]
+===== 응답
+include::{snippets}/user/create/http-response.adoc[]
+====== Body
+include::{snippets}/user/create/response-fields.adoc[]
+
+==== 회원 조회 (Refresh 토큰 포함)
+===== 요청
+include::{snippets}/user/auth/http-request.adoc[]
+====== Header
+include::{snippets}/user/auth/request-headers.adoc[]
+====== PathVariable
+include::{snippets}/user/auth/path-parameters.adoc[]
+===== 응답
+include::{snippets}/user/auth/http-response.adoc[]
+====== Body
+include::{snippets}/user/auth/response-fields.adoc[]

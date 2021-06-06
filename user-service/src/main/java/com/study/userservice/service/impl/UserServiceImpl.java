@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponse userLogin(UserLoginRequest request) {
+    public UserResponse save(UserLoginRequest request) {
         Optional<User> findUser = userRepository.findByKakaoId(request.getKakaoId());
 
         if (!findUser.isPresent()) {
@@ -54,5 +54,13 @@ public class UserServiceImpl implements UserService {
             log.error("{}", ex.getMessage());
         }
 
+    }
+
+    @Override
+    public UserResponse findWithRefreshTokenById(Long userId) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException("존재하지 않는 회원ID입니다."));
+
+        return UserResponse.fromWithRefreshToken(findUser);
     }
 }

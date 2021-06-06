@@ -45,5 +45,24 @@ class UserRepositoryTest {
         assertThat(findUser.getKakaoId()).isEqualTo(user.getKakaoId());
     }
 
+    @Test
+    @DisplayName("회원 ID로 회원 조회")
+    void findById(){
+        // given
+        User user = User.createUser(1L, "이미지", "이미지","이미지", UserRole.USER);
+        User savedUser = userRepository.save(user);
+
+        // when
+        User findUser = userRepository.findById(savedUser.getId()).get();
+
+        // then
+        assertThat(findUser.getKakaoId()).isEqualTo(user.getKakaoId());
+        assertThat(findUser.getNickName()).isEqualTo(user.getNickName());
+        assertThat(findUser.getProfileImage()).isEqualTo(user.getProfileImage());
+        assertThat(findUser.getThumbnailImage()).isEqualTo(user.getThumbnailImage());
+        assertThat(findUser.getRole()).isEqualTo(user.getRole());
+        assertThat(findUser.getStatus()).isEqualTo(user.getStatus());
+    }
+
 
 }

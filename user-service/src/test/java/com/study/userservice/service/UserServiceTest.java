@@ -53,7 +53,7 @@ class UserServiceTest {
                 .willReturn(user);
 
         // when
-        UserResponse userResponse = userServiceImpl.userLogin(userLoginRequest);
+        UserResponse userResponse = userServiceImpl.save(userLoginRequest);
 
         // then
         assertThat(userResponse.getKakaoId()).isEqualTo(userLoginRequest.getKakaoId());
@@ -82,7 +82,7 @@ class UserServiceTest {
                 .willReturn(Optional.of(user));
 
         // when
-        UserResponse userResponse = userServiceImpl.userLogin(userLoginRequest);
+        UserResponse userResponse = userServiceImpl.save(userLoginRequest);
 
         // then
         assertThat(userResponse.getKakaoId()).isEqualTo(userLoginRequest.getKakaoId());
@@ -114,5 +114,29 @@ class UserServiceTest {
 
         // then
         assertThat(user.getRefreshToken()).isEqualTo(refreshTokenCreateMessage.getRefreshToken());
+    }
+
+    @Test
+    @DisplayName("회원 조회 (Refresh 토큰 포함)")
+    void findWithRefreshTokenById(){
+        // given
+        User user = User.createUser(1L, "황주환", "이미지",
+                "이미지", UserRole.USER);
+        user.updateRefreshToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjI4ODU3NDEsImV4cCI6MTYyMzQ5MDU0MX0.c24V3JQxYlp9L4XgtFqfL6KR31CuTNRC5i-M0t8nMAU");
+
+        given(userRepository.findById(anyLong()))
+                .willReturn(Optional.of(user));
+
+        // when
+        UserResponse result = userServiceImpl.findWithRefreshTokenById(1L);
+
+        // then
+        assertThat(result.getKakaoId()).isEqualTo(user.getKakaoId());
+        assertThat(result.getRefreshToken()).isEqualTo(user.getRefreshToken());
+        assertThat(result.getNickName()).isEqualTo(user.getNickName());
+        assertThat(result.getProfileImage()).isEqualTo(user.getProfileImage());
+        assertThat(result.getThumbnailImage()).isEqualTo(user.getThumbnailImage());
+        assertThat(result.getStatus()).isEqualTo(user.getStatus());
+        assertThat(result.getRole()).isEqualTo(user.getRole());
     }
 }

@@ -6,7 +6,11 @@ import com.study.userservice.model.UserResponse;
 
 public interface UserService {
 
-    UserResponse userLogin(UserLoginRequest request);
+    UserResponse save(UserLoginRequest request);
 
     void updateRefreshToken(RefreshTokenCreateMessage refreshTokenCreateMessage);
+
+    UserResponse findWithRefreshTokenById(Long userId);
+
+
 }

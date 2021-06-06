@@ -1,5 +1,6 @@
 package com.study.userservice.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
 import com.study.userservice.domain.UserStatus;
@@ -18,6 +19,9 @@ public class UserResponse {
 
     private String profileImage; // 프로필 이미지
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private String refreshToken; // refreshToken
+
     private UserStatus status; // 회원 상태
 
     private UserRole role; // 회원 권한
@@ -29,6 +33,19 @@ public class UserResponse {
         userResponse.nickName = user.getNickName();
         userResponse.thumbnailImage = user.getThumbnailImage();
         userResponse.profileImage = user.getProfileImage();
+        userResponse.status = user.getStatus();
+        userResponse.role = user.getRole();
+        return userResponse;
+    }
+
+    public static UserResponse fromWithRefreshToken(User user){
+        UserResponse userResponse = new UserResponse();
+        userResponse.id = user.getId();
+        userResponse.kakaoId = user.getKakaoId();
+        userResponse.nickName = user.getNickName();
+        userResponse.thumbnailImage = user.getThumbnailImage();
+        userResponse.profileImage = user.getProfileImage();
+        userResponse.refreshToken = user.getRefreshToken();
         userResponse.status = user.getStatus();
         userResponse.role = user.getRole();
         return userResponse;

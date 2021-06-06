@@ -6,9 +6,7 @@ import com.study.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -19,9 +17,14 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody @Valid UserLoginRequest request){
-        return ResponseEntity.ok(userService.userLogin(request));
+    @PostMapping("/users")
+    public ResponseEntity<UserResponse> save(@RequestBody @Valid UserLoginRequest request){
+        return ResponseEntity.ok(userService.save(request));
+    }
+
+    @GetMapping("/users/{userId}/auth")
+    public ResponseEntity<UserResponse> findUserById(@PathVariable Long userId){
+        return ResponseEntity.ok(userService.findWithRefreshTokenById(userId));
     }
 
 
