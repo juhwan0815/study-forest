@@ -15,6 +15,8 @@ public class UserResponse {
 
     private String profileImage; // 프로필 이미지
 
+    private String refreshToken; // refreshToken
+
     private String status; // 회원 상태
 
     private String role; // 회원 권한

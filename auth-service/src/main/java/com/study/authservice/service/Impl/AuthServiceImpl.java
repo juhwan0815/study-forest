@@ -12,7 +12,6 @@ import com.study.authservice.service.AuthService;
 import com.study.authservice.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -35,6 +34,22 @@ public class AuthServiceImpl implements AuthService {
 
         kafkaRefreshTokenCreateMessageSender
                 .send(RefreshTokenCreateMessage.from(user.getId(), createTokenResult.getRefreshToken()));
+
+        return createTokenResult;
+    }
+
+    @Override
+    public CreateTokenResult refresh(String refreshToken) {
+
+        Long userId = jwtTokenProvider.getUserId(refreshToken);
+
+        // TODO Circuit Breaker 적용하기
+        UserResponse user = userServiceClient.findUserById(userId);
+
+        CreateTokenResult createTokenResult = jwtTokenProvider.refresh(refreshToken.substring(7), user);
+
+        kafkaRefreshTokenCreateMessageSender
+                .send(RefreshTokenCreateMessage.from(user.getId(),createTokenResult.getRefreshToken()));
 
         return createTokenResult;
     }

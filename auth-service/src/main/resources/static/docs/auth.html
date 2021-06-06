@@ -433,9 +433,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel3">
 <li><a href="#api">1. 카카오 로그인 API</a>
-<ul class="sectlevel5">
+<ul class="sectlevel4">
 <li><a href="#_요청">요청</a></li>
 <li><a href="#_응답">응답</a></li>
+</ul>
+</li>
+<li><a href="#_토큰_재발급_api">2. 토큰 재발급 API</a>
+<ul class="sectlevel4">
+<li><a href="#_요청_2">요청</a></li>
+<li><a href="#_응답_2">응답</a></li>
 </ul>
 </li>
 </ul>
@@ -444,16 +450,17 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="content">
 <div class="sect3">
 <h4 id="api"><a class="anchor" href="#api"></a><a class="link" href="#api">1. 카카오 로그인 API</a></h4>
-<div class="sect5">
-<h6 id="_요청"><a class="anchor" href="#_요청"></a><a class="link" href="#_요청">요청</a></h6>
+<div class="sect4">
+<h5 id="_요청"><a class="anchor" href="#_요청"></a><a class="link" href="#_요청">요청</a></h5>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /login HTTP/1.1
-Accept: application/json
 kakaoToken: kakaoToken
 Host: localhost:8080</code></pre>
 </div>
 </div>
+<div class="sect5">
+<h6 id="_header"><a class="anchor" href="#_header"></a><a class="link" href="#_header">Header</a></h6>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 50%;">
@@ -473,15 +480,18 @@ Host: localhost:8080</code></pre>
 </tbody>
 </table>
 </div>
-<div class="sect5">
-<h6 id="_응답"><a class="anchor" href="#_응답"></a><a class="link" href="#_응답">응답</a></h6>
+</div>
+<div class="sect4">
+<h5 id="_응답"><a class="anchor" href="#_응답"></a><a class="link" href="#_응답">응답</a></h5>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-accessToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjI4OTY2MDcsImV4cCI6MTYyMjk4MzAwN30.SGxijnM0aweK3BOH57sBDQVdtZcQjGAJ_tiNioPe8xU
-refreshToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjI4OTY2MDgsImV4cCI6MTYyMzUwMTQwOH0.Rk2PxKcCBCPyWi2lvdahKEukzWPhI21mubZAlL98AOo</code></pre>
+accessToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjI5NTYwMjEsImV4cCI6MTYyMzA0MjQyMX0.HeYzoJ1Ilgzd2X55iohzs6BxqdR3itEPv0eeEM9ippk
+refreshToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjI5NTYwMjEsImV4cCI6MTYyMzU2MDgyMX0.qOeOg56neOElb9OcbFzCoULxZq9rlyQwB4MMK_7bFus</code></pre>
 </div>
 </div>
+<div class="sect5">
+<h6 id="_header_2"><a class="anchor" href="#_header_2"></a><a class="link" href="#_header_2">Header</a></h6>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 50%;">
@@ -507,9 +517,79 @@ refreshToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2M
 </div>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_토큰_재발급_api"><a class="anchor" href="#_토큰_재발급_api"></a><a class="link" href="#_토큰_재발급_api">2. 토큰 재발급 API</a></h4>
+<div class="sect4">
+<h5 id="_요청_2"><a class="anchor" href="#_요청_2"></a><a class="link" href="#_요청_2">요청</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /refresh HTTP/1.1
+Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjI4ODU3NDEsImV4cCI6MTYyMzQ5MDU0MX0.c24V3JQxYlp9L4XgtFqfL6KR31CuTNRC5i-M0t8nMAU
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_header_3"><a class="anchor" href="#_header_3"></a><a class="link" href="#_header_3">Header</a></h6>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Refresh Token</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_응답_2"><a class="anchor" href="#_응답_2"></a><a class="link" href="#_응답_2">응답</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+accessToken: Access토큰
+refreshToken: Refresh토큰</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_header_4"><a class="anchor" href="#_header_4"></a><a class="link" href="#_header_4">Header</a></h6>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>accessToken</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">새로 발급된 Access 토큰</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>refreshToken</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">새로 발급된 Refresh 토큰</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-06-05 21:36:03 KST
+Last updated 2021-06-06 14:06:49 KST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">

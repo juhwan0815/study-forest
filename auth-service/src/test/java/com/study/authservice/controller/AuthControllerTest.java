@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -41,6 +42,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(AuthController.class)
 class AuthControllerTest {
+
+    private final String TEST_AUTHORIZATION = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjI4ODU3NDEsImV4cCI6MTYyMzQ5MDU0MX0.c24V3JQxYlp9L4XgtFqfL6KR31CuTNRC5i-M0t8nMAU";
 
     @MockBean
     private AuthService authService;
@@ -91,11 +94,10 @@ class AuthControllerTest {
                 .willReturn(createTokenResult);
 
         mockMvc.perform(post("/login")
-                .accept(MediaType.APPLICATION_JSON_VALUE)
                 .header("kakaoToken", "kakaoToken"))
                 .andExpect(status().isOk())
-                .andExpect(header().string("accessToken",createTokenResult.getAccessToken()))
-                .andExpect(header().string("refreshToken",createTokenResult.getRefreshToken()))
+                .andExpect(header().string("accessToken", createTokenResult.getAccessToken()))
+                .andExpect(header().string("refreshToken", createTokenResult.getRefreshToken()))
                 .andDo(document("auth/login",
                         requestHeaders(
                                 headerWithName("kakaoToken").description("카카오 토큰")
@@ -103,10 +105,37 @@ class AuthControllerTest {
                         responseHeaders(
                                 headerWithName("accessToken").description("Access 토큰"),
                                 headerWithName("refreshToken").description("Refresh 토큰")
-                        ))
-                );
+                        )));
 
         then(authService).should(times(1)).login(any());
+    }
+
+    @Test
+    @DisplayName("토큰 재발급 API 테스트")
+    void refreshToken() throws Exception {
+
+        CreateTokenResult createTokenResult = new CreateTokenResult();
+        createTokenResult.setAccessToken("Access토큰");
+        createTokenResult.setRefreshToken("Refresh토큰");
+
+        given(authService.refresh(any()))
+                .willReturn(createTokenResult);
+
+        mockMvc.perform(post("/refresh")
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
+                .andExpect(status().isOk())
+                .andExpect(header().string("accessToken", createTokenResult.getAccessToken()))
+                .andExpect(header().string("refreshToken", createTokenResult.getRefreshToken()))
+                .andDo(document("auth/refresh",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Refresh Token")
+                        ),
+                        responseHeaders(
+                                headerWithName("accessToken").description("새로 발급된 Access 토큰"),
+                                headerWithName("refreshToken").description("새로 발급된 Refresh 토큰")
+                        )));
+
+        then(authService).should(times(1)).refresh(any());
     }
 
 }

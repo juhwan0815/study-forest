@@ -30,5 +30,15 @@ public class AuthController {
                 .build();
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity refresh(@RequestHeader(name = "Authorization") String refreshToken){
+        CreateTokenResult createTokenResult = authService.refresh(refreshToken);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("accessToken",createTokenResult.getAccessToken())
+                .header("refreshToken", createTokenResult.getRefreshToken())
+                .build();
+    }
+
 
 }

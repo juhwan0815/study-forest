@@ -1,5 +1,6 @@
 package com.study.authservice.exception.advice;
 
+import com.study.authservice.exception.AuthException;
 import com.study.authservice.exception.KakaoException;
 import com.study.authservice.model.common.ExceptionResponse;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,12 @@ public class ExceptionAdvice {
                 .body(ExceptionResponse.from(ex.getMessage()));
     }
 
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<ExceptionResponse> AuthExceptionHandling(AuthException ex){
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ExceptionResponse.from(ex.getMessage()));
+    }
 
 
 

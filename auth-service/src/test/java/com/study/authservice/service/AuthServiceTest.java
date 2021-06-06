@@ -116,4 +116,47 @@ class AuthServiceTest {
         then(jwtTokenProvider).should(times(1)).createToken(any());
         then(kafkaRefreshTokenCreateMessageSender).should(times(1)).send(any());
     }
+
+    @Test
+    @DisplayName("토큰 재발급")
+    void refreshTokens(){
+        // given
+        String refreshToken = "refreshToken";
+
+        given(jwtTokenProvider.getUserId(any()))
+                .willReturn(1L);
+
+        UserResponse userResponse = new UserResponse();
+        userResponse.setId(1L);
+        userResponse.setKakaoId(1L);
+        userResponse.setNickName("황주환");
+        userResponse.setProfileImage("이미지");
+        userResponse.setThumbnailImage("이미지");
+        userResponse.setRefreshToken(refreshToken);
+        userResponse.setStatus("ACTIVE");
+        userResponse.setRole("USER");
+
+        given(userServiceClient.findUserById(any()))
+                .willReturn(userResponse);
+
+        CreateTokenResult createTokenResult = new CreateTokenResult();
+        createTokenResult.setAccessToken("Access토큰");
+        createTokenResult.setRefreshToken("Refresh토큰");
+
+        given(jwtTokenProvider.refresh(any(),any()))
+                .willReturn(createTokenResult);
+
+        willDoNothing()
+                .given(kafkaRefreshTokenCreateMessageSender)
+                .send(any());
+
+        // when
+        CreateTokenResult result = authServiceImpl.refresh(refreshToken);
+
+        // then
+        assertThat(result.getAccessToken()).isEqualTo(createTokenResult.getAccessToken());
+        assertThat(result.getRefreshToken()).isEqualTo(createTokenResult.getRefreshToken());
+    }
+
+
 }
