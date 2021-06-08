@@ -28,6 +28,15 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/auth-service/(?<segment>.*),/$\{segment}
+        # 인증 서비스 - Actuator API
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth-service/actuator/**
+            - Method=GET,POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/auth-service/(?<segment>.*),/$\{segment}
         # 인증 서비스 - refresh API, Logout API
         - id: auth-service
           uri: lb://AUTH-SERVICE
@@ -38,15 +47,6 @@ spring:
             - RemoveRequestHeader=Cookie
             - RewritePath=/auth-service/(?<segment>.*),/$\{segment}
             - AuthorizationHeaderFilter
-        # 인증 서비스 - Actuator API
-        - id: auth-service
-          uri: lb://AUTH-SERVICE
-          predicates:
-            - Path=/auth-service/actuator/**
-            - Method=GET,POST
-          filters:
-            - RemoveRequestHeader=Cookie
-            - RewritePath=/auth-service/(?<segment>.*),/$\{segment}
         # 인증 서비스 - API 문서
         - id: auth-service
           uri: lb://AUTH-SERVICE
@@ -75,16 +75,55 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*),/$\{segment}
-        # 회원 서비스 - 조회 API
+        # 회원 서비스
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
             - Path=/user-service/users/**
-            - Method=GET
+            - Method=GET,POST,PATCH,DELETE
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*),/$\{segment}
             - AuthorizationHeaderFilter
+        # 지역정보 서비스 - 검색 API
+        - id: location-service
+          uri: lb://LOCATION-SERVICE
+          predicates:
+            - Path=/location-service/locations/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/location-service/(?<segment>.*),/$\{segment}
+            - AuthorizationHeaderFilter
+        # 지역정보 서비스 - API 문서
+        - id: location-service
+          uri: lb://LOCATION-SERVICE
+          predicates:
+            - Path=/location-service/docs/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/location-service/(?<segment>.*),/$\{segment}
+        # 스터디 서비스 - 카테고리 생성 API
+        - id: study-service
+          uri: lb://STUDY-SERVICE
+          predicates:
+            - Path=/study-service/categories
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/study-service/(?<segment>.*),/$\{segment}
+            - AuthorizationHeaderFilter
+        # 스터디 서비스 - API 문서
+        - id: study-service
+          uri: lb://STUDY-SERVICE
+          predicates:
+            - Path=/study-service/docs/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/study-service/(?<segment>.*),/$\{segment}
+
 
 management:
   endpoints:
