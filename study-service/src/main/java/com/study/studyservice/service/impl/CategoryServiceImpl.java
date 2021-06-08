@@ -57,5 +57,14 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryResponse.from(findCategory);
     }
 
+    @Override
+    @Transactional
+    public void delete(Long categoryId) {
+        Category findCategory = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new CategoryException(categoryId + "은 존재하지 않는 카테고리 ID입니다."));
+
+        findCategory.delete();
+    }
+
 
 }

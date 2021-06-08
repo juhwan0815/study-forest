@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -25,8 +26,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -147,7 +147,28 @@ class CategoryControllerTest {
                         )
                 ));
 
-        then(categoryService).should(times(1)).update(any(),any());
+        then(categoryService).should(times(1)).update(any(), any());
+    }
+
+    @Test
+    @DisplayName("카테고리 삭제 API 테스트")
+    void delete() throws Exception {
+
+        willDoNothing().given(categoryService).delete(any());
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/categories/{categoryId}", 1)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
+                .andExpect(status().isOk())
+                .andDo(document("category/delete",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("categoryId").description("카테고리 ID")
+                        )
+                ));
+
+        then(categoryService).should(times(1)).delete(any());
     }
 
 }

@@ -41,4 +41,8 @@ public class Category extends BaseEntity{
     public void changeName(String name) {
         this.name = name;
     }
+
+    public void delete() {
+        this.status = CategoryStatus.DELETE;
+    }
 }

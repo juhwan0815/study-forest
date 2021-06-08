@@ -43,3 +43,16 @@ include::{snippets}/category/update/request-fields.adoc[]
 include::{snippets}/category/update/http-response.adoc[]
 ====== Body
 include::{snippets}/category/update/response-fields.adoc[]
+
+==== 카테고리 삭제 API
+===== ADMIN 권한 필요
+===== 요청
+include::{snippets}/category/delete/http-request.adoc[]
+====== Header
+include::{snippets}/category/delete/request-headers.adoc[]
+====== Path
+include::{snippets}/category/delete/path-parameters.adoc[]
+===== 응답
+include::{snippets}/category/delete/http-response.adoc[]
+
+

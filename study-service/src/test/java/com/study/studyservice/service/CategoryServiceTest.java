@@ -1,6 +1,7 @@
 package com.study.studyservice.service;
 
 import com.study.studyservice.domain.Category;
+import com.study.studyservice.domain.CategoryStatus;
 import com.study.studyservice.exception.CategoryException;
 import com.study.studyservice.model.category.request.CategorySaveRequest;
 import com.study.studyservice.model.category.request.CategoryUpdateRequest;
@@ -118,5 +119,18 @@ class CategoryServiceTest {
 
         // when
         assertThrows(CategoryException.class,()->categoryService.update(1L,categoryUpdateRequest));
+    }
+
+    @Test
+    @DisplayName("카테고리 삭제")
+    void deleteCategory(){
+        Category category = Category.createCategory("프론트엔드", null);
+
+        given(categoryRepository.findById(any()))
+                .willReturn(Optional.of(category));
+
+        categoryService.delete(1L);
+
+        assertThat(category.getStatus()).isEqualTo(CategoryStatus.DELETE);
     }
 }

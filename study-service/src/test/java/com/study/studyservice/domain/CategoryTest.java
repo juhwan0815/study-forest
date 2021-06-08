@@ -17,4 +17,14 @@ class CategoryTest {
 
         assertThat(category.getName()).isEqualTo("영어");
     }
+
+    @Test
+    @DisplayName("카테고리 삭제")
+    void delete(){
+        Category category = Category.createCategory("개발", null);
+
+        category.delete();;
+
+        assertThat(category.getStatus()).isEqualTo(CategoryStatus.DELETE);
+    }
 }
