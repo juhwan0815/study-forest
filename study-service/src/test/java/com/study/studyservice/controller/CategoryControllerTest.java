@@ -2,6 +2,7 @@ package com.study.studyservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.studyservice.model.category.request.CategorySaveRequest;
+import com.study.studyservice.model.category.request.CategoryUpdateRequest;
 import com.study.studyservice.model.category.response.CategoryResponse;
 import com.study.studyservice.service.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,8 +33,11 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.requestHe
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -105,6 +109,45 @@ class CategoryControllerTest {
                 ));
 
         then(categoryService).should(times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("카테고리 수정 API 테스트")
+    void update() throws Exception {
+        CategoryUpdateRequest categoryUpdateRequest = new CategoryUpdateRequest();
+        categoryUpdateRequest.setName("백엔드");
+
+        CategoryResponse categoryResponse = new CategoryResponse();
+        categoryResponse.setId(1L);
+        categoryResponse.setName(categoryUpdateRequest.getName());
+
+        given(categoryService.update(any(), any()))
+                .willReturn(categoryResponse);
+
+        mockMvc.perform(put("/categories/{categoryId}", 1)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(categoryUpdateRequest)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(categoryResponse)))
+                .andDo(document("category/update",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("categoryId").description("카테고리 ID")
+                        ),
+                        requestFields(
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("변경할 카테고리의 이름")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("변경된 카테고리의 ID"),
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("변경된 카테고리의 이름")
+                        )
+                ));
+
+        then(categoryService).should(times(1)).update(any(),any());
     }
 
 }

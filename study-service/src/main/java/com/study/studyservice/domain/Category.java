@@ -37,4 +37,8 @@ public class Category extends BaseEntity{
         category.status = CategoryStatus.ACTIVE;
         return category;
     }
+
+    public void changeName(String name) {
+        this.name = name;
+    }
 }

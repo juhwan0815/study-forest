@@ -28,3 +28,18 @@ include::{snippets}/category/create/request-fields.adoc[]
 include::{snippets}/category/create/http-response.adoc[]
 ====== Body
 include::{snippets}/category/create/response-fields.adoc[]
+
+==== 카테고리 수정 API
+===== ADMIN 권한 필요
+===== 요청
+include::{snippets}/category/update/http-request.adoc[]
+====== Header
+include::{snippets}/category/update/request-headers.adoc[]
+====== Path
+include::{snippets}/category/update/path-parameters.adoc[]
+====== Body
+include::{snippets}/category/update/request-fields.adoc[]
+===== 응답
+include::{snippets}/category/update/http-response.adoc[]
+====== Body
+include::{snippets}/category/update/response-fields.adoc[]

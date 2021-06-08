@@ -3,6 +3,7 @@ package com.study.studyservice.service;
 import com.study.studyservice.domain.Category;
 import com.study.studyservice.exception.CategoryException;
 import com.study.studyservice.model.category.request.CategorySaveRequest;
+import com.study.studyservice.model.category.request.CategoryUpdateRequest;
 import com.study.studyservice.model.category.response.CategoryResponse;
 import com.study.studyservice.repository.CategoryRepository;
 import com.study.studyservice.service.impl.CategoryServiceImpl;
@@ -79,4 +80,43 @@ class CategoryServiceTest {
         assertThrows(CategoryException.class,()-> categoryService.save(categorySaveRequest));
     }
 
+    @Test
+    @DisplayName("카테고리 수정 - 성공")
+    void updateCategory(){
+        // given
+        CategoryUpdateRequest categoryUpdateRequest = new CategoryUpdateRequest();
+        categoryUpdateRequest.setName("프론트엔드");
+
+        Category category = Category.createCategory("백엔드", null);
+
+        given(categoryRepository.findByName(anyString()))
+                .willReturn(Optional.empty());
+
+        given(categoryRepository.findById(any()))
+                .willReturn(Optional.of(category));
+
+        // when
+        CategoryResponse result = categoryService.update(1L, categoryUpdateRequest);
+
+        // then
+        assertThat(result.getName()).isEqualTo(categoryUpdateRequest.getName());
+        then(categoryRepository).should(times(1)).findByName(any());
+        then(categoryRepository).should(times(1)).findById(any());
+    }
+
+    @Test
+    @DisplayName("카테고리 수정 - 실패")
+    void updateDuplicatedCategory() {
+        // given
+        CategoryUpdateRequest categoryUpdateRequest = new CategoryUpdateRequest();
+        categoryUpdateRequest.setName("프론트엔드");
+
+        Category category = Category.createCategory("프론트엔드", null);
+
+        given(categoryRepository.findByName(anyString()))
+                .willReturn(Optional.of(category));
+
+        // when
+        assertThrows(CategoryException.class,()->categoryService.update(1L,categoryUpdateRequest));
+    }
 }
