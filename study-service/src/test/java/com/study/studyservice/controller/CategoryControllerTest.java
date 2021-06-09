@@ -1,6 +1,7 @@
 package com.study.studyservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.study.studyservice.domain.Category;
 import com.study.studyservice.model.category.request.CategorySaveRequest;
 import com.study.studyservice.model.category.request.CategoryUpdateRequest;
 import com.study.studyservice.model.category.response.CategoryResponse;
@@ -24,6 +25,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
@@ -32,8 +36,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -169,6 +172,68 @@ class CategoryControllerTest {
                 ));
 
         then(categoryService).should(times(1)).delete(any());
+    }
+
+    @Test
+    @DisplayName("부모 카테고리 조회 API 테스트")
+    void findParentCategory() throws Exception {
+        CategoryResponse categoryResponse1 = new CategoryResponse();
+        categoryResponse1.setId(1L);
+        categoryResponse1.setName("개발");
+
+        CategoryResponse categoryResponse2 = new CategoryResponse();
+        categoryResponse2.setId(2L);
+        categoryResponse2.setName("게임");
+
+        List<CategoryResponse> parentList = new ArrayList<>();
+        parentList.add(categoryResponse1);
+        parentList.add(categoryResponse2);
+
+        given(categoryService.findParent())
+                .willReturn(parentList);
+
+        mockMvc.perform(get("/categories/parent")
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(parentList)))
+                .andDo(document("category/findParent",
+                        responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("부모 카테고리 ID"),
+                                fieldWithPath("[].name").type(JsonFieldType.STRING).description("부모 카테고리 이름")
+                        )));
+
+        then(categoryService).should(times(1)).findParent();
+    }
+
+    @Test
+    @DisplayName("자식 카테고리 조회")
+    void findChildCategory() throws Exception {
+        CategoryResponse categoryResponse1 = new CategoryResponse();
+        categoryResponse1.setId(3L);
+        categoryResponse1.setName("프론트엔드");
+
+        CategoryResponse categoryResponse2 = new CategoryResponse();
+        categoryResponse2.setId(4L);
+        categoryResponse2.setName("백엔드");
+
+        List<CategoryResponse> childList = new ArrayList<>();
+        childList.add(categoryResponse1);
+        childList.add(categoryResponse2);
+
+        given(categoryService.findChild(any()))
+                .willReturn(childList);
+
+        mockMvc.perform(get("/categories/{categoryId}/child", 1)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(childList)))
+                .andDo(document("category/findChild",
+                        responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("자식 카테고리 ID"),
+                                fieldWithPath("[].name").type(JsonFieldType.STRING).description("자식 카테고리 이름")
+                        )));
+
+        then(categoryService).should(times(1)).findChild(any());
     }
 
 }

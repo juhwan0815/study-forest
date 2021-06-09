@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.ws.rs.Path;
+import java.util.List;
 
 @Slf4j
 @CrossOrigin(origins = "*",allowedHeaders = "*")
@@ -37,4 +39,15 @@ public class CategoryController {
         categoryService.delete(categoryId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @GetMapping("/categories/parent")
+    public ResponseEntity<List<CategoryResponse>> findParentCategory(){
+        return ResponseEntity.ok(categoryService.findParent());
+    }
+
+    @GetMapping("/categories/{categoryId}/child")
+    public ResponseEntity<List<CategoryResponse>> findChildCategory(@PathVariable Long categoryId){
+        return ResponseEntity.ok(categoryService.findChild(categoryId));
+    }
+
 }

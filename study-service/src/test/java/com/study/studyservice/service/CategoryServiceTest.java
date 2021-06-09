@@ -15,10 +15,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -132,5 +134,53 @@ class CategoryServiceTest {
         categoryService.delete(1L);
 
         assertThat(category.getStatus()).isEqualTo(CategoryStatus.DELETE);
+    }
+
+    @Test
+    @DisplayName("부모 카테고리 조회")
+    void findParentCategory(){
+        // given
+        Category parentCategory = Category.createCategory("개발", null);
+        Category childCategory = Category.createCategory("백엔드",parentCategory);
+
+        List<Category> parentList = new ArrayList<>();
+        parentList.add(parentCategory);
+
+        given(categoryRepository.findByParentIsNull())
+                .willReturn(parentList);
+
+        // when
+        List<CategoryResponse> result = categoryService.findParent();
+
+        // then
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getName()).isEqualTo(parentCategory.getName());
+        then(categoryRepository).should(times(1)).findByParentIsNull();
+    }
+
+    @Test
+    @DisplayName("자식 카테고리 조회")
+    void findChildCategory(){
+        // given
+        Category parentCategory = Category.createCategory("개발", null);
+        Category childCategory = Category.createCategory("백엔드",parentCategory);
+
+        List<Category> childList = new ArrayList<>();
+        childList.add(childCategory);
+
+        given(categoryRepository.findById(any()))
+                .willReturn(Optional.of(parentCategory));
+
+        given(categoryRepository.findByParent(any()))
+                .willReturn(childList);
+
+        // when
+        List<CategoryResponse> result = categoryService.findChild(1L);
+
+        // then
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getName()).isEqualTo(childCategory.getName());
+        then(categoryRepository).should(times(1)).findById(any());
+        then(categoryRepository).should(times(1)).findByParent(any());
     }
 }

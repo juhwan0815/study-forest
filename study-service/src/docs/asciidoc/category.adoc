@@ -55,4 +55,18 @@ include::{snippets}/category/delete/path-parameters.adoc[]
 ===== 응답
 include::{snippets}/category/delete/http-response.adoc[]
 
+==== 부모 카테고리 조회 API
+===== 요청
+include::{snippets}/category/findParent/http-request.adoc[]
+===== 응답
+include::{snippets}/category/findParent/http-response.adoc[]
+====== Body
+include::{snippets}/category/findParent/response-fields.adoc[]
 
+==== 자식 카테고리 조회 API
+===== 요청
+include::{snippets}/category/findChild/http-request.adoc[]
+===== 응답
+include::{snippets}/category/findChild/http-response.adoc[]
+====== Body
+include::{snippets}/category/findChild/response-fields.adoc[]

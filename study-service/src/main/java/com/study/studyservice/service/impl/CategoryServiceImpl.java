@@ -12,6 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 @Transactional(readOnly = true)
@@ -64,6 +67,25 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new CategoryException(categoryId + "은 존재하지 않는 카테고리 ID입니다."));
 
         findCategory.delete();
+    }
+
+    @Override
+    public List<CategoryResponse> findParent() {
+        return categoryRepository.findByParentIsNull()
+                .stream().map(category -> CategoryResponse.from(category))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CategoryResponse> findChild(Long categoryId) {
+
+        Category findCategory = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new CategoryException(categoryId + "는 존재하지 않는 카테고리 ID입니다."));
+
+        return categoryRepository.findByParent(findCategory)
+                .stream()
+                .map(category -> CategoryResponse.from(category))
+                .collect(Collectors.toList());
     }
 
 
