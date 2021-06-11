@@ -13,7 +13,7 @@ public class UserResponse {
 
     private Long kakaoId; // 카카오 Id
 
-    private String nickName;
+    private String nickName; // 닉네임
 
     private String thumbnailImage; // 썸네일 이미지
 

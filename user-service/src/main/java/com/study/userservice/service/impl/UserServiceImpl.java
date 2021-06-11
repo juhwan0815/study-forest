@@ -9,25 +9,18 @@ import com.study.userservice.domain.UserRole;
 import com.study.userservice.exception.UserException;
 import com.study.userservice.kafka.message.LogoutMessage;
 import com.study.userservice.kafka.message.RefreshTokenCreateMessage;
-import com.study.userservice.model.UserImageUpdateRequest;
 import com.study.userservice.model.UserLoginRequest;
-import com.study.userservice.model.UserNickNameUpdateRequest;
+import com.study.userservice.model.UserProfileUpdateRequest;
 import com.study.userservice.model.UserResponse;
 import com.study.userservice.repository.UserRepository;
 import com.study.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -42,6 +35,9 @@ public class UserServiceImpl implements UserService {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+
+    @Value("${cloud.aws.s3.thumbnailBucket}")
+    private String thumbnailBucket;
 
     @Override
     @Transactional
@@ -97,103 +93,63 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Override
-    @Transactional
-    public UserResponse imageUpdate(Long userId, UserImageUpdateRequest request) {
-        User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(userId + "는 존재하지 않는 회원ID입니다."));
-
-        validateFileType(request.getImage());
-        deleteImage(findUser);
-        uploadImage(findUser, request.getImage());
-        uploadThumbnailImage(findUser, request.getImage());
-
-        return UserResponse.from(findUser);
-    }
 
     @Override
     @Transactional
-    public UserResponse nickNameUpdate(Long userId, UserNickNameUpdateRequest request) {
+    public UserResponse profileUpdate(Long userId, UserProfileUpdateRequest request) {
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(userId + "는 존재하지 않는 회원ID입니다."));
-
-        if(userRepository.findByNickName(request.getNickName()).isPresent()){
-            throw new UserException(request.getNickName() + "은 이미 사용중인 닉네임입니다.");
-        }
+                .orElseThrow(() -> new UserException(userId + "는 존재하지 않는 회원 ID입니다."));
 
         findUser.changeNickName(request.getNickName());
 
+        if(request.isDeleteImage()){
+            deleteImageFromS3(findUser.getImageStoreName());
+            findUser.deleteImage();
+        }
+
+        if(request.isUpdateImage()){
+            validateImageType(request.getImage());
+            deleteImageFromS3(findUser.getImageStoreName());
+            uploadImageFromS3(request, findUser);
+        }
+
         return UserResponse.from(findUser);
     }
 
-    private void deleteImage(User user) {
-        if (user.getProfileImageStoreName() != null && user.getThumbnailImageStoreName() != null) {
-            amazonS3Client.deleteObject(bucket, user.getProfileImageStoreName());
-            amazonS3Client.deleteObject(bucket, user.getThumbnailImageStoreName());
-        }
-    }
-
-    private void uploadImage(User user, MultipartFile image) {
-        String storeName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
+    private void uploadImageFromS3(UserProfileUpdateRequest request, User findUser) {
+        String imageStoreName = UUID.randomUUID().toString() + "_" + request.getImage().getOriginalFilename();
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(image.getSize());
-        objectMetadata.setContentType(image.getContentType());
+        objectMetadata.setContentLength(request.getImage().getSize());
+        objectMetadata.setContentType(request.getImage().getContentType());
 
         try {
-            amazonS3Client.putObject(new PutObjectRequest(bucket, storeName, image.getInputStream(), objectMetadata)
+            amazonS3Client.putObject(new PutObjectRequest(bucket, imageStoreName,
+                    request.getImage().getInputStream(), objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
-            String imageStoreUrl = amazonS3Client.getUrl(bucket, storeName).toString();
+            String profileImage = amazonS3Client.getUrl(bucket, imageStoreName).toString();
+            String thumbnailImage = amazonS3Client.getUrl(thumbnailBucket,imageStoreName).toString();
 
-            user.changeImage(imageStoreUrl,storeName);
+            findUser.changeImage(profileImage,thumbnailImage,imageStoreName);
+
         } catch (Exception e) {
             throw new UserException(e.getMessage());
         }
     }
 
-    private void uploadThumbnailImage(User user, MultipartFile image) {
-        try {
-
-            // make thumbnail image for s3
-            BufferedImage bufferImage = ImageIO.read(image.getInputStream());
-            BufferedImage thumbnailImage = Thumbnails.of(bufferImage)
-                    .size(110, 110)
-                    .asBufferedImage();
-
-            ByteArrayOutputStream thumbOutPut = new ByteArrayOutputStream();
-            String imageType = image.getContentType();
-            ImageIO.write(thumbnailImage, imageType.substring(imageType.indexOf("/") + 1), thumbOutPut);
-
-            // set Metadata
-            ObjectMetadata thumbObjectMetadata = new ObjectMetadata();
-            byte[] thumbBytes = thumbOutPut.toByteArray();
-            thumbObjectMetadata.setContentLength(thumbBytes.length);
-            thumbObjectMetadata.setContentType(image.getContentType());
-
-            // save in s3
-            InputStream thumbInput = new ByteArrayInputStream(thumbBytes);
-            String thumbnailStoreName = "s_" + UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
-
-            amazonS3Client.putObject(
-                    new PutObjectRequest(bucket,thumbnailStoreName,thumbInput,thumbObjectMetadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
-            String thumbnailStoreUrl = amazonS3Client.getUrl(bucket, thumbnailStoreName).toString();
-
-            user.changeThumbnailImage(thumbnailStoreUrl, thumbnailStoreName);
-
-            thumbInput.close();
-            thumbOutPut.close();
-
-        } catch (Exception e) {
-            throw new UserException(e.getMessage());
+    private void deleteImageFromS3(String imageStoreName) {
+        if (imageStoreName != null) {
+            amazonS3Client.deleteObject(bucket, imageStoreName);
+            amazonS3Client.deleteObject(thumbnailBucket, imageStoreName);
         }
-
     }
 
-
-    private void validateFileType(MultipartFile file) {
+    private void validateImageType(MultipartFile image) {
+        if(image == null){
+            throw new UserException("변경할 이미지가 존재하지 않습니다.");
+        }
         // TODO TIKA 적용
-        if (file.getContentType().startsWith("image") == false) {
+        if (image.getContentType().startsWith("image") == false) {
             throw new UserException("이미지의 파일타입이 잘못되었습니다.");
         }
     }

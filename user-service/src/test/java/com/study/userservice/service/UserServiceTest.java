@@ -1,17 +1,12 @@
 package com.study.userservice.service;
 
-import com.amazonaws.Protocol;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
-import com.study.userservice.exception.UserException;
 import com.study.userservice.kafka.message.LogoutMessage;
 import com.study.userservice.kafka.message.RefreshTokenCreateMessage;
-import com.study.userservice.model.UserImageUpdateRequest;
 import com.study.userservice.model.UserLoginRequest;
-import com.study.userservice.model.UserNickNameUpdateRequest;
+import com.study.userservice.model.UserProfileUpdateRequest;
 import com.study.userservice.model.UserResponse;
 import com.study.userservice.repository.UserRepository;
 import com.study.userservice.service.impl.UserServiceImpl;
@@ -21,16 +16,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.*;
@@ -177,52 +169,73 @@ class UserServiceTest {
         assertThat(user.getRefreshToken()).isNull();;
     }
 
-    // TODO 이미지 업로드 테스트코드 작성하기
-
     @Test
-    @DisplayName("회원 닉네임 변경")
-    void nickNameUpdate(){
-        // given
-        UserNickNameUpdateRequest userNickNameUpdateRequest = new UserNickNameUpdateRequest();
-        userNickNameUpdateRequest.setNickName("황철원");
+    @DisplayName("회원 프로필 변경 - 이미지 수정")
+    void profileUpdate() throws Exception {
 
-        User user = User.createUser(1L, "황주환", "이미지",
-                "이미지", UserRole.USER);
+        MockMultipartFile image = new MockMultipartFile(
+                "image",
+                "프로필사진.png",
+                "image/png",
+                "<<image>>".getBytes(StandardCharsets.UTF_8));
+
+        UserProfileUpdateRequest userProfileUpdateRequest = new UserProfileUpdateRequest();
+        userProfileUpdateRequest.setImage(image);
+        userProfileUpdateRequest.setUpdateImage(true);
+        userProfileUpdateRequest.setDeleteImage(false);
+        userProfileUpdateRequest.setNickName("황철원");
+
+        User user = User.createUser(1L, "황주환", "이미지", "이미지", UserRole.USER);
+        user.changeImage("이미지","이미지","이미지");
+
 
         given(userRepository.findById(anyLong()))
                 .willReturn(Optional.of(user));
 
-        given(userRepository.findByNickName(any()))
-                .willReturn(Optional.empty());
+        willDoNothing()
+                .given(amazonS3Client)
+                .deleteObject(any(),any());
 
-        // when
-        UserResponse result = userServiceImpl.nickNameUpdate(1L, userNickNameUpdateRequest);
+        given(amazonS3Client.putObject(any()))
+                .willReturn(null);
 
-        // then
-        assertThat(result.getNickName()).isEqualTo(userNickNameUpdateRequest.getNickName());
+        given(amazonS3Client.getUrl(any(),any()))
+                .willReturn(new URL("http:이미지"))
+                .willReturn(new URL("http:썸네일이미지"));
+
+        UserResponse userResponse = userServiceImpl.profileUpdate(1L, userProfileUpdateRequest);
+
+        assertThat(userResponse.getProfileImage()).isEqualTo("http:이미지");
+        assertThat(userResponse.getThumbnailImage()).isEqualTo("http:썸네일이미지");
+        assertThat(userResponse.getNickName()).isEqualTo(userProfileUpdateRequest.getNickName());
+
         then(userRepository).should(times(1)).findById(anyLong());
-        then(userRepository).should(times(1)).findByNickName(any());
+        then(amazonS3Client).should(times(2)).deleteObject(any(),any());
+        then(amazonS3Client).should(times(1)).putObject(any());
+        then(amazonS3Client).should(times(2)).getUrl(any(),any());
     }
 
     @Test
-    @DisplayName("회원 닉네임 변경 - 중복")
-    void nickNameDuplicateUpdate(){
-        // given
-        UserNickNameUpdateRequest userNickNameUpdateRequest = new UserNickNameUpdateRequest();
-        userNickNameUpdateRequest.setNickName("황철원");
+    @DisplayName("회원 프로필 변경 - 이미지 삭제")
+    void profileImageDelete(){
+        UserProfileUpdateRequest userProfileUpdateRequest = new UserProfileUpdateRequest();
+        userProfileUpdateRequest.setDeleteImage(true);
 
-        User user1 = User.createUser(1L, "황주환", "이미지",
-                "이미지", UserRole.USER);
-
-        User user2 = User.createUser(2L, "황철원", "이미지",
-                "이미지", UserRole.USER);
+        User user = User.createUser(1L, "황주환", "이미지", "이미지", UserRole.USER);
+        user.changeImage("이미지","이미지","이미지");
 
         given(userRepository.findById(anyLong()))
-                .willReturn(Optional.of(user1));
+                .willReturn(Optional.of(user));
 
-        given(userRepository.findByNickName(any()))
-                .willReturn(Optional.of(user2));
+        willDoNothing()
+                .given(amazonS3Client)
+                .deleteObject(any(),any());
 
-        assertThrows(UserException.class,()->userServiceImpl.nickNameUpdate(1L,userNickNameUpdateRequest));
+        UserResponse userResponse = userServiceImpl.profileUpdate(1L, userProfileUpdateRequest);
+
+        assertThat(userResponse.getProfileImage()).isNull();
+        assertThat(userResponse.getThumbnailImage()).isNull();
+        then(userRepository).should(times(1)).findById(anyLong());
+        then(amazonS3Client).should(times(2)).deleteObject(any(),any());
     }
 }

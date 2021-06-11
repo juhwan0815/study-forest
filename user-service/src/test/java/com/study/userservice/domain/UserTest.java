@@ -32,41 +32,37 @@ class UserTest {
     }
 
     @Test
-    @DisplayName("회원 썸네일 이미지 변경")
-    void changeThumbnailImage(){
+    @DisplayName("회원 이미지 삭제")
+    void deleteImage(){
         User user = User.createUser(1L,"황주환","image", "image", UserRole.USER);
-        String thumbnailImageURL = "썸네일이미지URL";
-        String thumbnailImageStoreName = "썸네일이미지";
 
-        user.changeThumbnailImage(thumbnailImageURL, thumbnailImageStoreName);
+        user.deleteImage();
 
-        assertThat(user.getThumbnailImage()).isEqualTo(thumbnailImageURL);
-        assertThat(user.getThumbnailImageStoreName()).isEqualTo(thumbnailImageStoreName);
+        assertThat(user.getProfileImage()).isNull();
+        assertThat(user.getThumbnailImage()).isNull();
+        assertThat(user.getImageStoreName()).isNull();;
     }
 
     @Test
-    @DisplayName("회원 이미지 변경")
+    @DisplayName("회원 이미지 수정")
     void changeImage(){
         User user = User.createUser(1L,"황주환","image", "image", UserRole.USER);
-        String profileImageURL = "이미지URL";
-        String profileImageStoreName = "이미지";
 
-        user.changeImage(profileImageURL, profileImageStoreName);
+        user.changeImage("changedImage","changeThumbnailImage","imageStoreName");
 
-        assertThat(user.getProfileImage()).isEqualTo(profileImageURL);
-        assertThat(user.getProfileImageStoreName()).isEqualTo(profileImageStoreName);
+        assertThat(user.getProfileImage()).isEqualTo("changedImage");
+        assertThat(user.getThumbnailImage()).isEqualTo("changeThumbnailImage");
+        assertThat(user.getImageStoreName()).isEqualTo("imageStoreName");
     }
 
     @Test
-    @DisplayName("회원 이름 변경")
+    @DisplayName("회원 닉네임 수정")
     void changeNickName(){
         User user = User.createUser(1L,"황주환","image", "image", UserRole.USER);
-        String changeNickName = "황철원";
 
-        user.changeNickName(changeNickName);
+        user.changeNickName("황철원");
 
-        assertThat(user.getNickName()).isEqualTo(changeNickName);
+        assertThat(user.getNickName()).isEqualTo("황철원");
     }
-
 
 }
