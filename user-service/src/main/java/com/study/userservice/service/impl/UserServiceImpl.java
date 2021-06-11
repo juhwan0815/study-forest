@@ -12,6 +12,7 @@ import com.study.userservice.kafka.message.RefreshTokenCreateMessage;
 import com.study.userservice.model.UserLoginRequest;
 import com.study.userservice.model.UserProfileUpdateRequest;
 import com.study.userservice.model.UserResponse;
+import com.study.userservice.model.image.ImageUploadResult;
 import com.study.userservice.repository.UserRepository;
 import com.study.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -110,18 +111,24 @@ public class UserServiceImpl implements UserService {
         if(request.isUpdateImage()){
             validateImageType(request.getImage());
             deleteImageFromS3(findUser.getImageStoreName());
-            uploadImageFromS3(request, findUser);
+            ImageUploadResult imageUploadResult = uploadImageFromS3(request, findUser);
+
+            findUser.changeImage(imageUploadResult.getProfileImage(),
+                                imageUploadResult.getThumbnailImage(),
+                                imageUploadResult.getImageStoreName());
         }
 
         return UserResponse.from(findUser);
     }
 
-    private void uploadImageFromS3(UserProfileUpdateRequest request, User findUser) {
+    private ImageUploadResult uploadImageFromS3(UserProfileUpdateRequest request, User findUser) {
         String imageStoreName = UUID.randomUUID().toString() + "_" + request.getImage().getOriginalFilename();
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(request.getImage().getSize());
         objectMetadata.setContentType(request.getImage().getContentType());
+
+        ImageUploadResult imageUploadResult = null;
 
         try {
             amazonS3Client.putObject(new PutObjectRequest(bucket, imageStoreName,
@@ -130,11 +137,13 @@ public class UserServiceImpl implements UserService {
             String profileImage = amazonS3Client.getUrl(bucket, imageStoreName).toString();
             String thumbnailImage = amazonS3Client.getUrl(thumbnailBucket,imageStoreName).toString();
 
-            findUser.changeImage(profileImage,thumbnailImage,imageStoreName);
+            imageUploadResult = ImageUploadResult.from(profileImage,thumbnailImage,imageStoreName);
 
         } catch (Exception e) {
             throw new UserException(e.getMessage());
         }
+
+        return imageUploadResult;
     }
 
     private void deleteImageFromS3(String imageStoreName) {
