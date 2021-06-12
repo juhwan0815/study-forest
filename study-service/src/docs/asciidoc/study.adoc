@@ -30,3 +30,18 @@ include::{snippets}/study/create/request-part-request-fields.adoc[]
 include::{snippets}/study/create/http-response.adoc[]
 ====== Body
 include::{snippets}/study/create/response-fields.adoc[]
+
+==== 스터디 수정 API
+===== 요청
+include::{snippets}/study/update/http-request.adoc[]
+====== Header
+include::{snippets}/study/update/request-headers.adoc[]
+====== Part
+include::{snippets}/study/update/request-parts.adoc[]
+====== Body
+include::{snippets}/study/update/request-part-request-fields.adoc[]
+
+===== 응답
+include::{snippets}/study/update/http-response.adoc[]
+====== Body
+include::{snippets}/study/update/response-fields.adoc[]

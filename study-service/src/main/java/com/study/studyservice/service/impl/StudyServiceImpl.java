@@ -11,10 +11,13 @@ import com.study.studyservice.exception.StudyException;
 import com.study.studyservice.model.image.ImageUploadResult;
 import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
+import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
 import com.study.studyservice.repository.CategoryRepository;
 import com.study.studyservice.repository.StudyRepository;
+import com.study.studyservice.repository.StudyUserRepository;
 import com.study.studyservice.repository.TagRepository;
+import com.study.studyservice.repository.query.StudyQueryRepository;
 import com.study.studyservice.service.StudyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +41,8 @@ public class StudyServiceImpl implements StudyService {
     private final LocationServiceClient locationServiceClient;
     private final CategoryRepository categoryRepository;
     private final AmazonS3Client amazonS3Client;
+    private final StudyQueryRepository studyQueryRepository;
+    private final StudyUserRepository studyUserRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -51,13 +56,13 @@ public class StudyServiceImpl implements StudyService {
         Category findCategory = categoryRepository.findWithParentById(request.getCategoryId())
                 .orElseThrow(() -> new CategoryException(request.getCategoryId() + "는 존재하지 않는 카테고리 ID입니다."));
 
-        LocationResponse location = getLocation(request);
+        LocationResponse location = getLocation(request.isOffline(),request.getLocationCode());
 
         ImageUploadResult imageUploadResult = uploadImage(image);
 
         List<Tag> tagList = tagRepository.findByNameIn(request.getTags());
 
-        searchNewTags(request, tagList);
+        searchNewTags(request.getTags(), tagList);
 
         StudyUser studyUser = StudyUser.createStudyUser(userId, Role.ADMIN);
 
@@ -82,14 +87,59 @@ public class StudyServiceImpl implements StudyService {
         return StudyResponse.from(savedStudy, location);
     }
 
-    private LocationResponse getLocation(StudyCreateRequest request) {
+    @Override
+    @Transactional
+    public StudyResponse update(Long userId, Long studyId, MultipartFile image, StudyUpdateRequest request) {
+        Study findStudy = studyQueryRepository.findWithStudyTagsAndTagById(studyId);
+
+        StudyUser findStudyAdminUser = studyUserRepository
+                .findByUserIdAndAndRoleAndStudy(userId, Role.ADMIN, findStudy)
+                .orElseThrow(() -> new StudyException("스터디를 수정할 권한이 없습니다."));
+
+        Category findCategory = categoryRepository.findWithParentById(request.getCategoryId())
+                .orElseThrow(() -> new CategoryException(request.getCategoryId() + "는 존재하지 않는 카테고리입니다."));
+
+        LocationResponse location = getLocation(request.isOffline(), request.getLocationCode());
+
+        List<Tag> tagList = tagRepository.findByNameIn(request.getTags());
+        searchNewTags(request.getTags(),tagList);
+
+        if(request.isDeleteImage()){
+            deleteImageFromS3(findStudy.getImageStoreName());
+            findStudy.deleteImage();
+        }
+        if(!image.isEmpty()){
+            validateImageType(image);
+            deleteImageFromS3(findStudy.getImageStoreName());
+            ImageUploadResult imageUploadResult = uploadImage(image);
+
+            findStudy.changeImage(imageUploadResult.getStudyImage(),
+                                  imageUploadResult.getStudyThumbnailImage(),
+                                  imageUploadResult.getImageStoreName());
+        }
+
+
+        findStudy.update(request.getName(),
+                request.getNumberOfPeople(),
+                request.getContent(),
+                request.isOnline(),
+                request.isOffline(),
+                request.isClose(),
+                location.getId(),
+                findCategory,
+                tagList);
+
+        return StudyResponse.from(findStudy,location);
+    }
+
+    private LocationResponse getLocation(boolean offline,String locationCode) {
         LocationResponse location;
-        if (request.isOffline()) {
-            if (request.getLocationCode() == null) {
+        if (offline) {
+            if (locationCode == null) {
                 throw new StudyException("지역정보 코드가 존재하지 않습니다.");
             }
             location = locationServiceClient
-                    .findLocationByCode(request.getLocationCode());
+                    .findLocationByCode(locationCode);
         } else {
             location = new LocationResponse();
         }
@@ -138,6 +188,7 @@ public class StudyServiceImpl implements StudyService {
             amazonS3Client.deleteObject(bucket, imageStoreName);
             amazonS3Client.deleteObject(thumbnailBucket, imageStoreName);
         }
+
     }
 
     private void validateImageType(MultipartFile image) {
@@ -147,14 +198,8 @@ public class StudyServiceImpl implements StudyService {
         }
     }
 
-    /**
-     * DB에 없는 새로운 태그 찾기
-     *
-     * @param request
-     * @param tagList
-     */
-    private void searchNewTags(StudyCreateRequest request, List<Tag> tagList) {
-        request.getTags()
+    private void searchNewTags(List<String> requestTags, List<Tag> tagList) {
+        requestTags
                 .forEach(name -> {
                     boolean matchResult = false; // false 로 설정
 

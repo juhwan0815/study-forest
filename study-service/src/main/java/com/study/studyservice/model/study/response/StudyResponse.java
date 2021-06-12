@@ -4,7 +4,6 @@ import com.study.studyservice.domain.Study;
 import com.study.studyservice.domain.StudyStatus;
 import com.study.studyservice.model.category.response.CategoryResponse;
 import com.study.studyservice.model.location.response.LocationResponse;
-import com.study.studyservice.model.studytag.StudyTagResponse;
 import lombok.Data;
 
 import java.util.List;
@@ -39,7 +38,7 @@ public class StudyResponse {
 
     private CategoryResponse childCategory; // 자식 카테고리
 
-    private List<StudyTagResponse> studyTags; // 스터디 태그
+    private List<String> studyTags; // 스터디 태그
 
     public static StudyResponse from(Study study,LocationResponse location) {
         StudyResponse studyResponse = new StudyResponse();
@@ -57,7 +56,7 @@ public class StudyResponse {
         studyResponse.parentCategory = CategoryResponse.from(study.getCategory().getParent());
         studyResponse.childCategory = CategoryResponse.from(study.getCategory());
         studyResponse.studyTags = study.getStudyTags().stream()
-                .map(studyTag -> StudyTagResponse.from(studyTag))
+                .map(studyTag -> studyTag.getTag().getName())
                 .collect(Collectors.toList());
         return studyResponse;
     }

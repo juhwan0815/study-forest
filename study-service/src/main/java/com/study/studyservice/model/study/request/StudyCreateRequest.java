@@ -1,8 +1,6 @@
 package com.study.studyservice.model.study.request;
 
 import lombok.Data;
-import lombok.ToString;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;

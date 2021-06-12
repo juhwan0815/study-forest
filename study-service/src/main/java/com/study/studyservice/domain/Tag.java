@@ -31,4 +31,11 @@ public class Tag{
         tag.name = name;
         return tag;
     }
+
+    public static Tag createTestTag(Long id,String name){
+        Tag tag = new Tag();
+        tag.id = id;
+        tag.name = name;
+        return tag;
+    }
 }
