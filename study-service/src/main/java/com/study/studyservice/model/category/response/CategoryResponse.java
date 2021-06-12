@@ -10,6 +10,7 @@ public class CategoryResponse {
 
     private String name;
 
+
     public static CategoryResponse from(Category category){
         CategoryResponse categoryResponse = new CategoryResponse();
         categoryResponse.id = category.getId();

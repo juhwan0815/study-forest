@@ -146,7 +146,7 @@ class CategoryServiceTest {
         List<Category> parentList = new ArrayList<>();
         parentList.add(parentCategory);
 
-        given(categoryRepository.findByParentIsNull())
+        given(categoryRepository.findByParentIsNullAndStatus(any()))
                 .willReturn(parentList);
 
         // when
@@ -155,7 +155,7 @@ class CategoryServiceTest {
         // then
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get(0).getName()).isEqualTo(parentCategory.getName());
-        then(categoryRepository).should(times(1)).findByParentIsNull();
+        then(categoryRepository).should(times(1)).findByParentIsNullAndStatus((any()));
     }
 
     @Test
@@ -171,7 +171,7 @@ class CategoryServiceTest {
         given(categoryRepository.findById(any()))
                 .willReturn(Optional.of(parentCategory));
 
-        given(categoryRepository.findByParent(any()))
+        given(categoryRepository.findByParentAndStatus(any(),any()))
                 .willReturn(childList);
 
         // when
@@ -181,6 +181,6 @@ class CategoryServiceTest {
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get(0).getName()).isEqualTo(childCategory.getName());
         then(categoryRepository).should(times(1)).findById(any());
-        then(categoryRepository).should(times(1)).findByParent(any());
+        then(categoryRepository).should(times(1)).findByParentAndStatus(any(),any());
     }
 }

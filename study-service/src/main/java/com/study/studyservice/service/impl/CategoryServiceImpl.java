@@ -1,6 +1,7 @@
 package com.study.studyservice.service.impl;
 
 import com.study.studyservice.domain.Category;
+import com.study.studyservice.domain.CategoryStatus;
 import com.study.studyservice.exception.CategoryException;
 import com.study.studyservice.model.category.request.CategorySaveRequest;
 import com.study.studyservice.model.category.request.CategoryUpdateRequest;
@@ -71,7 +72,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryResponse> findParent() {
-        return categoryRepository.findByParentIsNull()
+        return categoryRepository.findByParentIsNullAndStatus(CategoryStatus.ACTIVE)
                 .stream().map(category -> CategoryResponse.from(category))
                 .collect(Collectors.toList());
     }
@@ -82,7 +83,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category findCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryException(categoryId + "는 존재하지 않는 카테고리 ID입니다."));
 
-        return categoryRepository.findByParent(findCategory)
+        return categoryRepository.findByParentAndStatus(findCategory,CategoryStatus.ACTIVE)
                 .stream()
                 .map(category -> CategoryResponse.from(category))
                 .collect(Collectors.toList());

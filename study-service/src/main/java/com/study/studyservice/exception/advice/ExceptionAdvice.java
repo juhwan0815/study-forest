@@ -1,6 +1,7 @@
 package com.study.studyservice.exception.advice;
 
 import com.study.studyservice.exception.CategoryException;
+import com.study.studyservice.exception.StudyException;
 import com.study.studyservice.model.common.ExceptionResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,4 +14,10 @@ public class ExceptionAdvice {
     public ResponseEntity<ExceptionResponse> categoryExceptionHandling(CategoryException ex){
         return ResponseEntity.badRequest().body(ExceptionResponse.from(ex.getMessage()));
     }
+
+    @ExceptionHandler(StudyException.class)
+    public ResponseEntity<ExceptionResponse> studyExceptionHandling(StudyException ex){
+        return ResponseEntity.badRequest().body(ExceptionResponse.from(ex.getMessage()));
+    }
+
 }

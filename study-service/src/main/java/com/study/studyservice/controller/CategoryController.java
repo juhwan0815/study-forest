@@ -1,6 +1,5 @@
 package com.study.studyservice.controller;
 
-import com.study.studyservice.domain.Category;
 import com.study.studyservice.model.category.request.CategorySaveRequest;
 import com.study.studyservice.model.category.request.CategoryUpdateRequest;
 import com.study.studyservice.model.category.response.CategoryResponse;
@@ -12,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.ws.rs.Path;
 import java.util.List;
 
 @Slf4j
