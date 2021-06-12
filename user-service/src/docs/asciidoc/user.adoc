@@ -48,8 +48,8 @@ include::{snippets}/user/profile/http-request.adoc[]
 include::{snippets}/user/profile/request-headers.adoc[]
 ====== Part
 include::{snippets}/user/profile/request-parts.adoc[]
-====== Parameter
-include::{snippets}/user/profile/request-parameters.adoc[]
+====== Body
+include::{snippets}/user/profile/request-part-request-fields.adoc[]
 ===== 응답
 include::{snippets}/user/profile/http-response.adoc[]
 ====== Body

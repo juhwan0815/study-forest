@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
@@ -29,8 +30,9 @@ public class UserController {
 
     @PostMapping("/users/profile")
     public ResponseEntity<UserResponse> changeProfile(@LoginUser Long userId,
-                                                      @Valid UserProfileUpdateRequest request){
-        return ResponseEntity.ok(userService.profileUpdate(userId,request));
+                                                      @RequestPart(required = false) MultipartFile image,
+                                                      @RequestPart @Valid UserProfileUpdateRequest request){
+        return ResponseEntity.ok(userService.profileUpdate(userId,image,request));
     }
 
 }

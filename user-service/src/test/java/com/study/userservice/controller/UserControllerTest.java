@@ -29,6 +29,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.nio.charset.StandardCharsets;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
@@ -191,18 +192,21 @@ class UserControllerTest {
     @Test
     @DisplayName("프로필 수정API 테스트")
     void profileUpdate() throws Exception {
-
+        // given
         MockMultipartFile image = new MockMultipartFile(
                 "image",
                 "프로필사진.png",
-                "image/png",
+                MediaType.IMAGE_PNG_VALUE,
                 "<<image>>".getBytes(StandardCharsets.UTF_8));
 
         UserProfileUpdateRequest userProfileUpdateRequest = new UserProfileUpdateRequest();
-        userProfileUpdateRequest.setImage(image);
-        userProfileUpdateRequest.setUpdateImage(true);
         userProfileUpdateRequest.setDeleteImage(false);
         userProfileUpdateRequest.setNickName("황철원");
+
+        MockMultipartFile request = new MockMultipartFile("request",
+                "request"
+                , MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsString(userProfileUpdateRequest).getBytes(StandardCharsets.UTF_8));
 
         UserResponse userResponse = new UserResponse();
         userResponse.setId(1L);
@@ -213,19 +217,17 @@ class UserControllerTest {
         userResponse.setRole(UserRole.USER);
         userResponse.setStatus(UserStatus.ACTIVE);
 
-        given(userService.profileUpdate(any(), any()))
+        given(userService.profileUpdate(any(), any(), any()))
                 .willReturn(userResponse);
 
         given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
                 .willReturn(1L);
 
-        mockMvc.perform(multipart("/users/profile").file(image)
+        // when
+        mockMvc.perform(multipart("/users/profile").file(image).file(request)
                 .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
-                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
-                .param("updateImage",String.valueOf(userProfileUpdateRequest.isUpdateImage()))
-                .param("deleteImage",String.valueOf(userProfileUpdateRequest.isDeleteImage()))
-                .param("nickName",userProfileUpdateRequest.getNickName()))
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(userResponse)))
                 .andDo(document("user/profile",
@@ -233,12 +235,12 @@ class UserControllerTest {
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
                         ),
                         requestParts(
-                                partWithName("image").description("변경할 이미지 파일")
+                                partWithName("image").description("변경할 이미지 파일").optional(),
+                                partWithName("request").ignored()
                         ),
-                        requestParameters(
-                                parameterWithName("updateImage").description("이미지 수정 여부"),
-                                parameterWithName("deleteImage").description("이미지 삭제 여부"),
-                                parameterWithName("nickName").description("수정할 닉네임")
+                        requestPartFields("request",
+                                fieldWithPath("deleteImage").type(JsonFieldType.BOOLEAN).description("이미지 삭제 여부"),
+                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("변경할 회원 닉네임")
                         ),
                         responseFields(
                                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("회원 ID"),
@@ -250,8 +252,9 @@ class UserControllerTest {
                                 fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한")
                         )));
 
-
-        then(userService).should(times(1)).profileUpdate(any(), any());
+        // then
+        then(userService).should(times(1)).profileUpdate(any
+                (), any(), any());
     }
 
 }

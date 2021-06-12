@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.net.URL;
@@ -172,22 +173,19 @@ class UserServiceTest {
     @Test
     @DisplayName("회원 프로필 변경 - 이미지 수정")
     void profileUpdate() throws Exception {
-
+        // given
         MockMultipartFile image = new MockMultipartFile(
                 "image",
                 "프로필사진.png",
-                "image/png",
+                MediaType.IMAGE_PNG_VALUE,
                 "<<image>>".getBytes(StandardCharsets.UTF_8));
 
         UserProfileUpdateRequest userProfileUpdateRequest = new UserProfileUpdateRequest();
-        userProfileUpdateRequest.setImage(image);
-        userProfileUpdateRequest.setUpdateImage(true);
         userProfileUpdateRequest.setDeleteImage(false);
         userProfileUpdateRequest.setNickName("황철원");
 
         User user = User.createUser(1L, "황주환", "이미지", "이미지", UserRole.USER);
         user.changeImage("이미지","이미지","이미지");
-
 
         given(userRepository.findById(anyLong()))
                 .willReturn(Optional.of(user));
@@ -203,8 +201,10 @@ class UserServiceTest {
                 .willReturn(new URL("http:이미지"))
                 .willReturn(new URL("http:썸네일이미지"));
 
-        UserResponse userResponse = userServiceImpl.profileUpdate(1L, userProfileUpdateRequest);
+        // when
+        UserResponse userResponse = userServiceImpl.profileUpdate(1L,image, userProfileUpdateRequest);
 
+        // then
         assertThat(userResponse.getProfileImage()).isEqualTo("http:이미지");
         assertThat(userResponse.getThumbnailImage()).isEqualTo("http:썸네일이미지");
         assertThat(userResponse.getNickName()).isEqualTo(userProfileUpdateRequest.getNickName());
@@ -218,6 +218,13 @@ class UserServiceTest {
     @Test
     @DisplayName("회원 프로필 변경 - 이미지 삭제")
     void profileImageDelete(){
+        MockMultipartFile image = new MockMultipartFile(
+                "image",
+                "프로필사진.png",
+                MediaType.IMAGE_PNG_VALUE,
+                "".getBytes(StandardCharsets.UTF_8));
+
+        // given
         UserProfileUpdateRequest userProfileUpdateRequest = new UserProfileUpdateRequest();
         userProfileUpdateRequest.setDeleteImage(true);
 
@@ -231,11 +238,14 @@ class UserServiceTest {
                 .given(amazonS3Client)
                 .deleteObject(any(),any());
 
-        UserResponse userResponse = userServiceImpl.profileUpdate(1L, userProfileUpdateRequest);
+        // when
+        UserResponse userResponse = userServiceImpl.profileUpdate(1L,image,userProfileUpdateRequest);
 
+        // then
         assertThat(userResponse.getProfileImage()).isNull();
         assertThat(userResponse.getThumbnailImage()).isNull();
         then(userRepository).should(times(1)).findById(anyLong());
         then(amazonS3Client).should(times(2)).deleteObject(any(),any());
     }
+
 }

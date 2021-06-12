@@ -771,22 +771,15 @@ Authorization: Bearer 액세스토큰
 Host: localhost:8080
 
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
-Content-Disposition: form-data; name=updateImage
-
-true
---6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
-Content-Disposition: form-data; name=deleteImage
-
-false
---6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
-Content-Disposition: form-data; name=nickName
-
-황철원
---6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 Content-Disposition: form-data; name=image; filename=프로필사진.png
 Content-Type: image/png
 
 &lt;&lt;image&gt;&gt;
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Content-Disposition: form-data; name=request; filename=request
+Content-Type: application/json
+
+{"deleteImage":false,"nickName":"황철원"}
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm--</code></pre>
 </div>
 </div>
@@ -833,30 +826,30 @@ Content-Type: image/png
 </table>
 </div>
 <div class="sect5">
-<h6 id="_parameter"><a class="anchor" href="#_parameter"></a><a class="link" href="#_parameter">Parameter</a></h6>
+<h6 id="_body_4"><a class="anchor" href="#_body_4"></a><a class="link" href="#_body_4">Body</a></h6>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
 <th class="tableblock halign-left valign-top">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>updateImage</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">이미지 수정 여부</p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>deleteImage</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">이미지 삭제 여부</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>nickName</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">수정할 닉네임</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">변경할 회원 닉네임</p></td>
 </tr>
 </tbody>
 </table>
@@ -882,7 +875,7 @@ Content-Length: 182
 </div>
 </div>
 <div class="sect5">
-<h6 id="_body_4"><a class="anchor" href="#_body_4"></a><a class="link" href="#_body_4">Body</a></h6>
+<h6 id="_body_5"><a class="anchor" href="#_body_5"></a><a class="link" href="#_body_5">Body</a></h6>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -940,7 +933,7 @@ Content-Length: 182
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-06-11 23:19:12 KST
+Last updated 2021-06-12 04:53:53 KST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">

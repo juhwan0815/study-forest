@@ -5,6 +5,7 @@ import com.study.userservice.kafka.message.RefreshTokenCreateMessage;
 import com.study.userservice.model.UserLoginRequest;
 import com.study.userservice.model.UserProfileUpdateRequest;
 import com.study.userservice.model.UserResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
@@ -16,5 +17,5 @@ public interface UserService {
 
     void logout(LogoutMessage logoutMessage);
 
-    UserResponse profileUpdate(Long userId, UserProfileUpdateRequest request);
+    UserResponse profileUpdate(Long userId, MultipartFile image,UserProfileUpdateRequest request);
 }

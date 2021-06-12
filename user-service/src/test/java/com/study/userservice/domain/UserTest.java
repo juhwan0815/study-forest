@@ -34,10 +34,13 @@ class UserTest {
     @Test
     @DisplayName("회원 이미지 삭제")
     void deleteImage(){
+        // given
         User user = User.createUser(1L,"황주환","image", "image", UserRole.USER);
 
+        // when
         user.deleteImage();
 
+        // then
         assertThat(user.getProfileImage()).isNull();
         assertThat(user.getThumbnailImage()).isNull();
         assertThat(user.getImageStoreName()).isNull();;
@@ -46,10 +49,13 @@ class UserTest {
     @Test
     @DisplayName("회원 이미지 수정")
     void changeImage(){
+        // given
         User user = User.createUser(1L,"황주환","image", "image", UserRole.USER);
 
+        // when
         user.changeImage("changedImage","changeThumbnailImage","imageStoreName");
 
+        // then
         assertThat(user.getProfileImage()).isEqualTo("changedImage");
         assertThat(user.getThumbnailImage()).isEqualTo("changeThumbnailImage");
         assertThat(user.getImageStoreName()).isEqualTo("imageStoreName");
@@ -58,10 +64,13 @@ class UserTest {
     @Test
     @DisplayName("회원 닉네임 수정")
     void changeNickName(){
+        // given
         User user = User.createUser(1L,"황주환","image", "image", UserRole.USER);
 
+        // when
         user.changeNickName("황철원");
 
+        // then
         assertThat(user.getNickName()).isEqualTo("황철원");
     }
 

@@ -15,6 +15,7 @@ import com.study.userservice.model.UserResponse;
 import com.study.userservice.model.image.ImageUploadResult;
 import com.study.userservice.repository.UserRepository;
 import com.study.userservice.service.UserService;
+import com.sun.org.apache.xpath.internal.operations.Mult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -97,7 +98,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponse profileUpdate(Long userId, UserProfileUpdateRequest request) {
+    public UserResponse profileUpdate(Long userId,MultipartFile image,UserProfileUpdateRequest request) {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(userId + "는 존재하지 않는 회원 ID입니다."));
 
@@ -108,10 +109,10 @@ public class UserServiceImpl implements UserService {
             findUser.deleteImage();
         }
 
-        if(request.isUpdateImage()){
-            validateImageType(request.getImage());
+        if(!image.isEmpty()){
+            validateImageType(image);
             deleteImageFromS3(findUser.getImageStoreName());
-            ImageUploadResult imageUploadResult = uploadImageFromS3(request, findUser);
+            ImageUploadResult imageUploadResult = uploadImageFromS3(image);
 
             findUser.changeImage(imageUploadResult.getProfileImage(),
                                 imageUploadResult.getThumbnailImage(),
@@ -121,18 +122,18 @@ public class UserServiceImpl implements UserService {
         return UserResponse.from(findUser);
     }
 
-    private ImageUploadResult uploadImageFromS3(UserProfileUpdateRequest request, User findUser) {
-        String imageStoreName = UUID.randomUUID().toString() + "_" + request.getImage().getOriginalFilename();
+    private ImageUploadResult uploadImageFromS3(MultipartFile image) {
+        String imageStoreName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(request.getImage().getSize());
-        objectMetadata.setContentType(request.getImage().getContentType());
+        objectMetadata.setContentLength(image.getSize());
+        objectMetadata.setContentType(image.getContentType());
 
         ImageUploadResult imageUploadResult = null;
 
         try {
             amazonS3Client.putObject(new PutObjectRequest(bucket, imageStoreName,
-                    request.getImage().getInputStream(), objectMetadata)
+                    image.getInputStream(), objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
             String profileImage = amazonS3Client.getUrl(bucket, imageStoreName).toString();
             String thumbnailImage = amazonS3Client.getUrl(thumbnailBucket,imageStoreName).toString();
@@ -154,9 +155,6 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateImageType(MultipartFile image) {
-        if(image == null){
-            throw new UserException("변경할 이미지가 존재하지 않습니다.");
-        }
         // TODO TIKA 적용
         if (image.getContentType().startsWith("image") == false) {
             throw new UserException("이미지의 파일타입이 잘못되었습니다.");
