@@ -28,7 +28,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findWithRefreshTokenById(userId));
     }
 
-    @PostMapping("/users/profile")
+    @PatchMapping("/users/profile")
     public ResponseEntity<UserResponse> changeProfile(@LoginUser Long userId,
                                                       @RequestPart(required = false) MultipartFile image,
                                                       @RequestPart @Valid UserProfileUpdateRequest request){

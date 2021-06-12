@@ -21,8 +21,10 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -223,8 +225,16 @@ class UserControllerTest {
         given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
                 .willReturn(1L);
 
+        MockMultipartHttpServletRequestBuilder builder =
+                RestDocumentationRequestBuilders.fileUpload("/users/profile");
+
+        builder.with(request1 -> {
+            request1.setMethod("PATCH");
+            return request1;
+        });
+
         // when
-        mockMvc.perform(multipart("/users/profile").file(image).file(request)
+        mockMvc.perform(builder.file(image).file(request)
                 .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
