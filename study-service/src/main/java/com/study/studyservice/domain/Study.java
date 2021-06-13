@@ -149,4 +149,19 @@ public class Study extends BaseEntity {
             }
         }
     }
+
+    public void checkStudyAdmin(Long userId) {
+        boolean matchResult = false;
+
+        for (StudyUser studyUser : studyUsers) {
+            if(studyUser.getUserId().equals(userId) && studyUser.getRole().equals(Role.ADMIN)){
+                matchResult = true;
+                break;
+            }
+        }
+
+        if(matchResult == false){
+            throw new StudyException("스터디를 삭제할 권한이 없습니다.");
+        }
+    }
 }

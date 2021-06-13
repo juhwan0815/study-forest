@@ -8,6 +8,8 @@ import com.study.studyservice.client.LocationServiceClient;
 import com.study.studyservice.domain.*;
 import com.study.studyservice.exception.CategoryException;
 import com.study.studyservice.exception.StudyException;
+import com.study.studyservice.kafka.message.StudyDeleteMessage;
+import com.study.studyservice.kafka.sender.KafkaStudyDeleteMessageSender;
 import com.study.studyservice.model.image.ImageUploadResult;
 import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
@@ -43,6 +45,7 @@ public class StudyServiceImpl implements StudyService {
     private final AmazonS3Client amazonS3Client;
     private final StudyQueryRepository studyQueryRepository;
     private final StudyUserRepository studyUserRepository;
+    private final KafkaStudyDeleteMessageSender kafkaStudyDeleteMessageSender;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -90,7 +93,7 @@ public class StudyServiceImpl implements StudyService {
     @Override
     @Transactional
     public StudyResponse update(Long userId, Long studyId, MultipartFile image, StudyUpdateRequest request) {
-        Study findStudy = studyQueryRepository.findWithStudyTagsAndTagById(studyId);
+        Study findStudy = studyQueryRepository.findWithStudyTagsById(studyId);
 
         StudyUser findStudyAdminUser = studyUserRepository
                 .findByUserIdAndAndRoleAndStudy(userId, Role.ADMIN, findStudy)
@@ -130,6 +133,18 @@ public class StudyServiceImpl implements StudyService {
                 tagList);
 
         return StudyResponse.from(findStudy,location);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long userId, Long studyId) {
+        Study findStudy = studyQueryRepository.findWithStudyUsersById(studyId);
+
+        findStudy.checkStudyAdmin(userId);
+
+        studyRepository.delete(findStudy);
+
+        kafkaStudyDeleteMessageSender.send(StudyDeleteMessage.from(findStudy));
     }
 
     private LocationResponse getLocation(boolean offline,String locationCode) {

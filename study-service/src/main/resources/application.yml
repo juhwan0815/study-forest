@@ -46,6 +46,11 @@ eureka:
 
 kafka:
   server: 127.0.0.1:9092
+  topic:
+    study:
+      delete:
+        name: study-delete-topic
+
 
 management:
   endpoints:

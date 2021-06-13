@@ -7,11 +7,13 @@ import com.study.studyservice.model.study.response.StudyResponse;
 import com.study.studyservice.service.StudyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.ws.rs.Path;
 
 @Slf4j
 @CrossOrigin(origins = "*",allowedHeaders = "*")
@@ -34,5 +36,12 @@ public class StudyController {
                                                 @RequestPart(required = false) MultipartFile image,
                                                 @RequestPart @Valid StudyUpdateRequest request){
         return ResponseEntity.ok(studyService.update(userId,studyId,image,request));
+    }
+
+    @DeleteMapping("/studies/{studyId}")
+    public ResponseEntity<Void> delete(@LoginUser Long userId,
+                                       @PathVariable Long studyId){
+        studyService.delete(userId,studyId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

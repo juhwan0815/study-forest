@@ -10,4 +10,6 @@ public interface StudyService {
     StudyResponse create(Long userId, MultipartFile image,StudyCreateRequest request);
 
     StudyResponse update(Long userId, Long studyId, MultipartFile image, StudyUpdateRequest request);
+
+    void delete(Long userId, Long studyId);
 }

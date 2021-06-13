@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.study.studyservice.client.LocationServiceClient;
 import com.study.studyservice.domain.*;
 import com.study.studyservice.exception.StudyException;
+import com.study.studyservice.kafka.sender.KafkaStudyDeleteMessageSender;
 import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
@@ -62,6 +63,9 @@ class StudyServiceTest {
 
     @Mock
     private AmazonS3Client amazonS3Client;
+
+    @Mock
+    private KafkaStudyDeleteMessageSender kafkaStudyDeleteMessageSender;
 
     @Test
     @DisplayName("스터디 생성 - 오류")
@@ -317,7 +321,7 @@ class StudyServiceTest {
                 true, true, "이미지 저장 이름",
                 "이미지", "썸네일 이미지", 1L, childCategory, studyUser, studyTagList);
 
-        given(studyQueryRepository.findWithStudyTagsAndTagById(any()))
+        given(studyQueryRepository.findWithStudyTagsById(any()))
                 .willReturn(study);
 
         given(studyUserRepository.findByUserIdAndAndRoleAndStudy(any(),any(),any()))
@@ -389,7 +393,7 @@ class StudyServiceTest {
                 true, true, "이미지 저장 이름",
                 "이미지", "썸네일 이미지", 1L, childCategory, studyUser, studyTagList);
 
-        given(studyQueryRepository.findWithStudyTagsAndTagById(any()))
+        given(studyQueryRepository.findWithStudyTagsById(any()))
                 .willReturn(study);
 
         given(studyUserRepository.findByUserIdAndAndRoleAndStudy(any(),any(),any()))
@@ -465,7 +469,7 @@ class StudyServiceTest {
                 true, true, "이미지 저장 이름",
                 "이미지", "썸네일 이미지", 1L, childCategory, studyUser, studyTagList);
 
-        given(studyQueryRepository.findWithStudyTagsAndTagById(any()))
+        given(studyQueryRepository.findWithStudyTagsById(any()))
                 .willReturn(study);
 
         given(studyUserRepository.findByUserIdAndAndRoleAndStudy(any(),any(),any()))
@@ -498,7 +502,7 @@ class StudyServiceTest {
         assertThat(result.isOnline()).isEqualTo(studyUpdateRequest.isOnline());
         assertThat(result.isOffline()).isEqualTo(studyUpdateRequest.isOffline());
 
-        then(studyQueryRepository).should(times(1)).findWithStudyTagsAndTagById(any());
+        then(studyQueryRepository).should(times(1)).findWithStudyTagsById(any());
         then(studyUserRepository).should(times(1)).findByUserIdAndAndRoleAndStudy(any(),any(),any());
         then(categoryRepository).should(times(1)).findWithParentById(any());
         then(amazonS3Client).should(times(2)).deleteObject(any(),any());
@@ -566,7 +570,7 @@ class StudyServiceTest {
                 true, true, "이미지 저장 이름",
                 "이미지", "썸네일 이미지", 1L, childCategory, studyUser, studyTagList);
 
-        given(studyQueryRepository.findWithStudyTagsAndTagById(any()))
+        given(studyQueryRepository.findWithStudyTagsById(any()))
                 .willReturn(study);
 
         given(studyUserRepository.findByUserIdAndAndRoleAndStudy(any(),any(),any()))
@@ -609,12 +613,92 @@ class StudyServiceTest {
         assertThat(result.isOnline()).isEqualTo(studyUpdateRequest.isOnline());
         assertThat(result.isOffline()).isEqualTo(studyUpdateRequest.isOffline());
 
-        then(studyQueryRepository).should(times(1)).findWithStudyTagsAndTagById(any());
+        then(studyQueryRepository).should(times(1)).findWithStudyTagsById(any());
         then(studyUserRepository).should(times(1)).findByUserIdAndAndRoleAndStudy(any(),any(),any());
         then(locationServiceClient).should(times(1)).findLocationByCode(any());
         then(categoryRepository).should(times(1)).findWithParentById(any());
         then(amazonS3Client).should(times(1)).putObject(any());
         then(amazonS3Client).should(times(2)).deleteObject(any(),any());
         then(tagRepository).should(times(1)).findByNameIn(any());
+    }
+
+    @Test
+    @DisplayName("스터디 삭제 - 스터디 권한 X")
+    void deleteNotWithAdminRole(){
+        // given
+        Category parentCategory = Category.createCategory("개발", null);
+        Category childCategory = Category.createCategory("백엔드", parentCategory);
+
+        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
+
+        List<Tag> tagList = new ArrayList<>();
+        Tag tag1 = Tag.createTestTag(1L,"스프링");
+        Tag tag2 = Tag.createTestTag(2L,"JPA");
+        tagList.add(tag1);
+        tagList.add(tag2);
+
+        List<StudyTag> studyTagList = new ArrayList<>();
+        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
+        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
+        studyTagList.add(studyTag1);
+        studyTagList.add(studyTag2);
+
+        Study study = Study.createStudy("스프링 스터디",
+                5, "안녕하세요 스프링 스터디입니다.",
+                true, true, "이미지 저장 이름",
+                "이미지", "썸네일 이미지", 1L, childCategory, studyUser, studyTagList);
+
+        given(studyQueryRepository.findWithStudyUsersById(any()))
+                .willReturn(study);
+
+        // when then
+        assertThrows(StudyException.class,()->studyService.delete(2L,1L));
+    }
+
+    @Test
+    @DisplayName("스터디 삭제 - 스터디 권한 O")
+    void deleteWithAdminRole(){
+        // given
+        Category parentCategory = Category.createCategory("개발", null);
+        Category childCategory = Category.createCategory("백엔드", parentCategory);
+
+        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
+
+        List<Tag> tagList = new ArrayList<>();
+        Tag tag1 = Tag.createTestTag(1L,"스프링");
+        Tag tag2 = Tag.createTestTag(2L,"JPA");
+        tagList.add(tag1);
+        tagList.add(tag2);
+
+        List<StudyTag> studyTagList = new ArrayList<>();
+        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
+        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
+        studyTagList.add(studyTag1);
+        studyTagList.add(studyTag2);
+
+        Study study = Study.createStudy("스프링 스터디",
+                5, "안녕하세요 스프링 스터디입니다.",
+                true, true, "이미지 저장 이름",
+                "이미지", "썸네일 이미지", 1L, childCategory, studyUser, studyTagList);
+
+
+        given(studyQueryRepository.findWithStudyUsersById(any()))
+                .willReturn(study);
+
+        willDoNothing()
+                .given(studyRepository)
+                .delete(any());
+
+        willDoNothing()
+                .given(kafkaStudyDeleteMessageSender)
+                .send(any());
+
+        // when
+        studyService.delete(1L,1L);
+
+        //  then
+        then(studyQueryRepository).should(times(1)).findWithStudyUsersById(any());
+        then(studyRepository).should(times(1)).delete(any());
+        then(kafkaStudyDeleteMessageSender).should(times(1)).send(any());
     }
 }

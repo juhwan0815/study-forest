@@ -27,6 +27,7 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -37,8 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -46,8 +46,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -279,7 +278,7 @@ class StudyControllerTest {
             return request1;
         });
 
-        given(studyService.update(any(),any(),any(),any()))
+        given(studyService.update(any(), any(), any(), any()))
                 .willReturn(studyResponse);
 
         given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
@@ -342,7 +341,35 @@ class StudyControllerTest {
                         )
                 ));
 
-        then(studyService).should(times(1)).update(any(),any(),any(),any());
+        then(studyService).should(times(1)).update(any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("스터디 삭제 API 테스트")
+    void delete() throws Exception {
+        // given
+        willDoNothing()
+                .given(studyService)
+                .delete(any(), any());
+
+        given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(1L);
+
+        // when
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/studies/{studyId}", 1)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
+                .andExpect(status().isOk())
+                .andDo(document("study/delete",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("studyId").description("삭제할 스터디 ID")
+                        )
+                ));
+
+        // then
+        then(studyService).should(times(1)).delete(any(),any());
     }
 
 
