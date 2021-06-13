@@ -55,7 +55,7 @@ public class Study extends BaseEntity {
     private List<StudyUser> studyUsers = new ArrayList<>();
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<WaitUser> waitUserList = new ArrayList<>();
+    private List<WaitUser> waitUsers = new ArrayList<>();
 
     public static Study createStudy(String name, Integer numberOfPeople, String content, boolean online,
                                     boolean offline, String imageStoreName, String studyImage,
@@ -163,5 +163,22 @@ public class Study extends BaseEntity {
         if(matchResult == false){
             throw new StudyException("스터디를 삭제할 권한이 없습니다.");
         }
+    }
+
+    public void addWaitUser(Long userId) {
+        boolean matchResult = false;
+
+        for (WaitUser waitUser : waitUsers) {
+            if(waitUser.getUserId().equals(userId)){
+                matchResult = true;
+                break;
+            }
+        }
+
+        if(matchResult){
+            throw new StudyException("이미 스터디에 가입신청을 한 회원입니다.");
+        }
+
+        waitUsers.add(WaitUser.createWaitUser(userId,this));
     }
 }

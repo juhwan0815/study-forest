@@ -5,6 +5,7 @@ import com.study.studyservice.client.LocationServiceClient;
 import com.study.studyservice.domain.*;
 import com.study.studyservice.exception.StudyException;
 import com.study.studyservice.kafka.sender.KafkaStudyDeleteMessageSender;
+import com.study.studyservice.kafka.sender.KafkaStudyJoinMessageSender;
 import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
@@ -66,6 +67,9 @@ class StudyServiceTest {
 
     @Mock
     private KafkaStudyDeleteMessageSender kafkaStudyDeleteMessageSender;
+
+    @Mock
+    private KafkaStudyJoinMessageSender kafkaStudyJoinMessageSender;
 
     @Test
     @DisplayName("스터디 생성 - 오류")
@@ -700,5 +704,220 @@ class StudyServiceTest {
         then(studyQueryRepository).should(times(1)).findWithStudyUsersById(any());
         then(studyRepository).should(times(1)).delete(any());
         then(kafkaStudyDeleteMessageSender).should(times(1)).send(any());
+    }
+
+    @Test
+    @DisplayName("스터디 상세 조회 - 지역정보 포함")
+    void findByIdWithLocation(){
+        // given
+        Category parentCategory = Category.createCategory("개발", null);
+        Category childCategory = Category.createCategory("백엔드", parentCategory);
+
+        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
+
+        List<Tag> tagList = new ArrayList<>();
+        Tag tag1 = Tag.createTestTag(1L,"스프링");
+        Tag tag2 = Tag.createTestTag(2L,"JPA");
+        tagList.add(tag1);
+        tagList.add(tag2);
+
+        List<StudyTag> studyTagList = new ArrayList<>();
+        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
+        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
+        studyTagList.add(studyTag1);
+        studyTagList.add(studyTag2);
+
+        Study study = Study.createStudy("스프링 스터디",
+                5, "안녕하세요 스프링 스터디입니다.",
+                true, true, "이미지 저장 이름",
+                "이미지", "썸네일 이미지", 1L, childCategory, studyUser, studyTagList);
+
+        LocationResponse locationResponse = new LocationResponse();
+        locationResponse.setId(1L);
+        locationResponse.setCity("서울특별시");
+        locationResponse.setCode("1111051500");
+        locationResponse.setGu("종로구");
+        locationResponse.setDong("삼청동");
+        locationResponse.setRi("--리");
+        locationResponse.setLen(126.980996);
+        locationResponse.setLet(37.590758);
+        locationResponse.setCodeType("H");
+
+        given(studyQueryRepository.findWithCategoryAndStudyTagsAndTagById(any()))
+                .willReturn(study);
+
+        given(locationServiceClient.findLocationById(any()))
+                .willReturn(locationResponse);
+
+        StudyResponse studyResponse = studyService.findById(1L);
+
+        assertThat(studyResponse.getName()).isEqualTo(study.getName());
+        assertThat(studyResponse.getStudyTags().size()).isEqualTo(2);
+        assertThat(studyResponse.getStudyTags()).contains("스프링","JPA");
+        assertThat(studyResponse.getLocation().getId()).isEqualTo(1L);
+        assertThat(studyResponse.getChildCategory().getName()).isEqualTo("백엔드");
+        assertThat(studyResponse.getParentCategory().getName()).isEqualTo("개발");
+
+        then(studyQueryRepository).should(times(1)).findWithCategoryAndStudyTagsAndTagById(any());
+        then(locationServiceClient).should(times(1)).findLocationById(any());
+    }
+
+    @Test
+    @DisplayName("스터디 상세 조회 - 지역정보 미포함")
+    void findByIdNotWithLocation(){
+        // given
+        Category parentCategory = Category.createCategory("개발", null);
+        Category childCategory = Category.createCategory("백엔드", parentCategory);
+
+        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
+
+        List<Tag> tagList = new ArrayList<>();
+        Tag tag1 = Tag.createTestTag(1L,"스프링");
+        Tag tag2 = Tag.createTestTag(2L,"JPA");
+        tagList.add(tag1);
+        tagList.add(tag2);
+
+        List<StudyTag> studyTagList = new ArrayList<>();
+        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
+        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
+        studyTagList.add(studyTag1);
+        studyTagList.add(studyTag2);
+
+        Study study = Study.createStudy("스프링 스터디",
+                5, "안녕하세요 스프링 스터디입니다.",
+                true, true, "이미지 저장 이름",
+                "이미지", "썸네일 이미지", null, childCategory, studyUser, studyTagList);
+
+        given(studyQueryRepository.findWithCategoryAndStudyTagsAndTagById(any()))
+                .willReturn(study);
+
+        // when
+        StudyResponse studyResponse = studyService.findById(1L);
+
+        // then
+        assertThat(studyResponse.getName()).isEqualTo(study.getName());
+        assertThat(studyResponse.getStudyTags().size()).isEqualTo(2);
+        assertThat(studyResponse.getStudyTags()).contains("스프링","JPA");
+        assertThat(studyResponse.getLocation().getId()).isEqualTo(null);
+        assertThat(studyResponse.getChildCategory().getName()).isEqualTo("백엔드");
+        assertThat(studyResponse.getParentCategory().getName()).isEqualTo("개발");
+
+        then(studyQueryRepository).should(times(1)).findWithCategoryAndStudyTagsAndTagById(any());
+    }
+
+    @Test
+    @DisplayName("스터디 참가 신청 인원 추가 - 이미 가입한 인원일 경우")
+    void createWaitUserDuplicateStudyUser(){
+        // given
+        Category parentCategory = Category.createCategory("개발", null);
+        Category childCategory = Category.createCategory("백엔드", parentCategory);
+
+        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
+
+        List<Tag> tagList = new ArrayList<>();
+        Tag tag1 = Tag.createTestTag(1L,"스프링");
+        Tag tag2 = Tag.createTestTag(2L,"JPA");
+        tagList.add(tag1);
+        tagList.add(tag2);
+
+        List<StudyTag> studyTagList = new ArrayList<>();
+        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
+        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
+        studyTagList.add(studyTag1);
+        studyTagList.add(studyTag2);
+
+        Study study = Study.createStudy("스프링 스터디",
+                5, "안녕하세요 스프링 스터디입니다.",
+                true, true, "이미지 저장 이름",
+                "이미지", "썸네일 이미지", null, childCategory, studyUser, studyTagList);
+
+        given(studyQueryRepository.findWithWaitUserById(any()))
+                .willReturn(study);
+
+        given(studyUserRepository.findByUserIdAndStudy(any(),any()))
+                .willReturn(Optional.of(studyUser));
+
+        assertThrows(StudyException.class,()->studyService.createWaitUser(1L,1L));
+    }
+
+    @Test
+    @DisplayName("스터디 참가 신청 인원 추가 - 이미 참가 신청을 한 인원일 경우")
+    void createDuplicatedWaitUser(){
+        // given
+        Category parentCategory = Category.createCategory("개발", null);
+        Category childCategory = Category.createCategory("백엔드", parentCategory);
+
+        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
+
+        List<Tag> tagList = new ArrayList<>();
+        Tag tag1 = Tag.createTestTag(1L,"스프링");
+        Tag tag2 = Tag.createTestTag(2L,"JPA");
+        tagList.add(tag1);
+        tagList.add(tag2);
+
+        List<StudyTag> studyTagList = new ArrayList<>();
+        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
+        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
+        studyTagList.add(studyTag1);
+        studyTagList.add(studyTag2);
+
+        Study study = Study.createStudy("스프링 스터디",
+                5, "안녕하세요 스프링 스터디입니다.",
+                true, true, "이미지 저장 이름",
+                "이미지", "썸네일 이미지", null, childCategory, studyUser, studyTagList);
+        study.addWaitUser(2L);
+
+        given(studyQueryRepository.findWithWaitUserById(any()))
+                .willReturn(study);
+
+        given(studyUserRepository.findByUserIdAndStudy(any(),any()))
+                .willReturn(Optional.empty());
+
+        assertThrows(StudyException.class,()->studyService.createWaitUser(2L,1L));
+    }
+
+    @Test
+    @DisplayName("스터디 참가 인원 추가 - 성공")
+    void addWaitUser(){
+        // given
+        Category parentCategory = Category.createCategory("개발", null);
+        Category childCategory = Category.createCategory("백엔드", parentCategory);
+
+        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
+
+        List<Tag> tagList = new ArrayList<>();
+        Tag tag1 = Tag.createTestTag(1L,"스프링");
+        Tag tag2 = Tag.createTestTag(2L,"JPA");
+        tagList.add(tag1);
+        tagList.add(tag2);
+
+        List<StudyTag> studyTagList = new ArrayList<>();
+        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
+        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
+        studyTagList.add(studyTag1);
+        studyTagList.add(studyTag2);
+
+        Study study = Study.createStudy("스프링 스터디",
+                5, "안녕하세요 스프링 스터디입니다.",
+                true, true, "이미지 저장 이름",
+                "이미지", "썸네일 이미지", null, childCategory, studyUser, studyTagList);
+
+        given(studyQueryRepository.findWithWaitUserById(any()))
+                .willReturn(study);
+
+        given(studyUserRepository.findByUserIdAndStudy(any(),any()))
+                .willReturn(Optional.empty());
+
+        willDoNothing()
+                .given(kafkaStudyJoinMessageSender)
+                .send(any());
+
+        studyService.createWaitUser(2L,1L);
+
+        assertThat(study.getWaitUsers().size()).isEqualTo(1);
+        assertThat(study.getWaitUsers().get(0).getUserId()).isEqualTo(2L);
+        then(studyQueryRepository).should(times(1)).findWithWaitUserById(any());
+        then(studyUserRepository).should(times(1)).findByUserIdAndStudy(any(),any());
+        then(kafkaStudyJoinMessageSender).should(times(1)).send(any());
     }
 }

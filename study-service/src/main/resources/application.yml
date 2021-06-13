@@ -50,6 +50,8 @@ kafka:
     study:
       delete:
         name: study-delete-topic
+      join:
+        name: study-join-topic
 
 
 management:

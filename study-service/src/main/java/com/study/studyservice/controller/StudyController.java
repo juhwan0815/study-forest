@@ -44,4 +44,16 @@ public class StudyController {
         studyService.delete(userId,studyId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @GetMapping("/studies/{studyId}")
+    public ResponseEntity<StudyResponse> findById(@PathVariable Long studyId){
+        return ResponseEntity.ok(studyService.findById(studyId));
+    }
+
+    @PostMapping("/studies/{studyId}/waitUsers")
+    public ResponseEntity<Void> createWaitMember(@LoginUser Long userId,
+                                                 @PathVariable Long studyId){
+        studyService.createWaitUser(userId,studyId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

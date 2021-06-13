@@ -180,4 +180,65 @@ class StudyTest {
         assertThrows(StudyException.class,()->study.checkStudyAdmin(2L));
     }
 
+    @Test
+    @DisplayName("스터디 참가 대기 인원 추가")
+    void addWaitUser(){
+        // given
+        Category category = Category.createCategory("백엔드", null);
+        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
+
+        List<Tag> tagList = new ArrayList<>();
+        Tag tag1 = Tag.createTag("스프링");
+        Tag tag2 = Tag.createTag("JPA");
+        tagList.add(tag1);
+        tagList.add(tag2);
+
+        List<StudyTag> studyTagList = new ArrayList<>();
+        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
+        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
+        studyTagList.add(studyTag1);
+        studyTagList.add(studyTag2);
+
+        Study study = Study.createStudy("스프링 스터디",
+                5, "안녕하세요 스프링 스터디입니다.",
+                true, true, "이미지 저장 이름",
+                "이미지", "썸네일 이미지", 1L, category, studyUser, studyTagList);
+
+        // when
+        study.addWaitUser(2L);
+
+        // then
+        assertThat(study.getWaitUsers().size()).isEqualTo(1);
+        assertThat(study.getWaitUsers().get(0).getUserId()).isEqualTo(2L);
+
+    }
+
+    @Test
+    @DisplayName("스터디 참가 대기 인원 추가")
+    void addDuplicatedWaitUser() {
+        // given
+        Category category = Category.createCategory("백엔드", null);
+        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
+
+        List<Tag> tagList = new ArrayList<>();
+        Tag tag1 = Tag.createTag("스프링");
+        Tag tag2 = Tag.createTag("JPA");
+        tagList.add(tag1);
+        tagList.add(tag2);
+
+        List<StudyTag> studyTagList = new ArrayList<>();
+        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
+        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
+        studyTagList.add(studyTag1);
+        studyTagList.add(studyTag2);
+
+        Study study = Study.createStudy("스프링 스터디",
+                5, "안녕하세요 스프링 스터디입니다.",
+                true, true, "이미지 저장 이름",
+                "이미지", "썸네일 이미지", 1L, category, studyUser, studyTagList);
+        study.addWaitUser(2L);
+
+        // when
+        assertThrows(StudyException.class,()->study.addWaitUser(2L));
+    }
 }

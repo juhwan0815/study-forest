@@ -9,7 +9,9 @@ import com.study.studyservice.domain.*;
 import com.study.studyservice.exception.CategoryException;
 import com.study.studyservice.exception.StudyException;
 import com.study.studyservice.kafka.message.StudyDeleteMessage;
+import com.study.studyservice.kafka.message.StudyJoinMessage;
 import com.study.studyservice.kafka.sender.KafkaStudyDeleteMessageSender;
+import com.study.studyservice.kafka.sender.KafkaStudyJoinMessageSender;
 import com.study.studyservice.model.image.ImageUploadResult;
 import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
@@ -46,6 +48,7 @@ public class StudyServiceImpl implements StudyService {
     private final StudyQueryRepository studyQueryRepository;
     private final StudyUserRepository studyUserRepository;
     private final KafkaStudyDeleteMessageSender kafkaStudyDeleteMessageSender;
+    private final KafkaStudyJoinMessageSender kafkaStudyJoinMessageSender;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -55,11 +58,11 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     @Transactional
-    public StudyResponse create(Long userId,MultipartFile image,StudyCreateRequest request) {
+    public StudyResponse create(Long userId, MultipartFile image, StudyCreateRequest request) {
         Category findCategory = categoryRepository.findWithParentById(request.getCategoryId())
                 .orElseThrow(() -> new CategoryException(request.getCategoryId() + "는 존재하지 않는 카테고리 ID입니다."));
 
-        LocationResponse location = getLocation(request.isOffline(),request.getLocationCode());
+        LocationResponse location = getLocation(request.isOffline(), request.getLocationCode());
 
         ImageUploadResult imageUploadResult = uploadImage(image);
 
@@ -105,20 +108,20 @@ public class StudyServiceImpl implements StudyService {
         LocationResponse location = getLocation(request.isOffline(), request.getLocationCode());
 
         List<Tag> tagList = tagRepository.findByNameIn(request.getTags());
-        searchNewTags(request.getTags(),tagList);
+        searchNewTags(request.getTags(), tagList);
 
-        if(request.isDeleteImage()){
+        if (request.isDeleteImage()) {
             deleteImageFromS3(findStudy.getImageStoreName());
             findStudy.deleteImage();
         }
-        if(!image.isEmpty()){
+        if (!image.isEmpty()) {
             validateImageType(image);
             deleteImageFromS3(findStudy.getImageStoreName());
             ImageUploadResult imageUploadResult = uploadImage(image);
 
             findStudy.changeImage(imageUploadResult.getStudyImage(),
-                                  imageUploadResult.getStudyThumbnailImage(),
-                                  imageUploadResult.getImageStoreName());
+                    imageUploadResult.getStudyThumbnailImage(),
+                    imageUploadResult.getImageStoreName());
         }
 
 
@@ -132,7 +135,7 @@ public class StudyServiceImpl implements StudyService {
                 findCategory,
                 tagList);
 
-        return StudyResponse.from(findStudy,location);
+        return StudyResponse.from(findStudy, location);
     }
 
     @Override
@@ -147,7 +150,36 @@ public class StudyServiceImpl implements StudyService {
         kafkaStudyDeleteMessageSender.send(StudyDeleteMessage.from(findStudy));
     }
 
-    private LocationResponse getLocation(boolean offline,String locationCode) {
+    @Override
+    public StudyResponse findById(Long studyId) {
+        Study findStudy = studyQueryRepository.findWithCategoryAndStudyTagsAndTagById(studyId);
+
+        LocationResponse location;
+
+        if (findStudy.getLocationId() != null && findStudy.isOffline()) {
+            location = locationServiceClient.findLocationById(findStudy.getLocationId());
+        } else {
+            location = new LocationResponse();
+        }
+
+        return StudyResponse.from(findStudy, location);
+    }
+
+    @Override
+    @Transactional
+    public void createWaitUser(Long userId, Long studyId) {
+        Study findStudy = studyQueryRepository.findWithWaitUserById(studyId);
+
+        if(studyUserRepository.findByUserIdAndStudy(userId,findStudy).isPresent()){
+            throw new StudyException("이미 스터디에 가입했습니다.");
+        }
+
+        findStudy.addWaitUser(userId);
+
+        kafkaStudyJoinMessageSender.send(StudyJoinMessage.createStudyJoin(userId,studyId));
+    }
+
+    private LocationResponse getLocation(boolean offline, String locationCode) {
         LocationResponse location;
         if (offline) {
             if (locationCode == null) {

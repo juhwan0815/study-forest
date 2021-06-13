@@ -10,4 +10,7 @@ import java.util.Optional;
 public interface StudyUserRepository extends JpaRepository<StudyUser,Long> {
 
     Optional<StudyUser> findByUserIdAndAndRoleAndStudy(Long userId, Role role, Study study);
+
+    Optional<StudyUser> findByUserIdAndStudy(Long userId,Study study);
+
 }

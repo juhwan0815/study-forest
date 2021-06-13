@@ -56,3 +56,23 @@ include::{snippets}/study/delete/path-parameters.adoc[]
 
 ===== 응답
 include::{snippets}/study/delete/http-response.adoc[]
+
+==== 스터디 상세 조회 API
+===== 요청
+include::{snippets}/study/findById/http-request.adoc[]
+====== Path
+include::{snippets}/study/findById/path-parameters.adoc[]
+===== 응답
+include::{snippets}/study/findById/http-response.adoc[]
+====== Body
+include::{snippets}/study/findById/response-fields.adoc[]
+
+==== 스터디 참가 신청 API
+===== 요청
+include::{snippets}/study/waitUser/create/http-request.adoc[]
+====== Header
+include::{snippets}/study/waitUser/create/request-headers.adoc[]
+====== Path
+include::{snippets}/study/waitUser/create/path-parameters.adoc[]
+===== 응답
+include::{snippets}/study/waitUser/create/http-response.adoc[]

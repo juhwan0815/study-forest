@@ -12,4 +12,8 @@ public interface StudyService {
     StudyResponse update(Long userId, Long studyId, MultipartFile image, StudyUpdateRequest request);
 
     void delete(Long userId, Long studyId);
+
+    StudyResponse findById(Long studyId);
+
+    void createWaitUser(Long userId, Long studyId);
 }
