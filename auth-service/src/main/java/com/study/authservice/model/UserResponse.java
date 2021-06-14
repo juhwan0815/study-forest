@@ -17,6 +17,10 @@ public class UserResponse {
 
     private String refreshToken; // refreshToken
 
+    private String gender; // 성별
+
+    private String ageRange; // 나이대
+
     private String status; // 회원 상태
 
     private String role; // 회원 권한

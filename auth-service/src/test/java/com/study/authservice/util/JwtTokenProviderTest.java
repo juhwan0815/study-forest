@@ -27,6 +27,8 @@ class JwtTokenProviderTest {
         userResponse.setNickName("황주환");
         userResponse.setProfileImage("이미지");
         userResponse.setThumbnailImage("이미지");
+        userResponse.setGender("male");
+        userResponse.setAgeRange("10~19");
         userResponse.setStatus("ACTIVE");
         userResponse.setRole("USER");
 
@@ -48,6 +50,8 @@ class JwtTokenProviderTest {
         userResponse.setNickName("황주환");
         userResponse.setProfileImage("이미지");
         userResponse.setThumbnailImage("이미지");
+        userResponse.setGender("male");
+        userResponse.setAgeRange("10~19");
         userResponse.setStatus("ACTIVE");
         userResponse.setRole("ROLE");
 
@@ -72,6 +76,8 @@ class JwtTokenProviderTest {
         userResponse.setNickName("황주환");
         userResponse.setProfileImage("이미지");
         userResponse.setThumbnailImage("이미지");
+        userResponse.setGender("male");
+        userResponse.setAgeRange("10~19");
         userResponse.setStatus("ACTIVE");
         userResponse.setRole("USER");
 
@@ -96,6 +102,8 @@ class JwtTokenProviderTest {
         userResponse.setNickName("황주환");
         userResponse.setProfileImage("이미지");
         userResponse.setThumbnailImage("이미지");
+        userResponse.setGender("male");
+        userResponse.setAgeRange("10~19");
         userResponse.setStatus("ACTIVE");
         userResponse.setRole("USER");
 

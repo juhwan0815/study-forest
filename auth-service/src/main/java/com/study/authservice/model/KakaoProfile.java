@@ -9,6 +9,8 @@ public class KakaoProfile {
 
     private Properties properties;
 
+    private KakaoAccount kakao_account;
+
     @Data
     public static class Properties {
         private String nickname;
@@ -17,4 +19,11 @@ public class KakaoProfile {
 
         private String thumbnail_image;
     }
+
+    @Data
+    public static class KakaoAccount{
+        private String age_range;
+        private String gender;
+    }
+
 }

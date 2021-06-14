@@ -51,7 +51,6 @@ class AuthServiceTest {
     void login(){
 
         // given
-
         String kakaoToken = "kakaoToken";
 
         KakaoProfile kakaoProfile = new KakaoProfile();
@@ -61,8 +60,13 @@ class AuthServiceTest {
         properties.setProfile_image("어딘가의 이미지");
         properties.setThumbnail_image("어딘가의 이미지");
 
+        KakaoProfile.KakaoAccount kakaoAccount = new KakaoProfile.KakaoAccount();
+        kakaoAccount.setAge_range("10~19");
+        kakaoAccount.setGender("male");
+
         kakaoProfile.setId(1L);
         kakaoProfile.setProperties(properties);
+        kakaoProfile.setKakao_account(kakaoAccount);
 
         UserResponse userResponse = new UserResponse();
         userResponse.setId(1L);
@@ -70,6 +74,8 @@ class AuthServiceTest {
         userResponse.setNickName(kakaoProfile.getProperties().getNickname());
         userResponse.setProfileImage(kakaoProfile.getProperties().getProfile_image());
         userResponse.setThumbnailImage(kakaoProfile.getProperties().getThumbnail_image());
+        userResponse.setGender("male");
+        userResponse.setAgeRange("10~19");
         userResponse.setStatus("ACTIVE");
         userResponse.setRole("USER");
 
@@ -131,6 +137,8 @@ class AuthServiceTest {
         userResponse.setProfileImage("이미지");
         userResponse.setThumbnailImage("이미지");
         userResponse.setRefreshToken(refreshToken);
+        userResponse.setGender("male");
+        userResponse.setAgeRange("10~19");
         userResponse.setStatus("ACTIVE");
         userResponse.setRole("USER");
 

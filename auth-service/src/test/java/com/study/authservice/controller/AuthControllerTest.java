@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.authservice.config.LoginUserArgumentResolver;
 import com.study.authservice.model.CreateTokenResult;
 import com.study.authservice.service.AuthService;
-import com.study.authservice.util.JwtTokenProvider;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(AuthController.class)
 class AuthControllerTest {
 
-    private final String TEST_AUTHORIZATION = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjI4ODU3NDEsImV4cCI6MTYyMzQ5MDU0MX0.c24V3JQxYlp9L4XgtFqfL6KR31CuTNRC5i-M0t8nMAU";
+    private final String TEST_AUTHORIZATION = "Bearer 토큰";
 
     @MockBean
     private AuthService authService;
