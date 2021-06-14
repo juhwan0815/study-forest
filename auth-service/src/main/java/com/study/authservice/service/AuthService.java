@@ -1,12 +1,12 @@
 package com.study.authservice.service;
 
-import com.study.authservice.model.CreateTokenResult;
+import com.study.authservice.model.common.CreateTokenResult;
 
 public interface AuthService {
 
     CreateTokenResult login(String kakaoToken);
 
-    CreateTokenResult refresh(String refreshToken,Long userId);
+    String refresh(String refreshToken,Long userId);
 
-    void logout(Long userId);
+    void delete(Long userId);
 }

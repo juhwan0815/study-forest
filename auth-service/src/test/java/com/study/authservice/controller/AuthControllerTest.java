@@ -1,8 +1,10 @@
 package com.study.authservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.study.authservice.AuthFixture;
 import com.study.authservice.config.LoginUserArgumentResolver;
-import com.study.authservice.model.CreateTokenResult;
+import com.study.authservice.domain.Auth;
+import com.study.authservice.model.common.CreateTokenResult;
 import com.study.authservice.service.AuthService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -17,12 +19,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Date;
 
+import static com.study.authservice.AuthFixture.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
@@ -67,38 +71,18 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("로그인 테스트")
+    @DisplayName("로그인 API 테스트")
     void login() throws Exception {
 
-        String accessToken = Jwts.builder()
-                .setSubject(String.valueOf(1L))
-                .claim("ROLE", "USER")
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + 86400000L))
-                .signWith(SignatureAlgorithm.HS256, "study")
-                .compact();
-
-        String refreshToken = Jwts.builder()
-                .setSubject(String.valueOf(1L))
-                .claim("ROLE", "USER")
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + 604800000L))
-                .signWith(SignatureAlgorithm.HS256, "study")
-                .compact();
-
-        CreateTokenResult createTokenResult = new CreateTokenResult();
-        createTokenResult.setAccessToken(accessToken);
-        createTokenResult.setRefreshToken(refreshToken);
-
         given(authService.login(any()))
-                .willReturn(createTokenResult);
+                .willReturn(TEST_CREATE_TOKEN_RESULT);
 
-        mockMvc.perform(post("/login")
+        mockMvc.perform(post("/auth")
                 .header("kakaoToken", "kakaoToken"))
                 .andExpect(status().isOk())
-                .andExpect(header().string("accessToken", createTokenResult.getAccessToken()))
-                .andExpect(header().string("refreshToken", createTokenResult.getRefreshToken()))
-                .andDo(document("auth/login",
+                .andExpect(header().string("accessToken", TEST_CREATE_TOKEN_RESULT.getAccessToken()))
+                .andExpect(header().string("refreshToken", TEST_CREATE_TOKEN_RESULT.getRefreshToken()))
+                .andDo(document("auth/create",
                         requestHeaders(
                                 headerWithName("kakaoToken").description("카카오 토큰")
                         ),
@@ -112,30 +96,24 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("토큰 재발급 API 테스트")
-    void refreshToken() throws Exception {
-
-        CreateTokenResult createTokenResult = new CreateTokenResult();
-        createTokenResult.setAccessToken("Access토큰");
-        createTokenResult.setRefreshToken("Refresh토큰");
+    void refresh() throws Exception {
 
         given(authService.refresh(any(), any()))
-                .willReturn(createTokenResult);
+                .willReturn(TEST_ACCESS_TOKEN);
 
         given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
                 .willReturn(1L);
 
-        mockMvc.perform(post("/refresh")
+        mockMvc.perform(post("/auth/refresh")
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
-                .andExpect(header().string("accessToken", createTokenResult.getAccessToken()))
-                .andExpect(header().string("refreshToken", createTokenResult.getRefreshToken()))
+                .andExpect(header().string("accessToken", TEST_ACCESS_TOKEN))
                 .andDo(document("auth/refresh",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("Refresh Token")
                         ),
                         responseHeaders(
-                                headerWithName("accessToken").description("새로 발급된 Access 토큰"),
-                                headerWithName("refreshToken").description("새로 발급된 Refresh 토큰")
+                                headerWithName("accessToken").description("새로 발급된 Access 토큰")
                         )));
 
         then(authService).should(times(1)).refresh(any(), any());
@@ -143,7 +121,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("로그아웃 API 테스트")
-    void logout() throws Exception {
+    void delete() throws Exception {
 
         // given
         given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
@@ -151,17 +129,17 @@ class AuthControllerTest {
 
         willDoNothing()
                 .given(authService)
-                .logout(any());
+                .delete(any());
 
         // when
-        mockMvc.perform(post("/logout")
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/auth")
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
-                .andDo(document("auth/logout",
+                .andDo(document("auth/delete",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
                         )));
 
-        then(authService).should(times(1)).logout(any());
+        then(authService).should(times(1)).delete(any());
     }
 }

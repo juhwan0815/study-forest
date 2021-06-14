@@ -1,8 +1,8 @@
 package com.study.authservice.util;
 
+import com.study.authservice.domain.Auth;
 import com.study.authservice.exception.AuthException;
-import com.study.authservice.model.CreateTokenResult;
-import com.study.authservice.model.UserResponse;
+import com.study.authservice.model.common.CreateTokenResult;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -26,26 +26,26 @@ public class JwtTokenProvider {
     @Value("${token.refresh_token.expiration_time}")
     private String refreshTokenExpirationTime;
 
-    public CreateTokenResult createToken(UserResponse user) {
-        return CreateTokenResult.from(createAccessToken(user), createRefreshToken(user));
+    public CreateTokenResult createToken(Long userId,String role) {
+        return CreateTokenResult.from(createAccessToken(userId,role), createRefreshToken(userId,role));
     }
 
-    public String createAccessToken(UserResponse user) {
+    public String createAccessToken(Long userId,String role) {
         Date now = new Date();
         return Jwts.builder()
-                .setSubject(String.valueOf(user.getId()))
-                .claim("ROLE", user.getRole())
+                .setSubject(String.valueOf(userId))
+                .claim("ROLE", role)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + Long.valueOf(accessTokenExpirationTime)))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
-    public String createRefreshToken(UserResponse user) {
+    public String createRefreshToken(Long userId,String role) {
         Date now = new Date();
         return Jwts.builder()
-                .setSubject(String.valueOf(user.getId()))
-                .claim("ROLE", user.getRole())
+                .setSubject(String.valueOf(userId))
+                .claim("ROLE", role)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + Long.valueOf(refreshTokenExpirationTime)))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
@@ -59,11 +59,16 @@ public class JwtTokenProvider {
         return Long.valueOf(userId);
     }
 
-    public CreateTokenResult refresh(String requestRefreshToken,UserResponse user){
-        if (!requestRefreshToken.equals(user.getRefreshToken())){
+
+    public String refresh(String requestRefreshToken, Auth auth){
+        if (!requestRefreshToken.equals(auth.getRefreshToken())){
             throw new AuthException("서버의 refreshToken과 일치하지 않습니다.");
         }
-        return createToken(user);
+
+        String role = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(requestRefreshToken)
+                .getBody().get("ROLE", String.class);
+
+        return createAccessToken(auth.getUserId(),role);
     }
 
 }

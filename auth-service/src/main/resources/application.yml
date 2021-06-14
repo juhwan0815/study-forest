@@ -4,11 +4,30 @@ server:
 spring:
   application:
     name: auth-service
+
   rabbitmq:
     host: 127.0.0.1
     port: 5672
     username: guest
     password: guest
+
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+      path: /h2-console
+
+  jpa:
+    #    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        #        default_batch_fetch_size: 1000
+        show_sql: false
+        format_sql: true
+    open-in-view: false
 
 eureka:
   instance:
@@ -19,13 +38,6 @@ eureka:
     service-url:
       defaultZone: http://127.0.0.1:8761/eureka
 
-kafka:
-  server: 127.0.0.1:9092
-  topic:
-    refresh:
-      name: auth-refresh-topic
-    logout:
-      name: auth-logout-topic
 
 social:
   kakao:
@@ -37,3 +49,7 @@ management:
     web:
       exposure:
         include: refresh, health, beans, busrefresh
+
+logging:
+  level:
+    org.hibernate.SQL: debug

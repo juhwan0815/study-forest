@@ -1,17 +1,14 @@
 package com.study.authservice.controller;
 
 import com.study.authservice.config.LoginUser;
-import com.study.authservice.model.CreateTokenResult;
+import com.study.authservice.model.common.CreateTokenResult;
 import com.study.authservice.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @Slf4j
@@ -22,9 +19,8 @@ public class AuthController {
 
     private final AuthService authService;
 
-
-    @PostMapping("/login")
-    public ResponseEntity login(@RequestHeader String kakaoToken){
+    @PostMapping("/auth")
+    public ResponseEntity create(@RequestHeader String kakaoToken){
 
         CreateTokenResult createTokenResult = authService.login(kakaoToken);
 
@@ -34,20 +30,17 @@ public class AuthController {
                 .build();
     }
 
-    @PostMapping("/refresh")
+    @PostMapping("/auth/refresh")
     public ResponseEntity refresh(@LoginUser Long userId,
                                   @RequestHeader(name = HttpHeaders.AUTHORIZATION) String refreshToken){
-        CreateTokenResult createTokenResult = authService.refresh(refreshToken,userId);
-
         return ResponseEntity.status(HttpStatus.OK)
-                .header("accessToken",createTokenResult.getAccessToken())
-                .header("refreshToken", createTokenResult.getRefreshToken())
+                .header("accessToken",authService.refresh(refreshToken,userId))
                 .build();
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity refresh(@LoginUser Long userId){
-        authService.logout(userId);
+    @DeleteMapping("/auth")
+    public ResponseEntity delete(@LoginUser Long userId){
+        authService.delete(userId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

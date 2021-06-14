@@ -3,7 +3,7 @@ package com.study.authservice.client.impl;
 import com.google.gson.Gson;
 import com.study.authservice.client.KakaoServiceClient;
 import com.study.authservice.exception.KakaoException;
-import com.study.authservice.model.KakaoProfile;
+import com.study.authservice.model.common.KakaoProfile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;

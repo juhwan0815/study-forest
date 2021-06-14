@@ -470,7 +470,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h5 id="_요청"><a class="anchor" href="#_요청"></a><a class="link" href="#_요청">요청</a></h5>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /login HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /auth HTTP/1.1
 kakaoToken: kakaoToken
 Host: localhost:8080</code></pre>
 </div>
@@ -505,8 +505,8 @@ Host: localhost:8080</code></pre>
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-accessToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjM2NjA3ODQsImV4cCI6MTYyMzc0NzE4NH0.8Gh-bIOiY3cCeC7wun7WdggJR7GbcQEHmjRRUoRjRDs
-refreshToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjM2NjA3ODQsImV4cCI6MTYyNDI2NTU4NH0.rdbnu8ykbfS0h1XUPd7GRFH0JSH6iNehUBjIpOgoAQo</code></pre>
+accessToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjM2OTY0MzksImV4cCI6MTYyMzc4MjgzOX0.vgEkRHGpFNumavc1NANYTQOcD1rHTitxo7WorJm7cRI
+refreshToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjM2OTY0NDAsImV4cCI6MTYyNDMwMTI0MH0.PJTOqqAQyOiCyQ1lTDA2Y1ZZc3iRo6-FfQ09B39yNhg</code></pre>
 </div>
 </div>
 <div class="sect5">
@@ -542,7 +542,7 @@ refreshToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2M
 <h5 id="_요청_2"><a class="anchor" href="#_요청_2"></a><a class="link" href="#_요청_2">요청</a></h5>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /refresh HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /auth/refresh HTTP/1.1
 Authorization: Bearer 토큰
 Host: localhost:8080</code></pre>
 </div>
@@ -577,8 +577,7 @@ Host: localhost:8080</code></pre>
 Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
-accessToken: Access토큰
-refreshToken: Refresh토큰</code></pre>
+accessToken: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjM2OTY0MzksImV4cCI6MTYyMzc4MjgzOX0.vgEkRHGpFNumavc1NANYTQOcD1rHTitxo7WorJm7cRI</code></pre>
 </div>
 </div>
 <div class="sect5">
@@ -599,10 +598,6 @@ refreshToken: Refresh토큰</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>accessToken</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">새로 발급된 Access 토큰</p></td>
 </tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>refreshToken</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">새로 발급된 Refresh 토큰</p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -614,7 +609,7 @@ refreshToken: Refresh토큰</code></pre>
 <h5 id="_요청_3"><a class="anchor" href="#_요청_3"></a><a class="link" href="#_요청_3">요청</a></h5>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /logout HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /auth HTTP/1.1
 Authorization: Bearer 토큰
 Host: localhost:8080</code></pre>
 </div>
@@ -656,7 +651,7 @@ Vary: Access-Control-Request-Headers</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-06-06 17:18:48 KST
+Last updated 2021-06-15 03:44:44 KST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">

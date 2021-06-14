@@ -1,8 +1,12 @@
-package com.study.authservice.model;
+package com.study.authservice.model.common;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class KakaoProfile {
 
     private Long id;
@@ -12,6 +16,8 @@ public class KakaoProfile {
     private KakaoAccount kakao_account;
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Properties {
         private String nickname;
 
@@ -21,6 +27,8 @@ public class KakaoProfile {
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class KakaoAccount{
         private String age_range;
         private String gender;

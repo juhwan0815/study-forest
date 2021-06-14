@@ -1,5 +1,6 @@
-package com.study.authservice.model;
+package com.study.authservice.model.user;
 
+import com.study.authservice.model.common.KakaoProfile;
 import lombok.Data;
 
 @Data

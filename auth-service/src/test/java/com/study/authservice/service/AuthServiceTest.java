@@ -1,16 +1,19 @@
 package com.study.authservice.service;
 
+import com.study.authservice.AuthFixture;
 import com.study.authservice.client.KakaoServiceClient;
 import com.study.authservice.client.UserServiceClient;
-import com.study.authservice.kafka.sender.KafkaLogoutMessageSender;
-import com.study.authservice.kafka.sender.KafkaRefreshTokenCreateMessageSender;
-import com.study.authservice.model.CreateTokenResult;
-import com.study.authservice.model.KakaoProfile;
-import com.study.authservice.model.UserResponse;
+import com.study.authservice.domain.Auth;
+import com.study.authservice.exception.AuthException;
+import com.study.authservice.model.common.CreateTokenResult;
+import com.study.authservice.model.common.KakaoProfile;
+import com.study.authservice.model.user.UserResponse;
+import com.study.authservice.repository.AuthRepository;
 import com.study.authservice.service.Impl.AuthServiceImpl;
 import com.study.authservice.util.JwtTokenProvider;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,8 +22,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
+import java.util.Optional;
 
+import static com.study.authservice.AuthFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 
@@ -28,7 +34,7 @@ import static org.mockito.BDDMockito.*;
 class AuthServiceTest {
 
     @InjectMocks
-    private AuthServiceImpl authServiceImpl;
+    private AuthServiceImpl authService;
 
     @Mock
     private KakaoServiceClient kakaoServiceClient;
@@ -40,143 +46,124 @@ class AuthServiceTest {
     private JwtTokenProvider jwtTokenProvider;
 
     @Mock
-    private KafkaRefreshTokenCreateMessageSender kafkaRefreshTokenCreateMessageSender;
-
-    @Mock
-    private KafkaLogoutMessageSender kafkaLogoutMessageSender;
-
+    private AuthRepository authRepository;
 
     @Test
-    @DisplayName("카카오 계정 로그인")
-    void login(){
+    @DisplayName("카카오 토큰으로 로그인 - 이미 가입된 회원일 경우")
+    void loginExistUser(){
 
         // given
-        String kakaoToken = "kakaoToken";
+        KakaoProfile.Properties properties =
+                new KakaoProfile.Properties("황주환","이미지","이미지");
 
-        KakaoProfile kakaoProfile = new KakaoProfile();
+        KakaoProfile.KakaoAccount kakaoAccount =
+                new KakaoProfile.KakaoAccount("10~19","male");
 
-        KakaoProfile.Properties properties = new KakaoProfile.Properties();
-        properties.setNickname("황주환");
-        properties.setProfile_image("어딘가의 이미지");
-        properties.setThumbnail_image("어딘가의 이미지");
-
-        KakaoProfile.KakaoAccount kakaoAccount = new KakaoProfile.KakaoAccount();
-        kakaoAccount.setAge_range("10~19");
-        kakaoAccount.setGender("male");
-
-        kakaoProfile.setId(1L);
-        kakaoProfile.setProperties(properties);
-        kakaoProfile.setKakao_account(kakaoAccount);
-
-        UserResponse userResponse = new UserResponse();
-        userResponse.setId(1L);
-        userResponse.setKakaoId(kakaoProfile.getId());
-        userResponse.setNickName(kakaoProfile.getProperties().getNickname());
-        userResponse.setProfileImage(kakaoProfile.getProperties().getProfile_image());
-        userResponse.setThumbnailImage(kakaoProfile.getProperties().getThumbnail_image());
-        userResponse.setGender("male");
-        userResponse.setAgeRange("10~19");
-        userResponse.setStatus("ACTIVE");
-        userResponse.setRole("USER");
-
-        String accessToken = Jwts.builder()
-                .setSubject(String.valueOf(userResponse.getId()))
-                .claim("ROLE", userResponse.getRole())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + 86400000L))
-                .signWith(SignatureAlgorithm.HS256, "study")
-                .compact();
-
-        String refreshToken = Jwts.builder()
-                .setSubject(String.valueOf(userResponse.getId()))
-                .claim("ROLE", userResponse.getRole())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + 604800000L))
-                .signWith(SignatureAlgorithm.HS256, "study")
-                .compact();
-
-        CreateTokenResult createTokenResult = new CreateTokenResult();
-        createTokenResult.setAccessToken(accessToken);
-        createTokenResult.setRefreshToken(refreshToken);
+        KakaoProfile kakaoProfile =
+                new KakaoProfile(1L,properties,kakaoAccount);
 
         given(kakaoServiceClient.getKakaoProfile(any()))
                 .willReturn(kakaoProfile);
 
         given(userServiceClient.login(any()))
-                .willReturn(userResponse);
+                .willReturn(TEST_USER_RESPONSE);
 
-        given(jwtTokenProvider.createToken(any()))
-                .willReturn(createTokenResult);
+        given(jwtTokenProvider.createToken(any(),any()))
+                .willReturn(TEST_CREATE_TOKEN_RESULT);
 
-        willDoNothing()
-                .given(kafkaRefreshTokenCreateMessageSender)
-                .send(any());
+        given(authRepository.findByUserId(any()))
+                .willReturn(Optional.of(TEST_AUTH));
 
         // when
-        CreateTokenResult tokenResult = authServiceImpl.login(kakaoToken);
+        CreateTokenResult tokenResult = authService.login("kakaoToken");
 
         // then
-        assertThat(tokenResult.getAccessToken()).isEqualTo(accessToken);
-        assertThat(tokenResult.getRefreshToken()).isEqualTo(refreshToken);
+        assertThat(tokenResult.getAccessToken()).isEqualTo(TEST_ACCESS_TOKEN);
+        assertThat(tokenResult.getRefreshToken()).isEqualTo(TEST_REFRESH_TOKEN);
         then(kakaoServiceClient).should(times(1)).getKakaoProfile(any());
         then(userServiceClient).should(times(1)).login(any());
-        then(jwtTokenProvider).should(times(1)).createToken(any());
-        then(kafkaRefreshTokenCreateMessageSender).should(times(1)).send(any());
+        then(jwtTokenProvider).should(times(1)).createToken(any(),any());
+        then(authRepository).should(times(1)).findByUserId(any());
     }
 
     @Test
-    @DisplayName("토큰 재발급")
-    void refreshTokens(){
+    @DisplayName("카카오 토큰으로 로그인 - 이미 가입된 회원이 아닐 경우")
+    void loginNotExistUser(){
+
         // given
-        String refreshToken = "refreshToken";
+        KakaoProfile.Properties properties =
+                new KakaoProfile.Properties("황주환","이미지","이미지");
 
-        UserResponse userResponse = new UserResponse();
-        userResponse.setId(1L);
-        userResponse.setKakaoId(1L);
-        userResponse.setNickName("황주환");
-        userResponse.setProfileImage("이미지");
-        userResponse.setThumbnailImage("이미지");
-        userResponse.setRefreshToken(refreshToken);
-        userResponse.setGender("male");
-        userResponse.setAgeRange("10~19");
-        userResponse.setStatus("ACTIVE");
-        userResponse.setRole("USER");
+        KakaoProfile.KakaoAccount kakaoAccount =
+                new KakaoProfile.KakaoAccount("10~19","male");
 
-        given(userServiceClient.findUserById(any()))
-                .willReturn(userResponse);
+        KakaoProfile kakaoProfile =
+                new KakaoProfile(1L,properties,kakaoAccount);
 
-        CreateTokenResult createTokenResult = new CreateTokenResult();
-        createTokenResult.setAccessToken("Access토큰");
-        createTokenResult.setRefreshToken("Refresh토큰");
+        given(kakaoServiceClient.getKakaoProfile(any()))
+                .willReturn(kakaoProfile);
 
-        given(jwtTokenProvider.refresh(any(),any()))
-                .willReturn(createTokenResult);
+        given(userServiceClient.login(any()))
+                .willReturn(TEST_USER_RESPONSE);
 
-        willDoNothing()
-                .given(kafkaRefreshTokenCreateMessageSender)
-                .send(any());
+        given(jwtTokenProvider.createToken(any(),any()))
+                .willReturn(TEST_CREATE_TOKEN_RESULT);
+
+        given(authRepository.findByUserId(any()))
+                .willReturn(Optional.empty());
+
+        given(authRepository.save(any()))
+                .willReturn(TEST_AUTH);
 
         // when
-        CreateTokenResult result = authServiceImpl.refresh(refreshToken,1L);
+        CreateTokenResult result = authService.login("kakaoToken");
 
         // then
-        assertThat(result.getAccessToken()).isEqualTo(createTokenResult.getAccessToken());
-        assertThat(result.getRefreshToken()).isEqualTo(createTokenResult.getRefreshToken());
+        assertThat(result.getAccessToken()).isEqualTo(TEST_ACCESS_TOKEN);
+        assertThat(result.getRefreshToken()).isEqualTo(TEST_REFRESH_TOKEN);
+        then(kakaoServiceClient).should(times(1)).getKakaoProfile(any());
+        then(userServiceClient).should(times(1)).login(any());
+        then(jwtTokenProvider).should(times(1)).createToken(any(),any());
+        then(authRepository).should(times(1)).findByUserId(any());
+        then(authRepository).should(times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("Refresh 토큰으로 Access 토큰을 재발급 받는다.")
+    void refreshTokenNotError(){
+        // given
+        given(authRepository.findByUserId(any()))
+                .willReturn(Optional.of(TEST_AUTH));
+
+        given(jwtTokenProvider.refresh(any(),any()))
+                .willReturn(TEST_ACCESS_TOKEN);
+
+        // when
+        String result = authService.refresh(TEST_REFRESH_TOKEN, 1L);
+
+        // then
+        assertThat(result).isEqualTo(TEST_ACCESS_TOKEN);
+
+        then(authRepository).should(times(1)).findByUserId(any());
+        then(jwtTokenProvider).should(times(1)).refresh(any(),any());
     }
 
     @Test
     @DisplayName("로그아웃")
     void logout() {
         // given
-        willDoNothing()
-                .given(kafkaLogoutMessageSender)
-                .send(any());
+        given(authRepository.findByUserId(any()))
+                .willReturn(Optional.of(TEST_AUTH));
 
+        willDoNothing()
+                .given(authRepository)
+                .delete(any());
         // when
-        authServiceImpl.logout(1L);
+        authService.delete(1L);
 
         // then
-        then(kafkaLogoutMessageSender).should(times(1)).send(any());
+        then(authRepository).should(times(1)).findByUserId(any());
+        then(authRepository).should(times(1)).delete(any());
     }
 
 

@@ -19,14 +19,14 @@ Gateway-service 주소 : 포트 + /auth-service
 [[api]]
 ==== 카카오 로그인 API
 ===== 요청
-include::{snippets}/auth/login/http-request.adoc[]
+include::{snippets}/auth/create/http-request.adoc[]
 ====== Header
-include::{snippets}/auth/login/request-headers.adoc[]
+include::{snippets}/auth/create/request-headers.adoc[]
 
 ===== 응답
-include::{snippets}/auth/login/http-response.adoc[]
+include::{snippets}/auth/create/http-response.adoc[]
 ====== Header
-include::{snippets}/auth/login/response-headers.adoc[]
+include::{snippets}/auth/create/response-headers.adoc[]
 
 ==== 토큰 재발급 API
 ===== 요청
@@ -41,9 +41,9 @@ include::{snippets}/auth/refresh/response-headers.adoc[]
 
 ==== 로그아웃 API
 ===== 요청
-include::{snippets}/auth/logout/http-request.adoc[]
+include::{snippets}/auth/delete/http-request.adoc[]
 ====== Header
-include::{snippets}/auth/logout/request-headers.adoc[]
+include::{snippets}/auth/delete/request-headers.adoc[]
 
 ===== 응답
-include::{snippets}/auth/logout/http-response.adoc[]
+include::{snippets}/auth/delete/http-response.adoc[]
