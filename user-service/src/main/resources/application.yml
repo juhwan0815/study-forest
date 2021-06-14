@@ -51,11 +51,17 @@ kafka:
       name: auth-refresh-topic
     logout:
       name: auth-logout-topic
+    study:
+      join:
+        name: study-join-topic
   consumer:
     refresh:
       groupName: auth-refresh-consumer-group
     logout:
       groupName: auth-logout-consumer-group
+    study:
+      join:
+        groupName: study-join-consumer-group
 
 management:
   endpoints:

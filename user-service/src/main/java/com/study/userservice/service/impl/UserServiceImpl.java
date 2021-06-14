@@ -9,6 +9,7 @@ import com.study.userservice.domain.UserRole;
 import com.study.userservice.exception.UserException;
 import com.study.userservice.kafka.message.LogoutMessage;
 import com.study.userservice.kafka.message.RefreshTokenCreateMessage;
+import com.study.userservice.kafka.message.StudyJoinMessage;
 import com.study.userservice.model.UserLoginRequest;
 import com.study.userservice.model.UserProfileUpdateRequest;
 import com.study.userservice.model.UserResponse;
@@ -52,6 +53,8 @@ public class UserServiceImpl implements UserService {
                             request.getNickName(),
                             request.getThumbnailImage(),
                             request.getProfileImage(),
+                            request.getAgeRange(),
+                            request.getGender(),
                             UserRole.USER));
             return UserResponse.from(savedUser);
         }
@@ -120,6 +123,28 @@ public class UserServiceImpl implements UserService {
         }
 
         return UserResponse.from(findUser);
+    }
+
+    @Override
+    @Transactional
+    public void handleStudyJoin(StudyJoinMessage studyJoinMessage) {
+        try {
+            User findUser = userRepository.findWithStudyJoinById(studyJoinMessage.getUserId())
+                    .orElseThrow(() -> new UserException(studyJoinMessage.getUserId() + "는 존재하지 않는 회원 ID입니다."));
+
+            if(studyJoinMessage.isCreate()){
+                findUser.addStudyJoin(studyJoinMessage.getStudyId());
+            }
+            if(studyJoinMessage.isFail()){
+                findUser.failStudyJoin(studyJoinMessage.getStudyId());
+            }
+            if(studyJoinMessage.isSuccess()){
+                findUser.successStudyJoin(studyJoinMessage.getStudyId());
+            }
+
+        }catch (UserException ex){
+            log.error("{}",ex.getMessage());
+        }
     }
 
     private ImageUploadResult uploadImageFromS3(MultipartFile image) {

@@ -16,4 +16,8 @@ public class UserLoginRequest {
 
     // TODO 이미지가 필수적으로 있는지 확인
     private String profileImage; // 프로필 이미지
+
+    private String ageRange;
+
+    private String gender;
 }

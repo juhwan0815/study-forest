@@ -474,14 +474,16 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer 액세스토큰
-Content-Length: 113
+Content-Length: 158
 Host: localhost:8080
 
 {
   "kakaoId" : 1,
   "nickName" : "황주환",
   "thumbnailImage" : "이미지",
-  "profileImage" : "이미지"
+  "profileImage" : "이미지",
+  "ageRange" : "10~19",
+  "gender" : "male"
 }</code></pre>
 </div>
 </div>
@@ -542,6 +544,16 @@ Host: localhost:8080
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">카카오 프로필 썸네일 이미지</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>gender</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 성별</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ageRange</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 나이대</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -552,7 +564,7 @@ Host: localhost:8080
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 167
+Content-Length: 212
 
 {
   "id" : 1,
@@ -560,6 +572,8 @@ Content-Length: 167
   "nickName" : "황주환",
   "thumbnailImage" : "이미지",
   "profileImage" : "이미지",
+  "gender" : "male",
+  "ageRange" : "10~19",
   "status" : "ACTIVE",
   "role" : "USER"
 }</code></pre>
@@ -605,6 +619,16 @@ Content-Length: 167
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>thumbnailImage</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">카카오 프로필 썸네일 이미지</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>gender</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 성별</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ageRange</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 나이대</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>status</code></p></td>
@@ -683,7 +707,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 212
+Content-Length: 257
 
 {
   "id" : 1,
@@ -692,6 +716,8 @@ Content-Length: 212
   "thumbnailImage" : "이미지",
   "profileImage" : "이미지",
   "refreshToken" : "Bearer 액세스토큰",
+  "gender" : "male",
+  "ageRange" : "10~19",
   "status" : "ACTIVE",
   "role" : "USER"
 }</code></pre>
@@ -744,6 +770,16 @@ Content-Length: 212
 <td class="tableblock halign-left valign-top"><p class="tableblock">Refresh토큰</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>gender</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 성별</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ageRange</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 나이대</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>status</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">회원 상태</p></td>
@@ -764,23 +800,11 @@ Content-Length: 212
 <h5 id="_요청_3"><a class="anchor" href="#_요청_3"></a><a class="link" href="#_요청_3">요청</a></h5>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /users/profile HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PATCH /users/profile HTTP/1.1
 Content-Type: multipart/form-data; boundary=6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
 Accept: application/json
 Authorization: Bearer 액세스토큰
-Host: localhost:8080
-
---6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
-Content-Disposition: form-data; name=image; filename=프로필사진.png
-Content-Type: image/png
-
-&lt;&lt;image&gt;&gt;
---6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
-Content-Disposition: form-data; name=request; filename=request
-Content-Type: application/json
-
-{"deleteImage":false,"nickName":"황철원"}
---6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm--</code></pre>
+Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect5">
@@ -861,7 +885,7 @@ Content-Type: application/json
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Content-Length: 182
+Content-Length: 227
 
 {
   "id" : 1,
@@ -869,6 +893,8 @@ Content-Length: 182
   "nickName" : "황철원",
   "thumbnailImage" : "썸네일이미지URL",
   "profileImage" : "이미지URL",
+  "gender" : "male",
+  "ageRange" : "10~19",
   "status" : "ACTIVE",
   "role" : "USER"
 }</code></pre>
@@ -914,6 +940,16 @@ Content-Length: 182
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>thumbnailImage</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">변경된 프로필 썸네일 이미지 URL</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>gender</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 성별</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ageRange</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 나이대</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>status</code></p></td>

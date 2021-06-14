@@ -35,4 +35,5 @@ public class UserController {
         return ResponseEntity.ok(userService.profileUpdate(userId,image,request));
     }
 
+
 }

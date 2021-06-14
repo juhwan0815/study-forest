@@ -1,10 +1,13 @@
 package com.study.userservice.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.study.userservice.domain.StudyJoin;
+import com.study.userservice.domain.StudyJoinStatus;
 import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
 import com.study.userservice.kafka.message.LogoutMessage;
 import com.study.userservice.kafka.message.RefreshTokenCreateMessage;
+import com.study.userservice.kafka.message.StudyJoinMessage;
 import com.study.userservice.model.UserLoginRequest;
 import com.study.userservice.model.UserProfileUpdateRequest;
 import com.study.userservice.model.UserResponse;
@@ -51,9 +54,10 @@ class UserServiceTest {
         userLoginRequest.setNickName("황주환");
         userLoginRequest.setProfileImage("이미지");
         userLoginRequest.setThumbnailImage("이미지");
+        userLoginRequest.setAgeRange("10~19");
+        userLoginRequest.setGender("male");
 
-        User user = User.createUser(1L, "황주환", "이미지",
-                "이미지", UserRole.USER);
+        User user = User.createUser(1L,"황주환","이미지", "이미지","10~19","male", UserRole.USER);
 
         given(userRepository.findByKakaoId(anyLong()))
                 .willReturn(Optional.empty());
@@ -69,6 +73,8 @@ class UserServiceTest {
         assertThat(userResponse.getNickName()).isEqualTo(userLoginRequest.getNickName());
         assertThat(userResponse.getProfileImage()).isEqualTo(userLoginRequest.getProfileImage());
         assertThat(userResponse.getThumbnailImage()).isEqualTo(userLoginRequest.getThumbnailImage());
+        assertThat(userResponse.getGender()).isEqualTo(userLoginRequest.getGender());
+        assertThat(userResponse.getAgeRange()).isEqualTo(userLoginRequest.getAgeRange());
 
         then(userRepository).should(times(1)).findByKakaoId(anyLong());
         then(userRepository).should(times(1)).save(any());
@@ -83,9 +89,11 @@ class UserServiceTest {
         userLoginRequest.setNickName("황주환");
         userLoginRequest.setProfileImage("이미지");
         userLoginRequest.setThumbnailImage("이미지");
+        userLoginRequest.setAgeRange("10~19");
+        userLoginRequest.setGender("male");
 
-        User user = User.createUser(1L, "황주환", "이미지",
-                "이미지", UserRole.USER);
+
+        User user = User.createUser(1L,"황주환","이미지", "이미지","10~19","male", UserRole.USER);
 
         given(userRepository.findByKakaoId(anyLong()))
                 .willReturn(Optional.of(user));
@@ -98,6 +106,8 @@ class UserServiceTest {
         assertThat(userResponse.getNickName()).isEqualTo(userLoginRequest.getNickName());
         assertThat(userResponse.getProfileImage()).isEqualTo(userLoginRequest.getProfileImage());
         assertThat(userResponse.getThumbnailImage()).isEqualTo(userLoginRequest.getThumbnailImage());
+        assertThat(userResponse.getGender()).isEqualTo(userLoginRequest.getGender());
+        assertThat(userResponse.getAgeRange()).isEqualTo(userLoginRequest.getAgeRange());
 
         then(userRepository).should(times(1)).findByKakaoId(anyLong());
         then(userRepository).should(never()).save(any());
@@ -112,8 +122,7 @@ class UserServiceTest {
         refreshTokenCreateMessage
                 .setRefreshToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjI4ODU3NDEsImV4cCI6MTYyMzQ5MDU0MX0.c24V3JQxYlp9L4XgtFqfL6KR31CuTNRC5i-M0t8nMAU");
 
-        User user = User.createUser(1L, "황주환", "이미지",
-                "이미지", UserRole.USER);
+        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
 
         given(userRepository.findById(anyLong()))
                 .willReturn(Optional.of(user));
@@ -129,8 +138,7 @@ class UserServiceTest {
     @DisplayName("회원 조회 (Refresh 토큰 포함)")
     void findWithRefreshTokenById(){
         // given
-        User user = User.createUser(1L, "황주환", "이미지",
-                "이미지", UserRole.USER);
+        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
         user.updateRefreshToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjI4ODU3NDEsImV4cCI6MTYyMzQ5MDU0MX0.c24V3JQxYlp9L4XgtFqfL6KR31CuTNRC5i-M0t8nMAU");
 
         given(userRepository.findById(anyLong()))
@@ -145,6 +153,8 @@ class UserServiceTest {
         assertThat(result.getNickName()).isEqualTo(user.getNickName());
         assertThat(result.getProfileImage()).isEqualTo(user.getProfileImage());
         assertThat(result.getThumbnailImage()).isEqualTo(user.getThumbnailImage());
+        assertThat(result.getGender()).isEqualTo("male");
+        assertThat(result.getAgeRange()).isEqualTo("10~19");
         assertThat(result.getStatus()).isEqualTo(user.getStatus());
         assertThat(result.getRole()).isEqualTo(user.getRole());
     }
@@ -156,8 +166,8 @@ class UserServiceTest {
         LogoutMessage logoutMessage = new LogoutMessage();
         logoutMessage.setUserId(1L);
 
-        User user = User.createUser(1L, "황주환", "이미지",
-                "이미지", UserRole.USER);
+        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
+
         user.updateRefreshToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjI4ODU3NDEsImV4cCI6MTYyMzQ5MDU0MX0.c24V3JQxYlp9L4XgtFqfL6KR31CuTNRC5i-M0t8nMAU");
 
         given(userRepository.findById(anyLong()))
@@ -184,7 +194,7 @@ class UserServiceTest {
         userProfileUpdateRequest.setDeleteImage(false);
         userProfileUpdateRequest.setNickName("황철원");
 
-        User user = User.createUser(1L, "황주환", "이미지", "이미지", UserRole.USER);
+        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
         user.changeImage("이미지","이미지","이미지");
 
         given(userRepository.findById(anyLong()))
@@ -228,7 +238,7 @@ class UserServiceTest {
         UserProfileUpdateRequest userProfileUpdateRequest = new UserProfileUpdateRequest();
         userProfileUpdateRequest.setDeleteImage(true);
 
-        User user = User.createUser(1L, "황주환", "이미지", "이미지", UserRole.USER);
+        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
         user.changeImage("이미지","이미지","이미지");
 
         given(userRepository.findById(anyLong()))
@@ -246,6 +256,87 @@ class UserServiceTest {
         assertThat(userResponse.getThumbnailImage()).isNull();
         then(userRepository).should(times(1)).findById(anyLong());
         then(amazonS3Client).should(times(2)).deleteObject(any(),any());
+    }
+
+    @Test
+    @DisplayName("회원 스터디 참가 신청 이력 추가")
+    void addStudyJoin(){
+        // given
+        StudyJoinMessage studyJoinMessage = new StudyJoinMessage();
+        studyJoinMessage.setStudyId(1L);
+        studyJoinMessage.setUserId(1L);
+        studyJoinMessage.setCreate(true);
+        studyJoinMessage.setFail(false);
+        studyJoinMessage.setSuccess(false);
+
+        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
+
+        given(userRepository.findWithStudyJoinById(anyLong()))
+                .willReturn(Optional.of(user));
+
+        // when
+        userServiceImpl.handleStudyJoin(studyJoinMessage);
+
+        // then
+        assertThat(user.getStudyJoins().size()).isEqualTo(1);
+        assertThat(user.getStudyJoins().get(0).getStudyId()).isEqualTo(1L);
+        then(userRepository).should(times(1)).findWithStudyJoinById(anyLong());
+    }
+
+    @Test
+    @DisplayName("회원 스터디 참가 신청 이력 실패")
+    void failStudyJoin(){
+        // given
+        StudyJoinMessage studyJoinMessage = new StudyJoinMessage();
+        studyJoinMessage.setStudyId(1L);
+        studyJoinMessage.setUserId(1L);
+        studyJoinMessage.setCreate(false);
+        studyJoinMessage.setFail(true);
+        studyJoinMessage.setSuccess(false);
+
+        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
+        user.getStudyJoins().add(StudyJoin.createTestStudyJoin(1L,1L,user));
+        user.getStudyJoins().add(StudyJoin.createTestStudyJoin(2L,1L,user));
+        user.getStudyJoins().add(StudyJoin.createTestStudyJoin(3L,2L,user));
+
+        given(userRepository.findWithStudyJoinById(anyLong()))
+                .willReturn(Optional.of(user));
+
+        // when
+        userServiceImpl.handleStudyJoin(studyJoinMessage);
+
+        // then
+        assertThat(user.getStudyJoins().size()).isEqualTo(3);
+        assertThat(user.getStudyJoins().get(1).getStatus()).isEqualTo(StudyJoinStatus.FAIL);
+        then(userRepository).should(times(1)).findWithStudyJoinById(anyLong());
+    }
+
+    @Test
+    @DisplayName("회원 스터디 참가 신청 이력 성공")
+    void successStudyJoin(){
+        // given
+        StudyJoinMessage studyJoinMessage = new StudyJoinMessage();
+        studyJoinMessage.setStudyId(1L);
+        studyJoinMessage.setUserId(1L);
+        studyJoinMessage.setCreate(false);
+        studyJoinMessage.setFail(false);
+        studyJoinMessage.setSuccess(true);
+
+        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
+        user.getStudyJoins().add(StudyJoin.createTestStudyJoin(1L,1L,user));
+        user.getStudyJoins().add(StudyJoin.createTestStudyJoin(2L,1L,user));
+        user.getStudyJoins().add(StudyJoin.createTestStudyJoin(3L,2L,user));
+
+        given(userRepository.findWithStudyJoinById(anyLong()))
+                .willReturn(Optional.of(user));
+
+        // when
+        userServiceImpl.handleStudyJoin(studyJoinMessage);
+
+        // then
+        assertThat(user.getStudyJoins().size()).isEqualTo(3);
+        assertThat(user.getStudyJoins().get(1).getStatus()).isEqualTo(StudyJoinStatus.SUCCESS);
+        then(userRepository).should(times(1)).findWithStudyJoinById(anyLong());
     }
 
 }

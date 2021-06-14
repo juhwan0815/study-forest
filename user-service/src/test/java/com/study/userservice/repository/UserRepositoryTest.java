@@ -22,7 +22,7 @@ class UserRepositoryTest {
     @DisplayName("회원 저장")
     void saveUser(){
         // given
-        User user = User.createUser(1L, "황주환","이미지", "이미지", UserRole.USER);
+        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
 
         // when
         User savedUser = userRepository.save(user);
@@ -35,7 +35,7 @@ class UserRepositoryTest {
     @DisplayName("카카오 ID로 회원 조회")
     void findByKakaoId(){
         // given
-        User user = User.createUser(1L, "이미지", "이미지","이미지", UserRole.USER);
+        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
         userRepository.save(user);
 
         // when
@@ -49,7 +49,7 @@ class UserRepositoryTest {
     @DisplayName("회원 ID로 회원 조회")
     void findById(){
         // given
-        User user = User.createUser(1L, "이미지", "이미지","이미지", UserRole.USER);
+        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
         User savedUser = userRepository.save(user);
 
         // when
@@ -68,7 +68,7 @@ class UserRepositoryTest {
     @DisplayName("회원 닉네임으로 조회")
     void findByNickName(){
         // given
-        User user = User.createUser(1L, "이미지", "이미지","이미지", UserRole.USER);
+        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
         User savedUser = userRepository.save(user);
 
         // when

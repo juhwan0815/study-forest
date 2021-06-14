@@ -88,6 +88,8 @@ class UserControllerTest {
         userLoginRequest.setNickName("황주환");
         userLoginRequest.setProfileImage("이미지");
         userLoginRequest.setThumbnailImage("이미지");
+        userLoginRequest.setAgeRange("10~19");
+        userLoginRequest.setGender("male");
 
         UserResponse userResponse = new UserResponse();
         userResponse.setId(1L);
@@ -95,6 +97,8 @@ class UserControllerTest {
         userResponse.setNickName(userLoginRequest.getNickName());
         userResponse.setProfileImage(userLoginRequest.getProfileImage());
         userResponse.setThumbnailImage(userLoginRequest.getThumbnailImage());
+        userResponse.setGender("male");
+        userResponse.setAgeRange("10~19");
         userResponse.setRole(UserRole.USER);
         userResponse.setStatus(UserStatus.ACTIVE);
 
@@ -108,13 +112,7 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(userLoginRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.kakaoId").value(1))
-                .andExpect(jsonPath("$.nickName").value("황주환"))
-                .andExpect(jsonPath("$.profileImage").value("이미지"))
-                .andExpect(jsonPath("$.thumbnailImage").value("이미지"))
-                .andExpect(jsonPath("$.role").value("USER"))
-                .andExpect(jsonPath("$.status").value("ACTIVE"))
+                .andExpect(content().json(objectMapper.writeValueAsString(userResponse)))
                 .andDo(document("user/create",
                         requestHeaders(
                                 headerWithName("Authorization").description("액세스 토큰")
@@ -123,7 +121,9 @@ class UserControllerTest {
                                 fieldWithPath("kakaoId").type(JsonFieldType.NUMBER).description("카카오 ID"),
                                 fieldWithPath("nickName").type(JsonFieldType.STRING).description("카카오 닉네임"),
                                 fieldWithPath("profileImage").type(JsonFieldType.STRING).description("카카오 프로필 이미지"),
-                                fieldWithPath("thumbnailImage").type(JsonFieldType.STRING).description("카카오 프로필 썸네일 이미지")
+                                fieldWithPath("thumbnailImage").type(JsonFieldType.STRING).description("카카오 프로필 썸네일 이미지"),
+                                fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
+                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대")
                         ),
                         responseFields(
                                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("회원 ID"),
@@ -131,6 +131,8 @@ class UserControllerTest {
                                 fieldWithPath("nickName").type(JsonFieldType.STRING).description("카카오 닉네임"),
                                 fieldWithPath("profileImage").type(JsonFieldType.STRING).description("카카오 프로필 이미지"),
                                 fieldWithPath("thumbnailImage").type(JsonFieldType.STRING).description("카카오 프로필 썸네일 이미지"),
+                                fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
+                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("status").type(JsonFieldType.STRING).description("회원 상태"),
                                 fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한")
                         )));
@@ -150,6 +152,8 @@ class UserControllerTest {
         userResponse.setNickName("황주환");
         userResponse.setProfileImage("이미지");
         userResponse.setThumbnailImage("이미지");
+        userResponse.setGender("male");
+        userResponse.setAgeRange("10~19");
         userResponse.setRefreshToken(TEST_AUTHORIZATION);
         userResponse.setRole(UserRole.USER);
         userResponse.setStatus(UserStatus.ACTIVE);
@@ -162,14 +166,7 @@ class UserControllerTest {
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.kakaoId").value(1))
-                .andExpect(jsonPath("$.nickName").value("황주환"))
-                .andExpect(jsonPath("$.profileImage").value("이미지"))
-                .andExpect(jsonPath("$.thumbnailImage").value("이미지"))
-                .andExpect(jsonPath("$.refreshToken").value(TEST_AUTHORIZATION))
-                .andExpect(jsonPath("$.role").value("USER"))
-                .andExpect(jsonPath("$.status").value("ACTIVE"))
+                .andExpect(content().json(objectMapper.writeValueAsString(userResponse)))
                 .andDo(document("user/auth",
                         requestHeaders(
                                 headerWithName("Authorization").description("Access Token")
@@ -184,6 +181,8 @@ class UserControllerTest {
                                 fieldWithPath("profileImage").type(JsonFieldType.STRING).description("카카오 프로필 이미지"),
                                 fieldWithPath("thumbnailImage").type(JsonFieldType.STRING).description("카카오 프로필 썸네일 이미지"),
                                 fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("Refresh토큰"),
+                                fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
+                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("status").type(JsonFieldType.STRING).description("회원 상태"),
                                 fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한")
                         )));
@@ -216,6 +215,8 @@ class UserControllerTest {
         userResponse.setNickName("황철원");
         userResponse.setProfileImage("이미지URL");
         userResponse.setThumbnailImage("썸네일이미지URL");
+        userResponse.setGender("male");
+        userResponse.setAgeRange("10~19");
         userResponse.setRole(UserRole.USER);
         userResponse.setStatus(UserStatus.ACTIVE);
 
@@ -258,13 +259,14 @@ class UserControllerTest {
                                 fieldWithPath("nickName").type(JsonFieldType.STRING).description("변경된 회원 닉네임"),
                                 fieldWithPath("profileImage").type(JsonFieldType.STRING).description("변경된 프로필 이미지 URL"),
                                 fieldWithPath("thumbnailImage").type(JsonFieldType.STRING).description("변경된 프로필 썸네일 이미지 URL"),
+                                fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
+                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("status").type(JsonFieldType.STRING).description("회원 상태"),
                                 fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한")
                         )));
 
         // then
-        then(userService).should(times(1)).profileUpdate(any
-                (), any(), any());
+        then(userService).should(times(1)).profileUpdate(any(), any(), any());
     }
 
 }

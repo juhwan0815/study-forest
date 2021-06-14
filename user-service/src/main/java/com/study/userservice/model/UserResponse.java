@@ -22,6 +22,10 @@ public class UserResponse {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String refreshToken; // refreshToken
 
+    private String gender;
+
+    private String ageRange;
+
     private UserStatus status; // 회원 상태
 
     private UserRole role; // 회원 권한
@@ -33,6 +37,8 @@ public class UserResponse {
         userResponse.nickName = user.getNickName();
         userResponse.thumbnailImage = user.getThumbnailImage();
         userResponse.profileImage = user.getProfileImage();
+        userResponse.gender = user.getGender();
+        userResponse.ageRange = user.getAgeRange();
         userResponse.status = user.getStatus();
         userResponse.role = user.getRole();
         return userResponse;
@@ -46,6 +52,8 @@ public class UserResponse {
         userResponse.thumbnailImage = user.getThumbnailImage();
         userResponse.profileImage = user.getProfileImage();
         userResponse.refreshToken = user.getRefreshToken();
+        userResponse.gender = user.getGender();
+        userResponse.ageRange = user.getAgeRange();
         userResponse.status = user.getStatus();
         userResponse.role = user.getRole();
         return userResponse;
