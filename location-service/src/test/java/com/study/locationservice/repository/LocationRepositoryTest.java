@@ -1,15 +1,13 @@
 package com.study.locationservice.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.study.locationservice.LocationFixture;
 import com.study.locationservice.domain.Location;
-import com.study.locationservice.domain.QLocation;
 import com.study.locationservice.model.LocationSearchRequest;
 import com.study.locationservice.repository.query.LocationQueryRepository;
-import org.apache.catalina.realm.JAASCallbackHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -18,11 +16,8 @@ import org.springframework.data.domain.PageRequest;
 
 import javax.persistence.EntityManager;
 
-import java.util.List;
-
-import static com.study.locationservice.domain.QLocation.*;
+import static com.study.locationservice.LocationFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
@@ -45,20 +40,6 @@ class LocationRepositoryTest {
     }
 
     @Test
-    @DisplayName("지역정보(위치) 저장")
-    void create(){
-        // given
-        Location location = Location.createLocation("1111051500", "서울특별시", "종로구", "삼청동",
-                null, 37.590758, 126.980996, "H");
-
-        // when
-        Location savedLocation = locationRepository.save(location);
-
-        // then
-        assertThat(savedLocation.getId()).isNotNull();
-    }
-
-    @Test
     @DisplayName("지역정보 ID로 조회테스트")
     void findById(){
         // given
@@ -67,12 +48,15 @@ class LocationRepositoryTest {
 
         Location savedLocation = locationRepository.save(location);
 
+        em.flush();
+        em.clear();
+
         // when
         Location result = locationRepository.findById(savedLocation.getId()).get();
 
         // then
         assertThat(result.getId()).isEqualTo(savedLocation.getId());
-        assertThat(result.getDong()).isEqualTo(savedLocation.getDong());
+        assertThat(result.getDong()).isEqualTo(location.getDong());
     }
 
 
@@ -85,12 +69,15 @@ class LocationRepositoryTest {
 
         Location savedLocation = locationRepository.save(location);
 
+        em.flush();
+        em.clear();
+
         // when
-        Location findLocation = locationRepository.findByCode(location.getCode()).get();
+        Location result = locationRepository.findByCode("1111051500").get();
 
         // then
-        assertThat(findLocation.getId()).isEqualTo(savedLocation.getId());
-        assertThat(findLocation.getCode()).isEqualTo(savedLocation.getCode());
+        assertThat(result.getId()).isEqualTo(savedLocation.getId());
+        assertThat(result.getCode()).isEqualTo("1111051500");
     }
 
     @Test
@@ -99,20 +86,20 @@ class LocationRepositoryTest {
         // given
         Location location = Location.createLocation("1111051500", "서울특별시", "종로구", "삼청동",
                 null, 37.590758, 126.980996, "H");
+        locationRepository.save(location);
 
-        Location savedLocation = locationRepository.save(location);
-
-        LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-        locationSearchRequest.setSearchName("삼청동");
         PageRequest pageable = PageRequest.of(0, 20);
 
+        em.flush();
+        em.clear();
+
         // when
-        Page<Location> result = locationQueryRepository.findBySearchCondition(pageable, locationSearchRequest);
+        Page<Location> result = locationQueryRepository.findBySearchCondition(pageable, TEST_LOCATION_SEARCH_REQUEST);
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(1);
         assertThat(result.getContent().get(0).getCode()).isEqualTo(location.getCode());
-        assertThat(result.getContent().get(0).getDong()).isEqualTo(locationSearchRequest.getSearchName());
+        assertThat(result.getContent().get(0).getDong()).isEqualTo(TEST_LOCATION_SEARCH_REQUEST.getSearchName());
     }
 
 

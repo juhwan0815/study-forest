@@ -1,6 +1,6 @@
 package com.study.locationservice.service;
 
-import com.querydsl.core.QueryResults;
+import com.study.locationservice.LocationFixture;
 import com.study.locationservice.domain.Location;
 import com.study.locationservice.model.LocationCodeRequest;
 import com.study.locationservice.model.LocationCreateRequest;
@@ -15,7 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.study.locationservice.domain.QLocation.location;
+import static com.study.locationservice.LocationFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
@@ -44,34 +43,19 @@ class LocationServiceTest {
     @Test
     @DisplayName("지역정보(위치) 저장")
     void create(){
-        LocationCreateRequest request1 = new LocationCreateRequest();
-        request1.setCode("1111054000");
-        request1.setCity("서울특별시");
-        request1.setGu("종로구");
-        request1.setDong("삼청동");
-        request1.setLen(126.980996);
-        request1.setLet(37.590758);
-        request1.setCodeType("H");
-
-        LocationCreateRequest request2 = new LocationCreateRequest();
-        request1.setCode("1111051500");
-        request1.setCity("서울특별시");
-        request1.setGu("종로구");
-        request1.setDong("청운효자동");
-        request1.setLen(126.970626);
-        request1.setLet(37.584009);
-        request1.setCodeType("H");
-
+        // given
         List<LocationCreateRequest> request = new ArrayList<>();
-        request.add(request1);
-        request.add(request2);
+        request.add(TEST_LOCATION_CREATE_REQUEST1);
+        request.add(TEST_LOCATION_CREATE_REQUEST2);
 
         given(locationRepository.save(any()))
                 .willReturn(null)
                 .willReturn(null);
 
+        // when
         locationService.create(request);
 
+        // then
         then(locationRepository).should(times(2)).save(any());
     }
 
@@ -79,67 +63,61 @@ class LocationServiceTest {
     @DisplayName("회원 Id로 조회")
     void findById(){
         // given
-        Location location = Location.createLocation("1111051500", "서울특별시", "종로구", "삼청동",
-                null, 37.590758, 126.980996, "H");
-
         given(locationRepository.findById(any()))
-                .willReturn(Optional.of(location));
+                .willReturn(Optional.of(TEST_LOCATION));
 
         // when
         LocationResponse locationResponse = locationService.findById(1L);
 
         // then
-        assertThat(locationResponse.getCode()).isEqualTo(location.getCode());
-        assertThat(locationResponse.getCity()).isEqualTo(location.getCity());
-        assertThat(locationResponse.getGu()).isEqualTo(location.getGu());
-        assertThat(locationResponse.getDong()).isEqualTo(location.getDong());
-        assertThat(locationResponse.getLen()).isEqualTo(location.getLen());
-        assertThat(locationResponse.getLet()).isEqualTo(location.getLet());
-        assertThat(locationResponse.getCodeType()).isEqualTo(location.getCodeType());
+        assertThat(locationResponse.getCode()).isEqualTo(TEST_LOCATION.getCode());
+        assertThat(locationResponse.getCity()).isEqualTo(TEST_LOCATION.getCity());
+        assertThat(locationResponse.getGu()).isEqualTo(TEST_LOCATION.getGu());
+        assertThat(locationResponse.getDong()).isEqualTo(TEST_LOCATION.getDong());
+        assertThat(locationResponse.getLen()).isEqualTo(TEST_LOCATION.getLen());
+        assertThat(locationResponse.getLet()).isEqualTo(TEST_LOCATION.getLet());
+        assertThat(locationResponse.getCodeType()).isEqualTo(TEST_LOCATION.getCodeType());
     }
 
     @Test
     @DisplayName("지역정보 검색어로 조회")
     void findBySearchName() {
         // given
-        LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-        locationSearchRequest.setSearchName("삼청동");
-
-        Location location = Location.createLocation("1111051500", "서울특별시", "종로구", "삼청동",
-                null, 37.590758, 126.980996, "H");
-        List<Location> content = new ArrayList<>();
-        content.add(location);
         PageRequest pageable = PageRequest.of(0, 20);
+
+        List<Location> content = new ArrayList<>();
+        content.add(TEST_LOCATION);
 
         Page<Location> pageLocations = new PageImpl<>(content, pageable, content.size());
 
-        given(locationQueryRepository.findBySearchCondition(pageable,locationSearchRequest))
+        given(locationQueryRepository.findBySearchCondition(any(),any()))
                 .willReturn(pageLocations);
 
         // when
-        Page<LocationResponse> result = locationService.findBySearchCondition(pageable, locationSearchRequest);
+        Page<LocationResponse> result
+                = locationService.findBySearchCondition(pageable,TEST_LOCATION_SEARCH_REQUEST );
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(1L);
-        assertThat(result.getContent().get(0).getDong()).isEqualTo(locationSearchRequest.getSearchName());
+        assertThat(result.getContent().get(0).getId()).isEqualTo(TEST_LOCATION.getId());
+        assertThat(result.getContent().get(0).getCode()).isEqualTo(TEST_LOCATION.getCode());
+        assertThat(result.getContent().get(0).getDong()).isEqualTo(TEST_LOCATION.getDong());
     }
 
     @Test
     @DisplayName("지역정보 코드로 조회")
     void findByCode(){
-        LocationCodeRequest locationCodeRequest = new LocationCodeRequest();
-        locationCodeRequest.setCode("1111051500");
-
-        Location location = Location.createLocation("1111051500", "서울특별시", "종로구", "삼청동",
-                null, 37.590758, 126.980996, "H");
-
+        // given
         given(locationRepository.findByCode(any()))
-                .willReturn(Optional.of(location));
+                .willReturn(Optional.of(TEST_LOCATION));
 
-        LocationResponse result = locationService.findByCode(locationCodeRequest);
+        // when
+        LocationResponse result = locationService.findByCode(TEST_LOCATION_CODE_REQUEST);
 
-        assertThat(result.getCode()).isEqualTo(locationCodeRequest.getCode());
-        assertThat(result.getDong()).isEqualTo(location.getDong());
+        // then
+        assertThat(result.getId()).isEqualTo(TEST_LOCATION.getId());
+        assertThat(result.getCode()).isEqualTo(TEST_LOCATION.getCode());
+        assertThat(result.getDong()).isEqualTo(TEST_LOCATION.getDong());
     }
 
 

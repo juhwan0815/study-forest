@@ -1,7 +1,7 @@
 package com.study.locationservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.study.locationservice.domain.Location;
+import com.study.locationservice.LocationFixture;
 import com.study.locationservice.model.LocationCodeRequest;
 import com.study.locationservice.model.LocationCreateRequest;
 import com.study.locationservice.model.LocationResponse;
@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,10 +17,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.integration.support.json.Jackson2JsonObjectMapper;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -30,10 +27,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.study.locationservice.LocationFixture.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -62,7 +59,6 @@ class LocationControllerTest {
 
     private MockMvc mockMvc;
 
-
     @BeforeEach
     void init(WebApplicationContext wac,
               RestDocumentationContextProvider restDocumentationContextProvider) {
@@ -80,29 +76,9 @@ class LocationControllerTest {
     @Test
     @DisplayName("지역정보(위치) 생성 API 테스트")
     void create() throws Exception {
-        LocationCreateRequest request1 = new LocationCreateRequest();
-        request1.setCode("1111054000");
-        request1.setCity("서울특별시");
-        request1.setGu("종로구");
-        request1.setDong("삼청동");
-        request1.setLen(126.980996);
-        request1.setLet(37.590758);
-        request1.setCodeType("H");
-        request1.setRi("--리");
-
-        LocationCreateRequest request2 = new LocationCreateRequest();
-        request2.setCode("1111054000");
-        request2.setCity("서울특별시");
-        request2.setGu("종로구");
-        request2.setDong("삼청동");
-        request2.setLen(126.980996);
-        request2.setLet(37.590758);
-        request2.setCodeType("H");
-        request2.setRi("--리");
-
         List<LocationCreateRequest> request = new ArrayList<>();
-        request.add(request1);
-        request.add(request2);
+        request.add(TEST_LOCATION_CREATE_REQUEST1);
+        request.add(TEST_LOCATION_CREATE_REQUEST2);
 
         willDoNothing()
                 .given(locationService)
@@ -119,7 +95,7 @@ class LocationControllerTest {
                         ),
                         requestFields(
                                 fieldWithPath("[]").type(JsonFieldType.ARRAY).description("지역 정보 목록"),
-                                fieldWithPath("[].code").type(JsonFieldType.STRING).description("법정동 코드"),
+                                fieldWithPath("[].code").type(JsonFieldType.STRING).description("행정동/법정동 코드"),
                                 fieldWithPath("[].city").type(JsonFieldType.STRING).description("특별시, 광역시, 도"),
                                 fieldWithPath("[].gu").type(JsonFieldType.STRING).description("시, 군, 구"),
                                 fieldWithPath("[].dong").type(JsonFieldType.STRING).description("읍, 면, 동"),
@@ -135,33 +111,15 @@ class LocationControllerTest {
     @Test
     @DisplayName("지역정보 ID로 조회 API 테스트")
     void findById() throws Exception {
-        LocationResponse locationResponse = new LocationResponse();
-        locationResponse.setId(1L);
-        locationResponse.setCity("서울특별시");
-        locationResponse.setCode("1111051500");
-        locationResponse.setGu("종로구");
-        locationResponse.setDong("삼청동");
-        locationResponse.setRi("--리");
-        locationResponse.setLen(126.980996);
-        locationResponse.setLet(37.590758);
-        locationResponse.setCodeType("H");
 
         given(locationService.findById(anyLong()))
-                .willReturn(locationResponse);
+                .willReturn(TEST_LOCATION_RESPONSE1);
 
         mockMvc.perform(get("/locations/{locationId}", 1)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(locationResponse.getId()))
-                .andExpect(jsonPath("$.code").value(locationResponse.getCode()))
-                .andExpect(jsonPath("$.city").value(locationResponse.getCity()))
-                .andExpect(jsonPath("$.gu").value(locationResponse.getGu()))
-                .andExpect(jsonPath("$.dong").value(locationResponse.getDong()))
-                .andExpect(jsonPath("$.ri").value(locationResponse.getRi()))
-                .andExpect(jsonPath("$.len").value(locationResponse.getLen()))
-                .andExpect(jsonPath("$.let").value(locationResponse.getLet()))
-                .andExpect(jsonPath("$.codeType").value(locationResponse.getCodeType()))
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_LOCATION_RESPONSE1)))
                 .andDo(document("location/findById",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("Access 토큰")
@@ -187,35 +145,21 @@ class LocationControllerTest {
     @Test
     @DisplayName("지역정보 검색어 조회 API")
     void findBySearchName() throws Exception {
-        String searchName = "삼청동";
-
-        LocationResponse locationResponse = new LocationResponse();
-        locationResponse.setId(1L);
-        locationResponse.setCity("서울특별시");
-        locationResponse.setCode("1111051500");
-        locationResponse.setGu("종로구");
-        locationResponse.setDong("삼청동");
-        locationResponse.setRi("--리");
-        locationResponse.setLen(126.980996);
-        locationResponse.setLet(37.590758);
-        locationResponse.setCodeType("H");
-
         List<LocationResponse> content = new ArrayList<>();
-        content.add(locationResponse);
-
+        content.add(TEST_LOCATION_RESPONSE1);
+        content.add(TEST_LOCATION_RESPONSE2);
         PageRequest pageable = PageRequest.of(0, 20);
-
         Page<LocationResponse> pageLocations = new PageImpl<>(content, pageable, content.size());
 
         given(locationService.findBySearchCondition(any(), any()))
                 .willReturn(pageLocations);
 
-        mockMvc.perform(get("/locations/search?")
+        mockMvc.perform(get("/locations/search")
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
                 .param("page", "0")
                 .param("size", "20")
-                .param("searchName", searchName))
+                .param("searchName", "삼청동"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(pageLocations)))
                 .andDo(document("location/findBySearchName",
@@ -266,29 +210,16 @@ class LocationControllerTest {
     @Test
     @DisplayName("지역정보 코드로 조회 API 테스트")
     void findByCode() throws Exception {
-        LocationCodeRequest locationCodeRequest = new LocationCodeRequest();
-        locationCodeRequest.setCode("1111051500");
-
-        LocationResponse locationResponse = new LocationResponse();
-        locationResponse.setId(1L);
-        locationResponse.setCity("서울특별시");
-        locationResponse.setCode("1111051500");
-        locationResponse.setGu("종로구");
-        locationResponse.setDong("삼청동");
-        locationResponse.setRi("--리");
-        locationResponse.setLen(126.980996);
-        locationResponse.setLet(37.590758);
-        locationResponse.setCodeType("H");
 
         given(locationService.findByCode(any()))
-                .willReturn(locationResponse);
+                .willReturn(TEST_LOCATION_RESPONSE1);
 
         mockMvc.perform(get("/locations/code")
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
-                .param("code", locationCodeRequest.getCode()))
+                .param("code", TEST_LOCATION_SEARCH_REQUEST.getSearchName()))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(locationResponse)))
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_LOCATION_RESPONSE1)))
                 .andDo(document("location/findByCode",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
