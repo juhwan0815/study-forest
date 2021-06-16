@@ -23,7 +23,7 @@ spring:
         - id: auth-service
           uri: lb://AUTH-SERVICE
           predicates:
-            - Path=/auth-service/login
+            - Path=/auth-service/auth
             - Method=POST
           filters:
             - RemoveRequestHeader=Cookie
@@ -41,8 +41,8 @@ spring:
         - id: auth-service
           uri: lb://AUTH-SERVICE
           predicates:
-            - Path=/auth-service/**
-            - Method=POST
+            - Path=/auth-service/auth/**
+            - Method=POST,DELETE
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/auth-service/(?<segment>.*),/$\{segment}
@@ -56,17 +56,7 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/auth-service/(?<segment>.*),/$\{segment}
-        # 회원 서비스 - 로그인 API
-        - id: user-service
-          uri: lb://USER-SERVICE
-          predicates:
-            - Path=/user-service/login
-            - Method=POST
-          filters:
-            - RemoveRequestHeader=Cookie
-            - RewritePath=/user-service/(?<segment>.*),/$\{segment}
-            - AuthorizationHeaderFilter
-        # 회원 서비스 - 로그인 및 회원가입 API
+        # 회원 서비스 - API 문서
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
@@ -85,6 +75,16 @@ spring:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*),/$\{segment}
             - AuthorizationHeaderFilter
+        # 회원 서비스 - Actuator API
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/actuator/**
+            - Method=GET,POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*),/$\{segment}
+        # 지역정보 서비스 - 지역정보 등록 - 어드민 권한 필요
         # 지역정보 서비스 - 검색 API
         - id: location-service
           uri: lb://LOCATION-SERVICE
@@ -133,26 +133,25 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/study-service/(?<segment>.*),/$\{segment}
-        # 스터디 서비스 - 스터디 생성 API
-        - id: study-service
-          uri: lb://STUDY-SERVICE
-          predicates:
-            - Path=/study-service/studies
-            - Method=POST
-          filters:
-            - RemoveRequestHeader=Cookie
-            - RewritePath=/study-service/(?<segment>.*),/$\{segment}
-            - AuthorizationHeaderFilter
-        # 스터디 서비스 - 스터디 수정/삭제 API
+        # 스터디 서비스 - 스터디 생성/수정/삭제/스터디 가입 신청 API
         - id: study-service
           uri: lb://STUDY-SERVICE
           predicates:
             - Path=/study-service/studies/**
-            - Method=PATCH,DELETE
+            - Method=POST,PATCH,DELETE
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/study-service/(?<segment>.*),/$\{segment}
             - AuthorizationHeaderFilter
+        # 스터디 서비스 - 스터디 검색/조회 API
+        - id: study-service
+          uri: lb://STUDY-SERVICE
+          predicates:
+            - Path=/study-service/studies/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/study-service/(?<segment>.*),/$\{segment}
         # 스터디 서비스 - API 문서
         - id: study-service
           uri: lb://STUDY-SERVICE
