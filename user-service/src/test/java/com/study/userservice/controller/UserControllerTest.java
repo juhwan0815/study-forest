@@ -2,11 +2,6 @@ package com.study.userservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.userservice.config.LoginUserArgumentResolver;
-import com.study.userservice.domain.UserRole;
-import com.study.userservice.domain.UserStatus;
-import com.study.userservice.model.UserLoginRequest;
-import com.study.userservice.model.UserProfileUpdateRequest;
-import com.study.userservice.model.UserResponse;
 import com.study.userservice.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,8 +25,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
 
+import static com.study.userservice.UserFixture.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
@@ -83,36 +78,17 @@ class UserControllerTest {
     @DisplayName("회원 로그인 API 테스트")
     void loginApi() throws Exception {
         // given
-        UserLoginRequest userLoginRequest = new UserLoginRequest();
-        userLoginRequest.setKakaoId(1L);
-        userLoginRequest.setNickName("황주환");
-        userLoginRequest.setProfileImage("이미지");
-        userLoginRequest.setThumbnailImage("이미지");
-        userLoginRequest.setAgeRange("10~19");
-        userLoginRequest.setGender("male");
-
-        UserResponse userResponse = new UserResponse();
-        userResponse.setId(1L);
-        userResponse.setKakaoId(userLoginRequest.getKakaoId());
-        userResponse.setNickName(userLoginRequest.getNickName());
-        userResponse.setProfileImage(userLoginRequest.getProfileImage());
-        userResponse.setThumbnailImage(userLoginRequest.getThumbnailImage());
-        userResponse.setGender("male");
-        userResponse.setAgeRange("10~19");
-        userResponse.setRole(UserRole.USER);
-        userResponse.setStatus(UserStatus.ACTIVE);
-
         given(userService.save(any()))
-                .willReturn(userResponse);
+                .willReturn(TEST_USER_RESPONSE);
 
         // when
         mockMvc.perform(post("/users")
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(userLoginRequest)))
+                .content(objectMapper.writeValueAsString(TEST_USER_LOGIN_REQUEST)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(userResponse)))
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE)))
                 .andDo(document("user/create",
                         requestHeaders(
                                 headerWithName("Authorization").description("액세스 토큰")
@@ -129,125 +105,58 @@ class UserControllerTest {
                                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("회원 ID"),
                                 fieldWithPath("kakaoId").type(JsonFieldType.NUMBER).description("카카오 ID"),
                                 fieldWithPath("nickName").type(JsonFieldType.STRING).description("카카오 닉네임"),
-                                fieldWithPath("profileImage").type(JsonFieldType.STRING).description("카카오 프로필 이미지"),
-                                fieldWithPath("thumbnailImage").type(JsonFieldType.STRING).description("카카오 프로필 썸네일 이미지"),
+                                fieldWithPath("image").type(JsonFieldType.OBJECT).description("이미지 정보"),
+                                fieldWithPath("image.profileImage").type(JsonFieldType.STRING).description("프로필 이미지 URL "),
+                                fieldWithPath("image.thumbnailImage").type(JsonFieldType.STRING).description("썸네일 이미지 URL"),
                                 fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("status").type(JsonFieldType.STRING).description("회원 상태"),
-                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한")
+                                fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수")
                         )));
 
         // then
         then(userService).should(times(1)).save(any());
     }
 
-    @Test
-    @DisplayName("회원 조회 (Refresh 포함) API 테스트")
-    void findUserWithRefreshTokenById() throws Exception {
-
-        // given
-        UserResponse userResponse = new UserResponse();
-        userResponse.setId(1L);
-        userResponse.setKakaoId(1L);
-        userResponse.setNickName("황주환");
-        userResponse.setProfileImage("이미지");
-        userResponse.setThumbnailImage("이미지");
-        userResponse.setGender("male");
-        userResponse.setAgeRange("10~19");
-        userResponse.setRefreshToken(TEST_AUTHORIZATION);
-        userResponse.setRole(UserRole.USER);
-        userResponse.setStatus(UserStatus.ACTIVE);
-
-        given(userService.findWithRefreshTokenById(any()))
-                .willReturn(userResponse);
-
-        // when
-        mockMvc.perform(get("/users/{userId}/auth", 1)
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(userResponse)))
-                .andDo(document("user/auth",
-                        requestHeaders(
-                                headerWithName("Authorization").description("Access Token")
-                        ),
-                        pathParameters(
-                                parameterWithName("userId").description("회원 ID")
-                        ),
-                        responseFields(
-                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("회원 ID"),
-                                fieldWithPath("kakaoId").type(JsonFieldType.NUMBER).description("카카오 ID"),
-                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("카카오 닉네임"),
-                                fieldWithPath("profileImage").type(JsonFieldType.STRING).description("카카오 프로필 이미지"),
-                                fieldWithPath("thumbnailImage").type(JsonFieldType.STRING).description("카카오 프로필 썸네일 이미지"),
-                                fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("Refresh토큰"),
-                                fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
-                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("status").type(JsonFieldType.STRING).description("회원 상태"),
-                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한")
-                        )));
-
-        then(userService).should(times(1)).findWithRefreshTokenById(any());
-    }
 
     @Test
-    @DisplayName("프로필 수정API 테스트")
+    @DisplayName("프로필 수정 API 테스트")
     void profileUpdate() throws Exception {
         // given
-        MockMultipartFile image = new MockMultipartFile(
-                "image",
-                "프로필사진.png",
-                MediaType.IMAGE_PNG_VALUE,
-                "<<image>>".getBytes(StandardCharsets.UTF_8));
-
-        UserProfileUpdateRequest userProfileUpdateRequest = new UserProfileUpdateRequest();
-        userProfileUpdateRequest.setDeleteImage(false);
-        userProfileUpdateRequest.setNickName("황철원");
-
         MockMultipartFile request = new MockMultipartFile("request",
                 "request"
                 , MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsString(userProfileUpdateRequest).getBytes(StandardCharsets.UTF_8));
+                objectMapper
+                        .writeValueAsString(TEST_USER_PROFILE_UPDATE_REQUEST1)
+                        .getBytes(StandardCharsets.UTF_8));
 
-        UserResponse userResponse = new UserResponse();
-        userResponse.setId(1L);
-        userResponse.setKakaoId(1L);
-        userResponse.setNickName("황철원");
-        userResponse.setProfileImage("이미지URL");
-        userResponse.setThumbnailImage("썸네일이미지URL");
-        userResponse.setGender("male");
-        userResponse.setAgeRange("10~19");
-        userResponse.setRole(UserRole.USER);
-        userResponse.setStatus(UserStatus.ACTIVE);
-
-        given(userService.profileUpdate(any(), any(), any()))
-                .willReturn(userResponse);
-
-        given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
-                .willReturn(1L);
 
         MockMultipartHttpServletRequestBuilder builder =
                 RestDocumentationRequestBuilders.fileUpload("/users/profile");
-
         builder.with(request1 -> {
             request1.setMethod("PATCH");
             return request1;
         });
 
+        given(userService.profileUpdate(any(), any(), any()))
+                .willReturn(TEST_USER_RESPONSE2);
+
+        given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(1L);
+
         // when
-        mockMvc.perform(builder.file(image).file(request)
+        mockMvc.perform(builder.file(TEST_IMAGE_FILE).file(request)
                 .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(userResponse)))
-                .andDo(document("user/profile",
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE2)))
+                .andDo(document("user/update/profile",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
                         ),
                         requestParts(
                                 partWithName("image").description("변경할 이미지 파일").optional(),
-                                partWithName("request").ignored()
+                                partWithName("request").description("변경할 내용")
                         ),
                         requestPartFields("request",
                                 fieldWithPath("deleteImage").type(JsonFieldType.BOOLEAN).description("이미지 삭제 여부"),
@@ -257,12 +166,12 @@ class UserControllerTest {
                                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("회원 ID"),
                                 fieldWithPath("kakaoId").type(JsonFieldType.NUMBER).description("카카오 ID"),
                                 fieldWithPath("nickName").type(JsonFieldType.STRING).description("변경된 회원 닉네임"),
-                                fieldWithPath("profileImage").type(JsonFieldType.STRING).description("변경된 프로필 이미지 URL"),
-                                fieldWithPath("thumbnailImage").type(JsonFieldType.STRING).description("변경된 프로필 썸네일 이미지 URL"),
+                                fieldWithPath("image").type(JsonFieldType.OBJECT).description("변경된 이미지 정보"),
+                                fieldWithPath("image.profileImage").type(JsonFieldType.STRING).description("변경된 프로필 이미지 URL"),
+                                fieldWithPath("image.thumbnailImage").type(JsonFieldType.STRING).description("변경된 프로필 썸네일 이미지 URL"),
                                 fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("status").type(JsonFieldType.STRING).description("회원 상태"),
-                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한")
+                                fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수")
                         )));
 
         // then

@@ -10,9 +10,5 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User,Long> {
 
     Optional<User> findByKakaoId(Long kakaoId);
-
-    Optional<User> findByNickName(String nickName);
-
-    @Query("select u from User u left join fetch u.studyJoins where u.id =:userId ")
-    Optional<User> findWithStudyJoinById(@Param("userId") Long userId);
 }
+

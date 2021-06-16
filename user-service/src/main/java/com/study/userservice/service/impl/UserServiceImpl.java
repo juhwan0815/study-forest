@@ -4,19 +4,15 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.study.userservice.domain.Image;
 import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
 import com.study.userservice.exception.UserException;
-import com.study.userservice.kafka.message.LogoutMessage;
-import com.study.userservice.kafka.message.RefreshTokenCreateMessage;
-import com.study.userservice.kafka.message.StudyJoinMessage;
-import com.study.userservice.model.UserLoginRequest;
-import com.study.userservice.model.UserProfileUpdateRequest;
-import com.study.userservice.model.UserResponse;
-import com.study.userservice.model.image.ImageUploadResult;
+import com.study.userservice.model.user.UserLoginRequest;
+import com.study.userservice.model.user.UserProfileUpdateRequest;
+import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.repository.UserRepository;
 import com.study.userservice.service.UserService;
-import com.sun.org.apache.xpath.internal.operations.Mult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,54 +44,20 @@ public class UserServiceImpl implements UserService {
         Optional<User> findUser = userRepository.findByKakaoId(request.getKakaoId());
 
         if (!findUser.isPresent()) {
-            User savedUser = userRepository.save(
-                    User.createUser(request.getKakaoId(),
-                            request.getNickName(),
-                            request.getThumbnailImage(),
-                            request.getProfileImage(),
-                            request.getAgeRange(),
-                            request.getGender(),
-                            UserRole.USER));
+            User user = User.createUser(request.getKakaoId(),
+                                        request.getNickName(),
+                                        request.getAgeRange(),
+                                        request.getGender(),
+                                        UserRole.USER);
+            user.changeImage(Image.createImage(request.getThumbnailImage(),
+                                                    request.getProfileImage(),
+                                                    null));
+            User savedUser = userRepository.save(user);
+
+
             return UserResponse.from(savedUser);
         }
-
         return UserResponse.from(findUser.get());
-    }
-
-    @Override
-    @Transactional
-    public void updateRefreshToken(RefreshTokenCreateMessage refreshTokenCreateMessage) {
-        try {
-            User findUser = userRepository.findById(refreshTokenCreateMessage.getId())
-                    .orElseThrow(() -> new UserException(refreshTokenCreateMessage.getId() + "는 존재하지 않는 회원입니다."));
-
-            findUser.updateRefreshToken(refreshTokenCreateMessage.getRefreshToken());
-
-        } catch (UserException ex) {
-            log.error("{}", ex.getMessage());
-        }
-
-    }
-
-    @Override
-    public UserResponse findWithRefreshTokenById(Long userId) {
-        User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException("존재하지 않는 회원ID입니다."));
-
-        return UserResponse.fromWithRefreshToken(findUser);
-    }
-
-    @Override
-    @Transactional
-    public void logout(LogoutMessage logoutMessage) {
-        try {
-            User findUser = userRepository.findById(logoutMessage.getUserId())
-                    .orElseThrow(() -> new UserException(logoutMessage.getUserId() + "는 존재하지 않는 회원입니다."));
-
-            findUser.logout();
-        } catch (UserException ex) {
-            log.error("{}", ex.getMessage());
-        }
     }
 
 
@@ -107,69 +69,54 @@ public class UserServiceImpl implements UserService {
 
         findUser.changeNickName(request.getNickName());
 
-        if(request.isDeleteImage()){
-            deleteImageFromS3(findUser.getImageStoreName());
-            findUser.deleteImage();
+        if(request.isDeleteImage() && image.isEmpty()){
+            if(findUser.getImage() != null){
+                deleteImageFromS3(findUser.getImage().getImageStoreName());
+                findUser.changeImage(null);
+            }
         }
-
-        if(!image.isEmpty()){
+        if (!request.isDeleteImage() && !image.isEmpty()){
+            if(findUser.getImage() != null){
+                deleteImageFromS3(findUser.getImage().getImageStoreName());
+            }
             validateImageType(image);
-            deleteImageFromS3(findUser.getImageStoreName());
-            ImageUploadResult imageUploadResult = uploadImageFromS3(image);
-
-            findUser.changeImage(imageUploadResult.getProfileImage(),
-                                imageUploadResult.getThumbnailImage(),
-                                imageUploadResult.getImageStoreName());
+            Image uploadResult = uploadImageFromS3(image);
+            findUser.changeImage(uploadResult);
         }
 
         return UserResponse.from(findUser);
     }
 
     @Override
-    @Transactional
-    public void handleStudyJoin(StudyJoinMessage studyJoinMessage) {
-        try {
-            User findUser = userRepository.findWithStudyJoinById(studyJoinMessage.getUserId())
-                    .orElseThrow(() -> new UserException(studyJoinMessage.getUserId() + "는 존재하지 않는 회원 ID입니다."));
-
-            if(studyJoinMessage.isCreate()){
-                findUser.addStudyJoin(studyJoinMessage.getStudyId());
-            }
-            if(studyJoinMessage.isFail()){
-                findUser.failStudyJoin(studyJoinMessage.getStudyId());
-            }
-            if(studyJoinMessage.isSuccess()){
-                findUser.successStudyJoin(studyJoinMessage.getStudyId());
-            }
-
-        }catch (UserException ex){
-            log.error("{}",ex.getMessage());
-        }
+    public UserResponse findById(Long userId) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(userId + "는 존재하지 않는 회원입니다."));
+        return UserResponse.from(findUser);
     }
 
-    private ImageUploadResult uploadImageFromS3(MultipartFile image) {
+    private Image uploadImageFromS3(MultipartFile image) {
         String imageStoreName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(image.getSize());
         objectMetadata.setContentType(image.getContentType());
 
-        ImageUploadResult imageUploadResult = null;
+        Image uploadResult = null;
 
         try {
-            amazonS3Client.putObject(new PutObjectRequest(bucket, imageStoreName,
-                    image.getInputStream(), objectMetadata)
+            amazonS3Client.putObject(
+                    new PutObjectRequest(bucket, imageStoreName, image.getInputStream(), objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
             String profileImage = amazonS3Client.getUrl(bucket, imageStoreName).toString();
             String thumbnailImage = amazonS3Client.getUrl(thumbnailBucket,imageStoreName).toString();
 
-            imageUploadResult = ImageUploadResult.from(profileImage,thumbnailImage,imageStoreName);
+             uploadResult = Image.createImage(thumbnailImage,profileImage,imageStoreName);
 
         } catch (Exception e) {
             throw new UserException(e.getMessage());
         }
 
-        return imageUploadResult;
+        return uploadResult;
     }
 
     private void deleteImageFromS3(String imageStoreName) {

@@ -1,16 +1,8 @@
 package com.study.userservice.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.study.userservice.domain.StudyJoin;
-import com.study.userservice.domain.StudyJoinStatus;
 import com.study.userservice.domain.User;
-import com.study.userservice.domain.UserRole;
-import com.study.userservice.kafka.message.LogoutMessage;
-import com.study.userservice.kafka.message.RefreshTokenCreateMessage;
-import com.study.userservice.kafka.message.StudyJoinMessage;
-import com.study.userservice.model.UserLoginRequest;
-import com.study.userservice.model.UserProfileUpdateRequest;
-import com.study.userservice.model.UserResponse;
+import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.repository.UserRepository;
 import com.study.userservice.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.DisplayName;
@@ -19,13 +11,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
+import static com.study.userservice.UserFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -37,7 +27,7 @@ import static org.mockito.Mockito.times;
 class UserServiceTest {
 
     @InjectMocks
-    private UserServiceImpl userServiceImpl;
+    private UserServiceImpl userService;
 
     @Mock
     private UserRepository userRepository;
@@ -46,156 +36,63 @@ class UserServiceTest {
     private AmazonS3Client amazonS3Client;
 
     @Test
-    @DisplayName("회원 로그인 - 신규가입")
+    @DisplayName("신규회원이 회원로그인한다.")
     void loginNewUser(){
         // given
-        UserLoginRequest userLoginRequest = new UserLoginRequest();
-        userLoginRequest.setKakaoId(1L);
-        userLoginRequest.setNickName("황주환");
-        userLoginRequest.setProfileImage("이미지");
-        userLoginRequest.setThumbnailImage("이미지");
-        userLoginRequest.setAgeRange("10~19");
-        userLoginRequest.setGender("male");
-
-        User user = User.createUser(1L,"황주환","이미지", "이미지","10~19","male", UserRole.USER);
-
         given(userRepository.findByKakaoId(anyLong()))
                 .willReturn(Optional.empty());
 
         given(userRepository.save(any()))
-                .willReturn(user);
+                .willReturn(TEST_USER);
 
         // when
-        UserResponse userResponse = userServiceImpl.save(userLoginRequest);
+        UserResponse userResponse = userService.save(TEST_USER_LOGIN_REQUEST);
 
         // then
-        assertThat(userResponse.getKakaoId()).isEqualTo(userLoginRequest.getKakaoId());
-        assertThat(userResponse.getNickName()).isEqualTo(userLoginRequest.getNickName());
-        assertThat(userResponse.getProfileImage()).isEqualTo(userLoginRequest.getProfileImage());
-        assertThat(userResponse.getThumbnailImage()).isEqualTo(userLoginRequest.getThumbnailImage());
-        assertThat(userResponse.getGender()).isEqualTo(userLoginRequest.getGender());
-        assertThat(userResponse.getAgeRange()).isEqualTo(userLoginRequest.getAgeRange());
+        assertThat(userResponse.getId()).isEqualTo(TEST_USER.getId());
+        assertThat(userResponse.getKakaoId()).isEqualTo(TEST_USER_LOGIN_REQUEST.getKakaoId());
+        assertThat(userResponse.getNickName()).isEqualTo(TEST_USER_LOGIN_REQUEST.getNickName());
+        assertThat(userResponse.getImage().getProfileImage()).isEqualTo(TEST_USER_LOGIN_REQUEST.getProfileImage());
+        assertThat(userResponse.getImage().getThumbnailImage()).isEqualTo(TEST_USER_LOGIN_REQUEST.getThumbnailImage());
+        assertThat(userResponse.getGender()).isEqualTo(TEST_USER_LOGIN_REQUEST.getGender());
+        assertThat(userResponse.getAgeRange()).isEqualTo(TEST_USER_LOGIN_REQUEST.getAgeRange());
+        assertThat(userResponse.getNumberOfStudyApply()).isEqualTo(0);
 
         then(userRepository).should(times(1)).findByKakaoId(anyLong());
         then(userRepository).should(times(1)).save(any());
     }
 
     @Test
-    @DisplayName("회원 로그인 - 기존회원")
+    @DisplayName("기존회원이 로그인을 한다.")
     void loginUser(){
         // given
-        UserLoginRequest userLoginRequest = new UserLoginRequest();
-        userLoginRequest.setKakaoId(1L);
-        userLoginRequest.setNickName("황주환");
-        userLoginRequest.setProfileImage("이미지");
-        userLoginRequest.setThumbnailImage("이미지");
-        userLoginRequest.setAgeRange("10~19");
-        userLoginRequest.setGender("male");
-
-
-        User user = User.createUser(1L,"황주환","이미지", "이미지","10~19","male", UserRole.USER);
-
         given(userRepository.findByKakaoId(anyLong()))
-                .willReturn(Optional.of(user));
+                .willReturn(Optional.of(TEST_USER));
 
         // when
-        UserResponse userResponse = userServiceImpl.save(userLoginRequest);
+        UserResponse userResponse = userService.save(TEST_USER_LOGIN_REQUEST);
 
         // then
-        assertThat(userResponse.getKakaoId()).isEqualTo(userLoginRequest.getKakaoId());
-        assertThat(userResponse.getNickName()).isEqualTo(userLoginRequest.getNickName());
-        assertThat(userResponse.getProfileImage()).isEqualTo(userLoginRequest.getProfileImage());
-        assertThat(userResponse.getThumbnailImage()).isEqualTo(userLoginRequest.getThumbnailImage());
-        assertThat(userResponse.getGender()).isEqualTo(userLoginRequest.getGender());
-        assertThat(userResponse.getAgeRange()).isEqualTo(userLoginRequest.getAgeRange());
+        assertThat(userResponse.getId()).isEqualTo(TEST_USER.getId());
+        assertThat(userResponse.getKakaoId()).isEqualTo(TEST_USER_LOGIN_REQUEST.getKakaoId());
+        assertThat(userResponse.getNickName()).isEqualTo(TEST_USER_LOGIN_REQUEST.getNickName());
+        assertThat(userResponse.getImage().getProfileImage()).isEqualTo(TEST_USER_LOGIN_REQUEST.getProfileImage());
+        assertThat(userResponse.getImage().getThumbnailImage()).isEqualTo(TEST_USER_LOGIN_REQUEST.getThumbnailImage());
+        assertThat(userResponse.getGender()).isEqualTo(TEST_USER_LOGIN_REQUEST.getGender());
+        assertThat(userResponse.getAgeRange()).isEqualTo(TEST_USER_LOGIN_REQUEST.getAgeRange());
+        assertThat(userResponse.getNumberOfStudyApply()).isEqualTo(0);
 
         then(userRepository).should(times(1)).findByKakaoId(anyLong());
         then(userRepository).should(never()).save(any());
     }
 
-    @Test
-    @DisplayName("Refresh 토큰 업데이트")
-    void updateRefreshToken(){
-        // given
-        RefreshTokenCreateMessage refreshTokenCreateMessage = new RefreshTokenCreateMessage();
-        refreshTokenCreateMessage.setId(1L);
-        refreshTokenCreateMessage
-                .setRefreshToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjI4ODU3NDEsImV4cCI6MTYyMzQ5MDU0MX0.c24V3JQxYlp9L4XgtFqfL6KR31CuTNRC5i-M0t8nMAU");
 
-        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
-
-        given(userRepository.findById(anyLong()))
-                .willReturn(Optional.of(user));
-
-        // when
-        userServiceImpl.updateRefreshToken(refreshTokenCreateMessage);
-
-        // then
-        assertThat(user.getRefreshToken()).isEqualTo(refreshTokenCreateMessage.getRefreshToken());
-    }
 
     @Test
-    @DisplayName("회원 조회 (Refresh 토큰 포함)")
-    void findWithRefreshTokenById(){
+    @DisplayName("회원 프로필의 이미지와 닉네임을 변경한다.")
+    void changeImageAndName() throws Exception {
         // given
-        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
-        user.updateRefreshToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjI4ODU3NDEsImV4cCI6MTYyMzQ5MDU0MX0.c24V3JQxYlp9L4XgtFqfL6KR31CuTNRC5i-M0t8nMAU");
-
-        given(userRepository.findById(anyLong()))
-                .willReturn(Optional.of(user));
-
-        // when
-        UserResponse result = userServiceImpl.findWithRefreshTokenById(1L);
-
-        // then
-        assertThat(result.getKakaoId()).isEqualTo(user.getKakaoId());
-        assertThat(result.getRefreshToken()).isEqualTo(user.getRefreshToken());
-        assertThat(result.getNickName()).isEqualTo(user.getNickName());
-        assertThat(result.getProfileImage()).isEqualTo(user.getProfileImage());
-        assertThat(result.getThumbnailImage()).isEqualTo(user.getThumbnailImage());
-        assertThat(result.getGender()).isEqualTo("male");
-        assertThat(result.getAgeRange()).isEqualTo("10~19");
-        assertThat(result.getStatus()).isEqualTo(user.getStatus());
-        assertThat(result.getRole()).isEqualTo(user.getRole());
-    }
-
-    @Test
-    @DisplayName("회원 로그아웃")
-    void logout(){
-        // given
-        LogoutMessage logoutMessage = new LogoutMessage();
-        logoutMessage.setUserId(1L);
-
-        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
-
-        user.updateRefreshToken("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiUk9MRSI6IlVTRVIiLCJpYXQiOjE2MjI4ODU3NDEsImV4cCI6MTYyMzQ5MDU0MX0.c24V3JQxYlp9L4XgtFqfL6KR31CuTNRC5i-M0t8nMAU");
-
-        given(userRepository.findById(anyLong()))
-                .willReturn(Optional.of(user));
-
-        // when
-        userServiceImpl.logout(logoutMessage);
-
-        // then
-        assertThat(user.getRefreshToken()).isNull();;
-    }
-
-    @Test
-    @DisplayName("회원 프로필 변경 - 이미지 수정")
-    void profileUpdate() throws Exception {
-        // given
-        MockMultipartFile image = new MockMultipartFile(
-                "image",
-                "프로필사진.png",
-                MediaType.IMAGE_PNG_VALUE,
-                "<<image>>".getBytes(StandardCharsets.UTF_8));
-
-        UserProfileUpdateRequest userProfileUpdateRequest = new UserProfileUpdateRequest();
-        userProfileUpdateRequest.setDeleteImage(false);
-        userProfileUpdateRequest.setNickName("황철원");
-
-        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
-        user.changeImage("이미지","이미지","이미지");
+        User user = createTestUser();
 
         given(userRepository.findById(anyLong()))
                 .willReturn(Optional.of(user));
@@ -212,12 +109,13 @@ class UserServiceTest {
                 .willReturn(new URL("http:썸네일이미지"));
 
         // when
-        UserResponse userResponse = userServiceImpl.profileUpdate(1L,image, userProfileUpdateRequest);
+        UserResponse userResponse =
+                userService.profileUpdate(1L,TEST_IMAGE_FILE, TEST_USER_PROFILE_UPDATE_REQUEST1);
 
         // then
-        assertThat(userResponse.getProfileImage()).isEqualTo("http:이미지");
-        assertThat(userResponse.getThumbnailImage()).isEqualTo("http:썸네일이미지");
-        assertThat(userResponse.getNickName()).isEqualTo(userProfileUpdateRequest.getNickName());
+        assertThat(userResponse.getNickName()).isEqualTo(TEST_USER_PROFILE_UPDATE_REQUEST1.getNickName());
+        assertThat(userResponse.getImage().getProfileImage()).isEqualTo("http:이미지");
+        assertThat(userResponse.getImage().getThumbnailImage()).isEqualTo("http:썸네일이미지");
 
         then(userRepository).should(times(1)).findById(anyLong());
         then(amazonS3Client).should(times(2)).deleteObject(any(),any());
@@ -226,20 +124,10 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("회원 프로필 변경 - 이미지 삭제")
-    void profileImageDelete(){
-        MockMultipartFile image = new MockMultipartFile(
-                "image",
-                "프로필사진.png",
-                MediaType.IMAGE_PNG_VALUE,
-                "".getBytes(StandardCharsets.UTF_8));
-
+    @DisplayName("회원 프로필의 이미지를 삭제하고 이름만 변경한다.")
+    void changeNullImageAndName(){
         // given
-        UserProfileUpdateRequest userProfileUpdateRequest = new UserProfileUpdateRequest();
-        userProfileUpdateRequest.setDeleteImage(true);
-
-        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
-        user.changeImage("이미지","이미지","이미지");
+        User user = createTestUser();
 
         given(userRepository.findById(anyLong()))
                 .willReturn(Optional.of(user));
@@ -249,94 +137,36 @@ class UserServiceTest {
                 .deleteObject(any(),any());
 
         // when
-        UserResponse userResponse = userServiceImpl.profileUpdate(1L,image,userProfileUpdateRequest);
+        UserResponse userResponse = userService.profileUpdate(1L,TEST_EMPTY_IMAGE_FILE,
+                                                             TEST_USER_PROFILE_UPDATE_REQUEST2);
 
         // then
-        assertThat(userResponse.getProfileImage()).isNull();
-        assertThat(userResponse.getThumbnailImage()).isNull();
+        assertThat(userResponse.getNickName()).isEqualTo(TEST_USER_PROFILE_UPDATE_REQUEST2.getNickName());
+        assertThat(userResponse.getImage()).isNull();
+
         then(userRepository).should(times(1)).findById(anyLong());
         then(amazonS3Client).should(times(2)).deleteObject(any(),any());
     }
 
     @Test
-    @DisplayName("회원 스터디 참가 신청 이력 추가")
-    void addStudyJoin(){
+    @DisplayName("회원 프로필의 이름만 변경한다.")
+    void changeName(){
         // given
-        StudyJoinMessage studyJoinMessage = new StudyJoinMessage();
-        studyJoinMessage.setStudyId(1L);
-        studyJoinMessage.setUserId(1L);
-        studyJoinMessage.setCreate(true);
-        studyJoinMessage.setFail(false);
-        studyJoinMessage.setSuccess(false);
+        User user = createTestUser();
 
-        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
-
-        given(userRepository.findWithStudyJoinById(anyLong()))
+        given(userRepository.findById(anyLong()))
                 .willReturn(Optional.of(user));
 
         // when
-        userServiceImpl.handleStudyJoin(studyJoinMessage);
+        UserResponse userResponse = userService.profileUpdate(1L,TEST_EMPTY_IMAGE_FILE,
+                TEST_USER_PROFILE_UPDATE_REQUEST1);
 
         // then
-        assertThat(user.getStudyJoins().size()).isEqualTo(1);
-        assertThat(user.getStudyJoins().get(0).getStudyId()).isEqualTo(1L);
-        then(userRepository).should(times(1)).findWithStudyJoinById(anyLong());
+        assertThat(userResponse.getNickName()).isEqualTo(TEST_USER_PROFILE_UPDATE_REQUEST1.getNickName());
+        assertThat(userResponse.getImage()).isNotNull();
+
+        then(userRepository).should(times(1)).findById(anyLong());;
     }
 
-    @Test
-    @DisplayName("회원 스터디 참가 신청 이력 실패")
-    void failStudyJoin(){
-        // given
-        StudyJoinMessage studyJoinMessage = new StudyJoinMessage();
-        studyJoinMessage.setStudyId(1L);
-        studyJoinMessage.setUserId(1L);
-        studyJoinMessage.setCreate(false);
-        studyJoinMessage.setFail(true);
-        studyJoinMessage.setSuccess(false);
-
-        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
-        user.getStudyJoins().add(StudyJoin.createTestStudyJoin(1L,1L,user));
-        user.getStudyJoins().add(StudyJoin.createTestStudyJoin(2L,1L,user));
-        user.getStudyJoins().add(StudyJoin.createTestStudyJoin(3L,2L,user));
-
-        given(userRepository.findWithStudyJoinById(anyLong()))
-                .willReturn(Optional.of(user));
-
-        // when
-        userServiceImpl.handleStudyJoin(studyJoinMessage);
-
-        // then
-        assertThat(user.getStudyJoins().size()).isEqualTo(3);
-        assertThat(user.getStudyJoins().get(1).getStatus()).isEqualTo(StudyJoinStatus.FAIL);
-        then(userRepository).should(times(1)).findWithStudyJoinById(anyLong());
-    }
-
-    @Test
-    @DisplayName("회원 스터디 참가 신청 이력 성공")
-    void successStudyJoin(){
-        // given
-        StudyJoinMessage studyJoinMessage = new StudyJoinMessage();
-        studyJoinMessage.setStudyId(1L);
-        studyJoinMessage.setUserId(1L);
-        studyJoinMessage.setCreate(false);
-        studyJoinMessage.setFail(false);
-        studyJoinMessage.setSuccess(true);
-
-        User user = User.createUser(1L,"황주환","image", "image","10~19","male", UserRole.USER);
-        user.getStudyJoins().add(StudyJoin.createTestStudyJoin(1L,1L,user));
-        user.getStudyJoins().add(StudyJoin.createTestStudyJoin(2L,1L,user));
-        user.getStudyJoins().add(StudyJoin.createTestStudyJoin(3L,2L,user));
-
-        given(userRepository.findWithStudyJoinById(anyLong()))
-                .willReturn(Optional.of(user));
-
-        // when
-        userServiceImpl.handleStudyJoin(studyJoinMessage);
-
-        // then
-        assertThat(user.getStudyJoins().size()).isEqualTo(3);
-        assertThat(user.getStudyJoins().get(1).getStatus()).isEqualTo(StudyJoinStatus.SUCCESS);
-        then(userRepository).should(times(1)).findWithStudyJoinById(anyLong());
-    }
 
 }

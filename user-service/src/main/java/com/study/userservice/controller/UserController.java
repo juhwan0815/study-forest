@@ -1,7 +1,9 @@
 package com.study.userservice.controller;
 
 import com.study.userservice.config.LoginUser;
-import com.study.userservice.model.*;
+import com.study.userservice.model.user.UserLoginRequest;
+import com.study.userservice.model.user.UserProfileUpdateRequest;
+import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +25,9 @@ public class UserController {
         return ResponseEntity.ok(userService.save(request));
     }
 
-    @GetMapping("/users/{userId}/auth")
-    public ResponseEntity<UserResponse> findUserById(@PathVariable Long userId) {
-        return ResponseEntity.ok(userService.findWithRefreshTokenById(userId));
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<UserResponse> findUserById(@PathVariable Long userId){
+        return ResponseEntity.ok(userService.findById(userId));
     }
 
     @PatchMapping("/users/profile")

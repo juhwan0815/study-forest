@@ -1,5 +1,5 @@
 package com.study.userservice.domain;
 
-public enum StudyJoinStatus {
+public enum StudyApplyStatus {
     WAIT,FAIL,SUCCESS
 }
