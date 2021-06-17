@@ -3,6 +3,7 @@ package com.study.userservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.userservice.config.LoginUserArgumentResolver;
 import com.study.userservice.model.user.UserLoginRequest;
+import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,8 +22,10 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.nio.charset.StandardCharsets;
 
@@ -35,6 +38,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -68,6 +72,7 @@ class UserControllerTest {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .alwaysDo(print())
+                .addFilters(new CharacterEncodingFilter("utf-8",true))
                 .apply(documentationConfiguration(restDocumentationContextProvider)
                         .operationPreprocessors()
                         .withRequestDefaults(prettyPrint())
@@ -132,7 +137,7 @@ class UserControllerTest {
 
 
         MockMultipartHttpServletRequestBuilder builder =
-                RestDocumentationRequestBuilders.fileUpload("/users/profile");
+                fileUpload("/users/profile");
         builder.with(request1 -> {
             request1.setMethod("PATCH");
             return request1;
@@ -179,6 +184,36 @@ class UserControllerTest {
         then(userService).should(times(1)).updateProfile(any(), any(), any());
     }
 
+
+    @Test
+    @DisplayName("로그인 회원 정보 조회 API 테스트")
+    void findByLoginUserId() throws Exception {
+        given(userService.findById(any()))
+                .willReturn(TEST_USER_RESPONSE);
+
+        mockMvc.perform(get("/users")
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE)))
+                .andDo(document("user/findByLoginId",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("회원 ID"),
+                                fieldWithPath("kakaoId").type(JsonFieldType.NUMBER).description("카카오 ID"),
+                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                fieldWithPath("image").type(JsonFieldType.OBJECT).description("회원 이미지 정보"),
+                                fieldWithPath("image.profileImage").type(JsonFieldType.STRING).description("회원 프로필 이미지 URL"),
+                                fieldWithPath("image.thumbnailImage").type(JsonFieldType.STRING).description("회원 프로필 썸네일 이미지 URL"),
+                                fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
+                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
+                                fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수")
+                        )
+                ));
+    }
+
     @Test
     @DisplayName("회원 ID 조회 API 테스트")
     void findById() throws Exception {
@@ -209,6 +244,7 @@ class UserControllerTest {
         then(userService).should(times(1)).findById(any());
     }
 
+
     @Test
     @DisplayName("회원 탈퇴 API 테스트")
     void delete() throws Exception {
@@ -217,8 +253,11 @@ class UserControllerTest {
                 .given(userService)
                 .delete(any());
 
+        given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(1L);
+
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/users")
-                .header(HttpHeaders.AUTHORIZATION,TEST_AUTHORIZATION))
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
                 .andDo(document("user/delete",
                         requestHeaders(
@@ -228,9 +267,6 @@ class UserControllerTest {
 
         then(userService).should(times(1)).delete(any());
     }
-
-
-
 
 
 }

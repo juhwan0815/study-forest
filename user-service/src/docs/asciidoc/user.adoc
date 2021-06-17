@@ -62,3 +62,12 @@ include::{snippets}/user/findById/http-response.adoc[]
 ====== Body
 include::{snippets}/user/findById/response-fields.adoc[]
 
+==== 로그인 회원 조회 API
+===== 요청
+include::{snippets}/user/findByLoginId/http-request.adoc[]
+====== Header
+include::{snippets}/user/findByLoginId/request-headers.adoc[]
+===== 응답
+include::{snippets}/user/findByLoginId/http-response.adoc[]
+====== Body
+include::{snippets}/user/findByLoginId/response-fields.adoc[]

@@ -32,6 +32,11 @@ public class UserController {
         return ResponseEntity.ok(userService.findById(userId));
     }
 
+    @GetMapping("/users")
+    public ResponseEntity<UserResponse> findUserByLoginId(@LoginUser Long userId){
+        return ResponseEntity.ok(userService.findById(userId));
+    }
+
     @PatchMapping("/users/profile")
     public ResponseEntity<UserResponse> changeProfile(@LoginUser Long userId,
                                                       @RequestPart(required = false) MultipartFile image,
@@ -44,6 +49,8 @@ public class UserController {
         userService.delete(userId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+
 
 
 }
