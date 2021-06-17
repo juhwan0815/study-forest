@@ -2,6 +2,7 @@ package com.study.userservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.userservice.config.LoginUserArgumentResolver;
+import com.study.userservice.model.user.UserLoginRequest;
 import com.study.userservice.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,14 +35,14 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureRestDocs
 @ExtendWith(RestDocumentationExtension.class)
@@ -78,7 +79,7 @@ class UserControllerTest {
     @DisplayName("회원 로그인 API 테스트")
     void loginApi() throws Exception {
         // given
-        given(userService.save(any()))
+        given(userService.create((UserLoginRequest) any()))
                 .willReturn(TEST_USER_RESPONSE);
 
         // when
@@ -114,7 +115,7 @@ class UserControllerTest {
                         )));
 
         // then
-        then(userService).should(times(1)).save(any());
+        then(userService).should(times(1)).create((UserLoginRequest) any());
     }
 
 
@@ -137,7 +138,7 @@ class UserControllerTest {
             return request1;
         });
 
-        given(userService.profileUpdate(any(), any(), any()))
+        given(userService.updateProfile(any(), any(), any()))
                 .willReturn(TEST_USER_RESPONSE2);
 
         given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
@@ -175,7 +176,7 @@ class UserControllerTest {
                         )));
 
         // then
-        then(userService).should(times(1)).profileUpdate(any(), any(), any());
+        then(userService).should(times(1)).updateProfile(any(), any(), any());
     }
 
 }

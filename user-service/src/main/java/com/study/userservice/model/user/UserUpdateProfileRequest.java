@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserProfileUpdateRequest {
+public class UserUpdateProfileRequest {
 
     private boolean deleteImage;
 

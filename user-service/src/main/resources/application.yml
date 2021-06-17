@@ -47,7 +47,8 @@ eureka:
 kafka:
   server: 127.0.0.1:9092
   topic:
-  consumer:
+
+
 
 management:
   endpoints:

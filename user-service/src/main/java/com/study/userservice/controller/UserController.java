@@ -2,7 +2,7 @@ package com.study.userservice.controller;
 
 import com.study.userservice.config.LoginUser;
 import com.study.userservice.model.user.UserLoginRequest;
-import com.study.userservice.model.user.UserProfileUpdateRequest;
+import com.study.userservice.model.user.UserUpdateProfileRequest;
 import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class UserController {
 
     @PostMapping("/users")
     public ResponseEntity<UserResponse> save(@RequestBody @Valid UserLoginRequest request) {
-        return ResponseEntity.ok(userService.save(request));
+        return ResponseEntity.ok(userService.create(request));
     }
 
     @GetMapping("/users/{userId}")
@@ -33,8 +33,8 @@ public class UserController {
     @PatchMapping("/users/profile")
     public ResponseEntity<UserResponse> changeProfile(@LoginUser Long userId,
                                                       @RequestPart(required = false) MultipartFile image,
-                                                      @RequestPart @Valid UserProfileUpdateRequest request){
-        return ResponseEntity.ok(userService.profileUpdate(userId,image,request));
+                                                      @RequestPart @Valid UserUpdateProfileRequest request){
+        return ResponseEntity.ok(userService.updateProfile(userId,image,request));
     }
 
 

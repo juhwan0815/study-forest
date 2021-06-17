@@ -4,7 +4,7 @@ import com.study.userservice.domain.Image;
 import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
 import com.study.userservice.model.user.UserLoginRequest;
-import com.study.userservice.model.user.UserProfileUpdateRequest;
+import com.study.userservice.model.user.UserUpdateProfileRequest;
 import com.study.userservice.model.user.UserResponse;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -37,11 +37,11 @@ public class UserFixture {
             MediaType.IMAGE_PNG_VALUE,
             "".getBytes(StandardCharsets.UTF_8));
 
-    public static final UserProfileUpdateRequest TEST_USER_PROFILE_UPDATE_REQUEST1
-            = new UserProfileUpdateRequest(false,"황철원");
+    public static final UserUpdateProfileRequest TEST_USER_PROFILE_UPDATE_REQUEST1
+            = new UserUpdateProfileRequest(false,"황철원");
 
-    public static final UserProfileUpdateRequest TEST_USER_PROFILE_UPDATE_REQUEST2
-            = new UserProfileUpdateRequest(true,"황철원");
+    public static final UserUpdateProfileRequest TEST_USER_PROFILE_UPDATE_REQUEST2
+            = new UserUpdateProfileRequest(true,"황철원");
 
     public static final UserResponse TEST_USER_RESPONSE
             = new UserResponse(1L,1L,"황주환",TEST_Image,"male","10~19",3);

@@ -46,7 +46,7 @@ class UserServiceTest {
                 .willReturn(TEST_USER);
 
         // when
-        UserResponse userResponse = userService.save(TEST_USER_LOGIN_REQUEST);
+        UserResponse userResponse = userService.create(TEST_USER_LOGIN_REQUEST);
 
         // then
         assertThat(userResponse.getId()).isEqualTo(TEST_USER.getId());
@@ -70,7 +70,7 @@ class UserServiceTest {
                 .willReturn(Optional.of(TEST_USER));
 
         // when
-        UserResponse userResponse = userService.save(TEST_USER_LOGIN_REQUEST);
+        UserResponse userResponse = userService.create(TEST_USER_LOGIN_REQUEST);
 
         // then
         assertThat(userResponse.getId()).isEqualTo(TEST_USER.getId());
@@ -85,8 +85,6 @@ class UserServiceTest {
         then(userRepository).should(times(1)).findByKakaoId(anyLong());
         then(userRepository).should(never()).save(any());
     }
-
-
 
     @Test
     @DisplayName("회원 프로필의 이미지와 닉네임을 변경한다.")
@@ -110,7 +108,7 @@ class UserServiceTest {
 
         // when
         UserResponse userResponse =
-                userService.profileUpdate(1L,TEST_IMAGE_FILE, TEST_USER_PROFILE_UPDATE_REQUEST1);
+                userService.updateProfile(1L,TEST_IMAGE_FILE, TEST_USER_PROFILE_UPDATE_REQUEST1);
 
         // then
         assertThat(userResponse.getNickName()).isEqualTo(TEST_USER_PROFILE_UPDATE_REQUEST1.getNickName());
@@ -137,7 +135,7 @@ class UserServiceTest {
                 .deleteObject(any(),any());
 
         // when
-        UserResponse userResponse = userService.profileUpdate(1L,TEST_EMPTY_IMAGE_FILE,
+        UserResponse userResponse = userService.updateProfile(1L,TEST_EMPTY_IMAGE_FILE,
                                                              TEST_USER_PROFILE_UPDATE_REQUEST2);
 
         // then
@@ -158,7 +156,7 @@ class UserServiceTest {
                 .willReturn(Optional.of(user));
 
         // when
-        UserResponse userResponse = userService.profileUpdate(1L,TEST_EMPTY_IMAGE_FILE,
+        UserResponse userResponse = userService.updateProfile(1L,TEST_EMPTY_IMAGE_FILE,
                 TEST_USER_PROFILE_UPDATE_REQUEST1);
 
         // then

@@ -9,7 +9,7 @@ import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
 import com.study.userservice.exception.UserException;
 import com.study.userservice.model.user.UserLoginRequest;
-import com.study.userservice.model.user.UserProfileUpdateRequest;
+import com.study.userservice.model.user.UserUpdateProfileRequest;
 import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.repository.UserRepository;
 import com.study.userservice.service.UserService;
@@ -40,20 +40,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponse save(UserLoginRequest request) {
+    public UserResponse create(UserLoginRequest request) {
         Optional<User> findUser = userRepository.findByKakaoId(request.getKakaoId());
 
         if (!findUser.isPresent()) {
             User user = User.createUser(request.getKakaoId(),
-                                        request.getNickName(),
-                                        request.getAgeRange(),
-                                        request.getGender(),
-                                        UserRole.USER);
+                    request.getNickName(),
+                    request.getAgeRange(),
+                    request.getGender(),
+                    UserRole.USER);
             user.changeImage(Image.createImage(request.getThumbnailImage(),
-                                                    request.getProfileImage(),
-                                                    null));
-            User savedUser = userRepository.save(user);
+                    request.getProfileImage(),
+                    null));
 
+            User savedUser = userRepository.save(user);
 
             return UserResponse.from(savedUser);
         }
@@ -63,25 +63,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponse profileUpdate(Long userId,MultipartFile image,UserProfileUpdateRequest request) {
+    public UserResponse updateProfile(Long userId, MultipartFile image, UserUpdateProfileRequest request) {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(userId + "는 존재하지 않는 회원 ID입니다."));
 
         findUser.changeNickName(request.getNickName());
 
-        if(request.isDeleteImage() && image.isEmpty()){
-            if(findUser.getImage() != null){
+        if (request.isDeleteImage() && image.isEmpty()) {
+            if (findUser.getImage() != null) {
                 deleteImageFromS3(findUser.getImage().getImageStoreName());
                 findUser.changeImage(null);
             }
         }
-        if (!request.isDeleteImage() && !image.isEmpty()){
-            if(findUser.getImage() != null){
+        if (!request.isDeleteImage() && !image.isEmpty()) {
+            if (findUser.getImage() != null) {
                 deleteImageFromS3(findUser.getImage().getImageStoreName());
             }
             validateImageType(image);
-            Image uploadResult = uploadImageFromS3(image);
-            findUser.changeImage(uploadResult);
+            findUser.changeImage(uploadImageFromS3(image));
         }
 
         return UserResponse.from(findUser);
@@ -106,11 +105,11 @@ public class UserServiceImpl implements UserService {
         try {
             amazonS3Client.putObject(
                     new PutObjectRequest(bucket, imageStoreName, image.getInputStream(), objectMetadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
+                            .withCannedAcl(CannedAccessControlList.PublicRead));
             String profileImage = amazonS3Client.getUrl(bucket, imageStoreName).toString();
-            String thumbnailImage = amazonS3Client.getUrl(thumbnailBucket,imageStoreName).toString();
+            String thumbnailImage = amazonS3Client.getUrl(thumbnailBucket, imageStoreName).toString();
 
-             uploadResult = Image.createImage(thumbnailImage,profileImage,imageStoreName);
+            uploadResult = Image.createImage(thumbnailImage, profileImage, imageStoreName);
 
         } catch (Exception e) {
             throw new UserException(e.getMessage());
