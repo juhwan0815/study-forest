@@ -2,6 +2,8 @@ package com.study.userservice.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.study.userservice.domain.User;
+import com.study.userservice.kafka.sender.UserDeleteMessageSender;
+import com.study.userservice.kafka.sender.UserUpdateProfileMessageSender;
 import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.repository.UserRepository;
 import com.study.userservice.service.impl.UserServiceImpl;
@@ -34,6 +36,12 @@ class UserServiceTest {
 
     @Mock
     private AmazonS3Client amazonS3Client;
+
+    @Mock
+    private UserDeleteMessageSender userDeleteMessageSender;
+
+    @Mock
+    private UserUpdateProfileMessageSender userUpdateProfileMessageSender;
 
     @Test
     @DisplayName("신규회원이 회원로그인한다.")
@@ -106,6 +114,10 @@ class UserServiceTest {
                 .willReturn(new URL("http:이미지"))
                 .willReturn(new URL("http:썸네일이미지"));
 
+        willDoNothing()
+                .given(userUpdateProfileMessageSender)
+                .send(any());
+
         // when
         UserResponse userResponse =
                 userService.updateProfile(1L,TEST_IMAGE_FILE, TEST_USER_PROFILE_UPDATE_REQUEST1);
@@ -119,6 +131,7 @@ class UserServiceTest {
         then(amazonS3Client).should(times(2)).deleteObject(any(),any());
         then(amazonS3Client).should(times(1)).putObject(any());
         then(amazonS3Client).should(times(2)).getUrl(any(),any());
+        then(userUpdateProfileMessageSender).should(times(1)).send(any());
     }
 
     @Test
@@ -134,6 +147,10 @@ class UserServiceTest {
                 .given(amazonS3Client)
                 .deleteObject(any(),any());
 
+        willDoNothing()
+                .given(userUpdateProfileMessageSender)
+                .send(any());
+
         // when
         UserResponse userResponse = userService.updateProfile(1L,TEST_EMPTY_IMAGE_FILE,
                                                              TEST_USER_PROFILE_UPDATE_REQUEST2);
@@ -144,6 +161,7 @@ class UserServiceTest {
 
         then(userRepository).should(times(1)).findById(anyLong());
         then(amazonS3Client).should(times(2)).deleteObject(any(),any());
+        then(userUpdateProfileMessageSender).should(times(1)).send(any());
     }
 
     @Test
@@ -155,6 +173,10 @@ class UserServiceTest {
         given(userRepository.findById(anyLong()))
                 .willReturn(Optional.of(user));
 
+        willDoNothing()
+                .given(userUpdateProfileMessageSender)
+                .send(any());
+
         // when
         UserResponse userResponse = userService.updateProfile(1L,TEST_EMPTY_IMAGE_FILE,
                 TEST_USER_PROFILE_UPDATE_REQUEST1);
@@ -164,6 +186,52 @@ class UserServiceTest {
         assertThat(userResponse.getImage()).isNotNull();
 
         then(userRepository).should(times(1)).findById(anyLong());;
+        then(userUpdateProfileMessageSender).should(times(1)).send(any());
+
+    }
+
+    @Test
+    @DisplayName("회원 ID로 회원을 조회한다.")
+    void findById(){
+        // given
+        given(userRepository.findById(anyLong()))
+                .willReturn(Optional.of(TEST_USER));
+
+        // when
+        UserResponse result = userService.findById(1L);
+
+        // then
+        assertThat(result.getId()).isEqualTo(TEST_USER.getId());
+        assertThat(result.getKakaoId()).isEqualTo(TEST_USER.getId());
+        assertThat(result.getNickName()).isEqualTo(TEST_USER.getNickName());
+        assertThat(result.getGender()).isEqualTo(TEST_USER.getGender());
+        assertThat(result.getAgeRange()).isEqualTo(TEST_USER.getAgeRange());
+        assertThat(result.getImage()).isEqualTo(TEST_USER.getImage());
+        assertThat(result.getNumberOfStudyApply()).isEqualTo(TEST_USER.getNumberOfStudyApply());
+    }
+
+    @Test
+    @DisplayName("회원 ID로 회원 탈퇴를 한다.")
+    void delete(){
+        // given
+        given(userRepository.findById(anyLong()))
+                .willReturn(Optional.of(TEST_USER));
+
+        willDoNothing()
+                .given(userRepository)
+                .delete(any());
+
+        willDoNothing()
+                .given(userDeleteMessageSender)
+                .send(any());
+
+        // when
+        userService.delete(1L);
+
+        // then
+        then(userRepository).should(times(1)).findById(anyLong());
+        then(userRepository).should(times(1)).delete(any());
+        then(userDeleteMessageSender).should(times(1)).send(any());
     }
 
 

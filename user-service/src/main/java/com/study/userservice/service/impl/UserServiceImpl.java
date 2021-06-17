@@ -8,6 +8,10 @@ import com.study.userservice.domain.Image;
 import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
 import com.study.userservice.exception.UserException;
+import com.study.userservice.kafka.message.UserDeleteMessage;
+import com.study.userservice.kafka.message.UserUpdateProfileMessage;
+import com.study.userservice.kafka.sender.UserDeleteMessageSender;
+import com.study.userservice.kafka.sender.UserUpdateProfileMessageSender;
 import com.study.userservice.model.user.UserLoginRequest;
 import com.study.userservice.model.user.UserUpdateProfileRequest;
 import com.study.userservice.model.user.UserResponse;
@@ -31,6 +35,9 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final AmazonS3Client amazonS3Client;
+
+    private final UserDeleteMessageSender userDeleteMessageSender;
+    private final UserUpdateProfileMessageSender userUpdateProfileMessageSender;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -83,14 +90,27 @@ public class UserServiceImpl implements UserService {
             findUser.changeImage(uploadImageFromS3(image));
         }
 
+        userUpdateProfileMessageSender.send(UserUpdateProfileMessage.from(findUser));
+
         return UserResponse.from(findUser);
     }
 
     @Override
     public UserResponse findById(Long userId) {
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(userId + "는 존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new UserException(userId + "는 존재하지 않는 회원 ID 입니다."));
         return UserResponse.from(findUser);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long userId) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(userId + "는 존재하지 않는 회원 ID 입니다."));
+
+        userRepository.delete(findUser);
+
+        userDeleteMessageSender.send(UserDeleteMessage.from(findUser));
     }
 
     private Image uploadImageFromS3(MultipartFile image) {

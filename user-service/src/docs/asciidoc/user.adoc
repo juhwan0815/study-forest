@@ -43,3 +43,22 @@ include::{snippets}/user/update/profile/request-part-request-fields.adoc[]
 include::{snippets}/user/update/profile/http-response.adoc[]
 ====== Body
 include::{snippets}/user/update/profile/response-fields.adoc[]
+
+==== 회원 탈퇴 API
+===== 요청
+include::{snippets}/user/delete/http-request.adoc[]
+===== Header
+include::{snippets}/user/delete/request-headers.adoc[]
+===== 응답
+include::{snippets}/user/delete/http-response.adoc[]
+
+==== 회원 상세 조회 API
+===== 요청
+include::{snippets}/user/findById/http-request.adoc[]
+====== Path
+include::{snippets}/user/findById/path-parameters.adoc[]
+===== 응답
+include::{snippets}/user/findById/http-response.adoc[]
+====== Body
+include::{snippets}/user/findById/response-fields.adoc[]
+

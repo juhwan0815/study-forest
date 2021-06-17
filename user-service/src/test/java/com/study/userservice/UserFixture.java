@@ -44,10 +44,10 @@ public class UserFixture {
             = new UserUpdateProfileRequest(true,"황철원");
 
     public static final UserResponse TEST_USER_RESPONSE
-            = new UserResponse(1L,1L,"황주환",TEST_Image,"male","10~19",3);
+            = new UserResponse(1L,1L,"황주환",TEST_Image,"male","10~19",2);
 
     public static final UserResponse TEST_USER_RESPONSE2
-            = new UserResponse(1L,1L,"황철원",TEST_Image,"male","10~19",3);
+            = new UserResponse(2L,2L,"황철원",TEST_Image,"male","10~19",3);
 
 
     public static User createTestUser(){

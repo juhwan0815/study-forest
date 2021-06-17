@@ -28,18 +28,18 @@ import java.nio.charset.StandardCharsets;
 
 import static com.study.userservice.UserFixture.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParts;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -178,5 +178,59 @@ class UserControllerTest {
         // then
         then(userService).should(times(1)).updateProfile(any(), any(), any());
     }
+
+    @Test
+    @DisplayName("회원 ID 조회 API 테스트")
+    void findById() throws Exception {
+        given(userService.findById(anyLong()))
+                .willReturn(TEST_USER_RESPONSE);
+
+        mockMvc.perform(get("/users/{userId}", 1)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE)))
+                .andDo(document("user/findById",
+                        pathParameters(
+                                parameterWithName("userId").description("조회할 회원 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("회원 ID"),
+                                fieldWithPath("kakaoId").type(JsonFieldType.NUMBER).description("카카오 ID"),
+                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                fieldWithPath("image").type(JsonFieldType.OBJECT).description("회원 이미지 정보"),
+                                fieldWithPath("image.profileImage").type(JsonFieldType.STRING).description("회원 프로필 이미지 URL"),
+                                fieldWithPath("image.thumbnailImage").type(JsonFieldType.STRING).description("회원 프로필 썸네일 이미지 URL"),
+                                fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
+                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
+                                fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수")
+                        )
+                ));
+
+        then(userService).should(times(1)).findById(any());
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴 API 테스트")
+    void delete() throws Exception {
+
+        willDoNothing()
+                .given(userService)
+                .delete(any());
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/users")
+                .header(HttpHeaders.AUTHORIZATION,TEST_AUTHORIZATION))
+                .andExpect(status().isOk())
+                .andDo(document("user/delete",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        )
+                ));
+
+        then(userService).should(times(1)).delete(any());
+    }
+
+
+
+
 
 }

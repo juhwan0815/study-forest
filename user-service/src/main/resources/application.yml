@@ -47,7 +47,9 @@ eureka:
 kafka:
   server: 127.0.0.1:9092
   topic:
-
+    user:
+      delete: user-delete-topic
+      update: user-update-topic
 
 
 management:

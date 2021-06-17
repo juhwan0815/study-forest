@@ -7,6 +7,7 @@ import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 
 @Slf4j
+@CrossOrigin(origins = "*",allowedHeaders = "*")
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -21,7 +23,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/users")
-    public ResponseEntity<UserResponse> save(@RequestBody @Valid UserLoginRequest request) {
+    public ResponseEntity<UserResponse> create(@RequestBody @Valid UserLoginRequest request) {
         return ResponseEntity.ok(userService.create(request));
     }
 
@@ -35,6 +37,12 @@ public class UserController {
                                                       @RequestPart(required = false) MultipartFile image,
                                                       @RequestPart @Valid UserUpdateProfileRequest request){
         return ResponseEntity.ok(userService.updateProfile(userId,image,request));
+    }
+
+    @DeleteMapping("/users")
+    public ResponseEntity<Void> delete(@LoginUser Long userId){
+        userService.delete(userId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 
