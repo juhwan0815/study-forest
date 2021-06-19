@@ -65,12 +65,31 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*),/$\{segment}
+        # 회원 서비스 - 로그인 회원 정보 조회 API
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/users
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*),/$\{segment}
+            - AuthorizationHeaderFilter
+        # 회원 서비스 - 회원 상세 조회 API
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/users/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*),/$\{segment}
         # 회원 서비스
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
             - Path=/user-service/users/**
-            - Method=GET,POST,PATCH,DELETE
+            - Method=POST,PATCH,DELETE
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*),/$\{segment}
@@ -104,22 +123,12 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/location-service/(?<segment>.*),/$\{segment}
-        # 스터디 서비스 - 카테고리 생성 API
-        - id: study-service
-          uri: lb://STUDY-SERVICE
-          predicates:
-            - Path=/study-service/categories
-            - Method=POST
-          filters:
-            - RemoveRequestHeader=Cookie
-            - RewritePath=/study-service/(?<segment>.*),/$\{segment}
-            - AuthorizationHeaderFilter
-        # 스터디 서비스 - 카테고리 수정/삭제 API
+        # 스터디 서비스 - 카테고리 생성/수정/삭제 API
         - id: study-service
           uri: lb://STUDY-SERVICE
           predicates:
             - Path=/study-service/categories/**
-            - Method=PUT,DELETE
+            - Method=POST,PUT,DELETE
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/study-service/(?<segment>.*),/$\{segment}
@@ -139,6 +148,16 @@ spring:
           predicates:
             - Path=/study-service/studies/**
             - Method=POST,PATCH,DELETE
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/study-service/(?<segment>.*),/$\{segment}
+            - AuthorizationHeaderFilter
+        # 스터디 서비스 - 스터디 대기 인원 조회 API
+        - id: study-service
+          uri: lb://STUDY-SERVICE
+          predicates:
+            - Path=/study-service/studies/{studyId}/waitUsers
+            - Method=GET
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/study-service/(?<segment>.*),/$\{segment}
