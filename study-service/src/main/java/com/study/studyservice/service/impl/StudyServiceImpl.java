@@ -10,9 +10,11 @@ import com.study.studyservice.domain.*;
 import com.study.studyservice.exception.CategoryException;
 import com.study.studyservice.exception.StudyException;
 import com.study.studyservice.kafka.message.StudyApplyCreateMessage;
+import com.study.studyservice.kafka.message.StudyApplyFailMessage;
 import com.study.studyservice.kafka.message.StudyApplySuccessMessage;
 import com.study.studyservice.kafka.message.StudyDeleteMessage;
 import com.study.studyservice.kafka.sender.StudyApplyCreateMessageSender;
+import com.study.studyservice.kafka.sender.StudyApplyFailMessageSender;
 import com.study.studyservice.kafka.sender.StudyApplySuccessMessageSender;
 import com.study.studyservice.kafka.sender.StudyDeleteMessageSender;
 import com.study.studyservice.model.location.response.LocationResponse;
@@ -59,6 +61,7 @@ public class StudyServiceImpl implements StudyService {
     private final StudyDeleteMessageSender studyDeleteMessageSender;
     private final StudyApplyCreateMessageSender studyApplyCreateMessageSender;
     private final StudyApplySuccessMessageSender studyApplySuccessMessageSender;
+    private final StudyApplyFailMessageSender studyApplyFailMessageSender;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -239,6 +242,17 @@ public class StudyServiceImpl implements StudyService {
         findStudy.addStudyUser(userId,Role.USER);
 
         studyApplySuccessMessageSender.send(StudyApplySuccessMessage.from(userId,studyId));
+    }
+
+    @Override
+    @Transactional
+    public void deleteWaitUser(Long loginUserId, Long studyId, Long userId) {
+        Study findStudy = studyQueryRepository.findWithWaitUserById(studyId);
+        findStudy.checkStudyAdmin(loginUserId);
+
+        findStudy.deleteWaitUser(userId);
+
+       studyApplyFailMessageSender.send(StudyApplyFailMessage.from(userId,studyId));
     }
 
     private LocationResponse getLocation(boolean offline, String locationCode) {

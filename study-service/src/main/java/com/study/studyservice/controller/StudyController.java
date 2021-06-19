@@ -53,7 +53,7 @@ public class StudyController {
     }
 
     @PostMapping("/studies/{studyId}/waitUsers")
-    public ResponseEntity<Void> createWaitMember(@LoginUser Long userId,
+    public ResponseEntity<Void> createWaitUser(@LoginUser Long userId,
                                                  @PathVariable Long studyId){
         studyService.createWaitUser(userId,studyId);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -68,8 +68,15 @@ public class StudyController {
     public ResponseEntity<Void> createStudyUser(@LoginUser Long loginUserId,
                                                 @PathVariable Long studyId,@PathVariable Long userId){
         studyService.createStudyUser(loginUserId,studyId,userId);
-
         return ResponseEntity.status(HttpStatus.OK).build();
-
     }
+
+    @DeleteMapping("/studies/{studyId}/waitUsers/{userId}")
+    public ResponseEntity<Void> deleteWaitUser(@LoginUser Long loginUserId,
+                                               @PathVariable Long studyId, @PathVariable Long userId){
+        studyService.deleteWaitUser(loginUserId,studyId,userId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
 }

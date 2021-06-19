@@ -6,6 +6,7 @@ import com.study.studyservice.client.UserServiceClient;
 import com.study.studyservice.domain.Study;
 import com.study.studyservice.domain.StudyStatus;
 import com.study.studyservice.exception.StudyException;
+import com.study.studyservice.kafka.sender.StudyApplyFailMessageSender;
 import com.study.studyservice.kafka.sender.StudyApplySuccessMessageSender;
 import com.study.studyservice.kafka.sender.StudyDeleteMessageSender;
 import com.study.studyservice.kafka.sender.StudyApplyCreateMessageSender;
@@ -74,6 +75,9 @@ class StudyServiceTest {
 
     @Mock
     private StudyApplySuccessMessageSender studyApplySuccessMessageSender;
+
+    @Mock
+    private StudyApplyFailMessageSender studyApplyFailMessageSender;
 
     @Test
     @DisplayName("예외테스트 : 동네정보 코드 없이 오프라인 스터디 생성 요청을 보낼 경우 예외가 발생한다.")
@@ -508,4 +512,34 @@ class StudyServiceTest {
         then(studyApplySuccessMessageSender).should(times(1)).send(any());
     }
 
+    @Test
+    @DisplayName("예외테스트 : 스터디 관리자가 아닌 회원이 스터디 참가 신청을 거부하면 예외가 발생한다.")
+    void deleteWaitUserWhenNotStudyAdmin(){
+        Study study = createTestOfflineStudy();
+        given(studyQueryRepository.findWithWaitUserById(any()))
+                .willReturn(study);
+
+        // when
+        assertThrows(StudyException.class,()->studyService.deleteWaitUser(2L,1L,3L));
+    }
+
+    @Test
+    @DisplayName("스터디 관리자가 스터디 참가 신청을 거절한다.")
+    void deleteWaitUser(){
+        Study study = createTestOfflineStudy();
+        given(studyQueryRepository.findWithWaitUserById(any()))
+                .willReturn(study);
+
+        willDoNothing()
+                .given(studyApplyFailMessageSender)
+                .send(any());
+
+        // when
+        studyService.deleteWaitUser(1L,1L,2L);
+
+        // then
+        assertThat(study.getWaitUsers().size()).isEqualTo(1);
+        then(studyQueryRepository).should(times(1)).findWithWaitUserById(any());
+        then(studyApplyFailMessageSender).should(times(1)).send(any());
+    }
 }

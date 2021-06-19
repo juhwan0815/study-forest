@@ -98,3 +98,13 @@ include::{snippets}/study/studyUser/create/request-headers.adoc[]
 include::{snippets}/study/studyUser/create/path-parameters.adoc[]
 ===== 응답
 include::{snippets}/study/studyUser/create/http-response.adoc[]
+
+==== 스터디 참가 신청 거부 API
+===== 요청
+include::{snippets}/study/waitUser/delete/http-request.adoc[]
+====== Header
+include::{snippets}/study/waitUser/delete/request-headers.adoc[]
+====== Path
+include::{snippets}/study/waitUser/delete/path-parameters.adoc[]
+===== 응답
+include::{snippets}/study/waitUser/delete/http-response.adoc[]
