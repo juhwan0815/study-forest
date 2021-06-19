@@ -88,3 +88,13 @@ include::{snippets}/study/waitUser/find/path-parameters.adoc[]
 include::{snippets}/study/waitUser/find/http-response.adoc[]
 ====== Body
 include::{snippets}/study/waitUser/find/response-fields.adoc[]
+
+==== 스터디 참가 인원 추가 API
+===== 요청
+include::{snippets}/study/studyUser/create/http-request.adoc[]
+====== Header
+include::{snippets}/study/studyUser/create/request-headers.adoc[]
+====== Path
+include::{snippets}/study/studyUser/create/path-parameters.adoc[]
+===== 응답
+include::{snippets}/study/studyUser/create/http-response.adoc[]

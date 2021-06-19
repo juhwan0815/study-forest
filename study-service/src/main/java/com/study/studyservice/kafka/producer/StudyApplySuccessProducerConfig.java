@@ -2,6 +2,7 @@ package com.study.studyservice.kafka.producer;
 
 import com.study.studyservice.kafka.config.KafkaConfig;
 import com.study.studyservice.kafka.message.StudyApplyCreateMessage;
+import com.study.studyservice.kafka.message.StudyApplySuccessMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,19 +15,19 @@ import java.util.Map;
 
 @EnableKafka
 @Configuration
-public class StudyApplyCreateProducerConfig {
+public class StudyApplySuccessProducerConfig {
 
     @Value("${kafka.server}")
     private String kafkaServer;
 
-    @Bean(name = "studyApplyCreateProducerFactory")
-    public ProducerFactory<String, StudyApplyCreateMessage> producerFactory(){
+    @Bean(name = "studyApplySuccessProducerFactory")
+    public ProducerFactory<String, StudyApplySuccessMessage> producerFactory(){
         Map<String, Object> properties = KafkaConfig.producerFactory(kafkaServer);
         return new DefaultKafkaProducerFactory<>(properties);
     }
 
-    @Bean(name = "studyApplyCreateKafkaTemplate")
-    public KafkaTemplate<String, StudyApplyCreateMessage> kafkaTemplate(){
+    @Bean(name = "studyApplySuccessKafkaTemplate")
+    public KafkaTemplate<String, StudyApplySuccessMessage> kafkaTemplate(){
         return new KafkaTemplate<>(producerFactory());
     }
 

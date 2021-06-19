@@ -63,4 +63,13 @@ public class StudyController {
     public ResponseEntity<List<WaitUserResponse>> findWaitUsersByStudyId(@PathVariable Long studyId){
         return ResponseEntity.ok(studyService.findWaitUsersByStudyId(studyId));
     }
+
+    @PostMapping("/studies/{studyId}/users/{userId}")
+    public ResponseEntity<Void> createStudyUser(@LoginUser Long loginUserId,
+                                                @PathVariable Long studyId,@PathVariable Long userId){
+        studyService.createStudyUser(loginUserId,studyId,userId);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+
+    }
 }

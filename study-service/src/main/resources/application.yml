@@ -51,7 +51,8 @@ kafka:
       delete: study-delete-topic
     studyApply:
       create: studyApply-create-topic
-
+      success: studyApply-success-topic
+      fail: studyApply-fail-topic
 
 management:
   endpoints:

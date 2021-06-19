@@ -462,6 +462,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_응답_5">응답</a></li>
 </ul>
 </li>
+<li><a href="#_스터디_참가_대기_인원_조회_api">6. 스터디 참가 대기 인원 조회 API</a>
+<ul class="sectlevel4">
+<li><a href="#_요청_6">요청</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -489,7 +494,7 @@ Accept: application/json
 Host: localhost:8080
 
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
-Content-Disposition: form-data; name=image; filename=프로필사진.png
+Content-Disposition: form-data; name=image; filename=스터디이미지.png
 Content-Type: image/png
 
 &lt;&lt;image&gt;&gt;
@@ -497,7 +502,7 @@ Content-Type: image/png
 Content-Disposition: form-data; name=request; filename=request
 Content-Type: application/json
 
-{"name":"스프링 스터디","numberOfPeople":5,"content":"안녕하세요 스프링 스터디입니다.","tags":["JPA","스프링"],"online":true,"offline":true,"locationCode":"1111051500","categoryId":1}
+{"name":"테스트 스터디","numberOfPeople":5,"content":"테스트 스터디 입니다.","tags":["JPA","스프링"],"online":true,"offline":true,"locationCode":"1111054000","categoryId":2}
 --6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm--</code></pre>
 </div>
 </div>
@@ -539,6 +544,10 @@ Content-Type: application/json
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>image</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">스터디 이미지 파일</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>request</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 생성 요청 데이터</p></td>
 </tr>
 </tbody>
 </table>
@@ -612,22 +621,24 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/json;charset=UTF-8
-Content-Length: 721
+Content-Length: 736
 
 {
   "id" : 1,
-  "name" : "스프링 스터디",
+  "name" : "테스트 스터디",
   "numberOfPeople" : 5,
   "currentNumberOfPeople" : 1,
-  "content" : "스프링 스터디입니다.",
-  "online" : false,
+  "content" : "테스트 스터디 입니다.",
+  "online" : true,
   "offline" : true,
   "status" : "OPEN",
-  "studyImage" : "스터디 이미지 URL",
-  "studyThumbnailImage" : "스터디 썸네일 이미지 URL",
+  "image" : {
+    "studyImage" : "테스트 이미지",
+    "thumbnailImage" : "테스트 썸네일 이미지"
+  },
   "location" : {
     "id" : 1,
-    "code" : "1111051500",
+    "code" : "1111054000",
     "city" : "서울특별시",
     "gu" : "종로구",
     "dong" : "삼청동",
@@ -642,7 +653,7 @@ Content-Length: 721
   },
   "childCategory" : {
     "id" : 2,
-    "name" : "백엔드"
+    "name" : "프론트엔드"
   },
   "studyTags" : [ "JPA", "스프링" ]
 }</code></pre>
@@ -705,12 +716,17 @@ Content-Length: 721
 <td class="tableblock halign-left valign-top"><p class="tableblock">스터디 상태</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>studyImage</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>image</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 이미지</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>image.studyImage</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">스터디 이미지 URL</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>studyThumbnailImage</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>image.thumbnailImage</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">스터디 썸네일 이미지 URL</p></td>
 </tr>
@@ -856,6 +872,10 @@ Host: localhost:8080</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>image</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">변경할 이미지 파일</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>request</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 수정 요청 데이터</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -938,22 +958,24 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/json;charset=UTF-8
-Content-Length: 749
+Content-Length: 737
 
 {
   "id" : 1,
-  "name" : "노드 스터디",
-  "numberOfPeople" : 10,
+  "name" : "테스트 스터디",
+  "numberOfPeople" : 5,
   "currentNumberOfPeople" : 1,
-  "content" : "노드 스터디 입니다.",
-  "online" : false,
+  "content" : "테스트 스터디 입니다.",
+  "online" : true,
   "offline" : true,
-  "status" : "OPEN",
-  "studyImage" : "변경된 스터디 이미지 URL",
-  "studyThumbnailImage" : "변경된 스터디 썸네일 이미지 URL",
+  "status" : "CLOSE",
+  "image" : {
+    "studyImage" : "테스트 이미지",
+    "thumbnailImage" : "테스트 썸네일 이미지"
+  },
   "location" : {
     "id" : 1,
-    "code" : "1111051500",
+    "code" : "1111054000",
     "city" : "서울특별시",
     "gu" : "종로구",
     "dong" : "삼청동",
@@ -967,10 +989,10 @@ Content-Length: 749
     "name" : "개발"
   },
   "childCategory" : {
-    "id" : 3,
-    "name" : "백엔드"
+    "id" : 2,
+    "name" : "프론트엔드"
   },
-  "studyTags" : [ "노드", "자바스크립트" ]
+  "studyTags" : [ "JPA", "스프링" ]
 }</code></pre>
 </div>
 </div>
@@ -1031,14 +1053,19 @@ Content-Length: 749
 <td class="tableblock halign-left valign-top"><p class="tableblock">스터디 상태</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>studyImage</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 이미지 URL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>image</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">변경된 스터디 이미지</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>studyThumbnailImage</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>image.studyImage</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 썸네일 이미지 URL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">변경된 스터디 이미지 URL</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>image.thumbnailImage</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">변경된 스터디 썸네일 이미지 URL</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>location</code></p></td>
@@ -1240,22 +1267,24 @@ Vary: Origin
 Vary: Access-Control-Request-Method
 Vary: Access-Control-Request-Headers
 Content-Type: application/json;charset=UTF-8
-Content-Length: 721
+Content-Length: 736
 
 {
   "id" : 1,
-  "name" : "스프링 스터디",
+  "name" : "테스트 스터디",
   "numberOfPeople" : 5,
   "currentNumberOfPeople" : 1,
-  "content" : "스프링 스터디입니다.",
-  "online" : false,
+  "content" : "테스트 스터디 입니다.",
+  "online" : true,
   "offline" : true,
   "status" : "OPEN",
-  "studyImage" : "스터디 이미지 URL",
-  "studyThumbnailImage" : "스터디 썸네일 이미지 URL",
+  "image" : {
+    "studyImage" : "테스트 이미지",
+    "thumbnailImage" : "테스트 썸네일 이미지"
+  },
   "location" : {
     "id" : 1,
-    "code" : "1111051500",
+    "code" : "1111054000",
     "city" : "서울특별시",
     "gu" : "종로구",
     "dong" : "삼청동",
@@ -1270,7 +1299,7 @@ Content-Length: 721
   },
   "childCategory" : {
     "id" : 2,
-    "name" : "백엔드"
+    "name" : "프론트엔드"
   },
   "studyTags" : [ "JPA", "스프링" ]
 }</code></pre>
@@ -1333,12 +1362,17 @@ Content-Length: 721
 <td class="tableblock halign-left valign-top"><p class="tableblock">스터디 상태</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>studyImage</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>image</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 이미지</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>image.studyImage</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">스터디 이미지 URL</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>studyThumbnailImage</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>image.thumbnailImage</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">스터디 썸네일 이미지 URL</p></td>
 </tr>
@@ -1499,10 +1533,17 @@ Vary: Access-Control-Request-Headers</code></pre>
 </div>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_스터디_참가_대기_인원_조회_api"><a class="anchor" href="#_스터디_참가_대기_인원_조회_api"></a><a class="link" href="#_스터디_참가_대기_인원_조회_api">6. 스터디 참가 대기 인원 조회 API</a></h4>
+<div class="sect4">
+<h5 id="_요청_6"><a class="anchor" href="#_요청_6"></a><a class="link" href="#_요청_6">요청</a></h5>
+
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-06-14 02:28:41 KST
+Last updated 2021-06-19 17:51:59 KST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">

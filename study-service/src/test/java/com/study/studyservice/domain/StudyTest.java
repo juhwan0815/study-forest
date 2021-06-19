@@ -31,6 +31,34 @@ class StudyTest {
     }
 
     @Test
+    @DisplayName("스터디 참가자수와 스터디의 정원이 같으면 스터디의 상태가 CLOSE로 변경된다.")
+    void addStudyUserStatusClose(){
+        // given
+        Study study = Study.createStudy("테스트 스터디", 2, "테스트 스터디입니다.",
+                true, true, null);
+        study.addStudyUser(1L,Role.USER);
+
+        // when
+        study.addStudyUser(2L,Role.USER);
+
+        // then
+        assertThat(study.getStatus()).isEqualTo(StudyStatus.CLOSE);
+    }
+
+    @Test
+    @DisplayName("예외테스트 : 스터디가 마감되었을 경우 스터디 참가 인원을 추가하면 예외가 발생한다")
+    void addStudyUsersWhenStatusClose(){
+        // given
+        Study study = Study.createStudy("테스트 스터디", 2, "테스트 스터디입니다.",
+                true, true, null);
+        study.addStudyUser(1L,Role.USER);
+        study.addStudyUser(2L,Role.USER);
+
+        // when
+        assertThrows(StudyException.class,()->study.addStudyUser(3L,Role.USER));
+    }
+
+    @Test
     @DisplayName("스터디의 이미지를 변경한다.")
     void changeImage(){
         // given

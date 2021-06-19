@@ -21,4 +21,7 @@ public interface StudyService {
     void createWaitUser(Long userId, Long studyId);
 
     List<WaitUserResponse> findWaitUsersByStudyId(Long studyId);
+
+    void createStudyUser(Long loginUserId, Long studyId, Long userId);
+
 }

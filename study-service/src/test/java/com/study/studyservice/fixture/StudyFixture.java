@@ -43,6 +43,7 @@ public class StudyFixture {
             true, true, StudyStatus.OPEN, TEST_IMAGE, 1L, TEST_CATEGORY2,
             new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
 
+
     public static final StudyTag TEST_STUDY_TAG1 = new StudyTag(1L,TEST_STUDY1,TEST_TAG1);
     public static final StudyTag TEST_STUDY_TAG2 = new StudyTag(2L,TEST_STUDY1,TEST_TAG2);
     public static final StudyUser TEST_STUDY_USER1 = new StudyUser(1L,1L,Role.ADMIN,TEST_STUDY1);
@@ -117,6 +118,19 @@ public class StudyFixture {
         Study study = new Study(1L,
                 "테스트 스터디", 5, 1, "테스트 스터디 입니다.",
                 true, true, StudyStatus.OPEN, TEST_IMAGE, 1L, TEST_CATEGORY2,
+                new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        study.getStudyTags().add(new StudyTag(1L,study,TEST_TAG1));
+        study.getStudyTags().add(new StudyTag(2L,study,TEST_TAG2));
+        study.getStudyUsers().add(new StudyUser(1L,1L,Role.ADMIN,study));
+        study.getWaitUsers().add(new WaitUser(1L,3L,study));
+        study.getWaitUsers().add(new WaitUser(2L,2L,study));
+        return study;
+    }
+
+    public static Study createTestCloseStudy(){
+        Study study = new Study(1L,
+                "테스트 스터디", 5, 1, "테스트 스터디 입니다.",
+                true, true, StudyStatus.CLOSE, TEST_IMAGE, 1L, TEST_CATEGORY2,
                 new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         study.getStudyTags().add(new StudyTag(1L,study,TEST_TAG1));
         study.getStudyTags().add(new StudyTag(2L,study,TEST_TAG2));

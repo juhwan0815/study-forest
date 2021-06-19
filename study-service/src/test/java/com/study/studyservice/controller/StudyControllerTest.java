@@ -325,7 +325,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @DisplayName("스터디 참가 대기 인원 추가 API 테스트")
+    @DisplayName("스터디 참가 신청 API 테스트")
     void addWaitUser() throws Exception {
         willDoNothing()
                 .given(studyService)
@@ -350,7 +350,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @DisplayName("스터디 참가 인원 조회 API 테스트")
+    @DisplayName("스터디 참가 대기 인원 조회 API 테스트")
     void findWaitUser() throws Exception{
         List<WaitUserResponse> waitUserResponseList = Arrays.asList(TEST_WAIT_USER_RESPONSE1, TEST_WAIT_USER_RESPONSE2);
 
@@ -378,5 +378,30 @@ class StudyControllerTest {
         then(studyService).should(times(1)).findWaitUsersByStudyId(any());
     }
 
+    @Test
+    @DisplayName("스터디 참가 인원 추가 API 테스트")
+    void createStudyUser() throws Exception{
+        willDoNothing()
+                .given(studyService)
+                .createStudyUser(any(),any(),any());
+
+        given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(1L);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/studies/{studyId}/users/{userId}", 1,2)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
+                .andExpect(status().isOk())
+                .andDo(document("study/studyUser/create",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("studyId").description("스터디 ID"),
+                                parameterWithName("userId").description("스터디 참가 대기 목록의 회원 ID")
+                        )
+                ));
+
+        then(studyService).should(times(1)).createStudyUser(any(),any(),any());
+    }
 
 }

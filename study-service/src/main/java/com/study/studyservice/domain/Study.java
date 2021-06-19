@@ -72,9 +72,17 @@ public class Study extends BaseEntity {
     }
 
     public void addStudyUser(Long userId,Role role){
+        if(this.status.equals(StudyStatus.CLOSE)){
+            throw new StudyException("스터디가 마감되었습니다.");
+        }
+
         StudyUser studyUser = StudyUser.createStudyUser(userId, role, this);
         studyUsers.add(studyUser);
         this.currentNumberOfPeople += 1;
+
+        if(currentNumberOfPeople == numberOfPeople){
+            this.status = StudyStatus.CLOSE;
+        }
     }
 
     public void changeImage(Image image){
@@ -170,4 +178,12 @@ public class Study extends BaseEntity {
         WaitUser waitUser = WaitUser.createWaitUser(userId,this);
         waitUsers.add(waitUser);
     }
+
+    public void deleteWaitUser(Long userId) {
+        WaitUser findWaitUser = waitUsers.stream()
+                .filter(waitUser -> waitUser.getUserId().equals(userId))
+                .findFirst().get();
+        waitUsers.remove(findWaitUser);
+    }
+
 }

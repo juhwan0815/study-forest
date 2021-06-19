@@ -6,6 +6,7 @@ import com.study.studyservice.client.UserServiceClient;
 import com.study.studyservice.domain.Study;
 import com.study.studyservice.domain.StudyStatus;
 import com.study.studyservice.exception.StudyException;
+import com.study.studyservice.kafka.sender.StudyApplySuccessMessageSender;
 import com.study.studyservice.kafka.sender.StudyDeleteMessageSender;
 import com.study.studyservice.kafka.sender.StudyApplyCreateMessageSender;
 import com.study.studyservice.model.study.response.StudyResponse;
@@ -70,6 +71,9 @@ class StudyServiceTest {
 
     @Mock
     private StudyApplyCreateMessageSender studyApplyCreateMessageSender;
+
+    @Mock
+    private StudyApplySuccessMessageSender studyApplySuccessMessageSender;
 
     @Test
     @DisplayName("예외테스트 : 동네정보 코드 없이 오프라인 스터디 생성 요청을 보낼 경우 예외가 발생한다.")
@@ -441,7 +445,7 @@ class StudyServiceTest {
     }
 
     @Test
-    @DisplayName("회원의 스터디 대기 인원을 조회한다.")
+    @DisplayName("회원이 스터디 대기 인원을 조회한다.")
     void findWaitUserByStudyId(){
         // given
         given(studyQueryRepository.findWithWaitUserById(any()))
@@ -457,6 +461,51 @@ class StudyServiceTest {
         assertThat(result.size()).isEqualTo(2);
         assertThat(result.get(0).getUserId()).isEqualTo(TEST_USER_RESPONSE2.getId());
         assertThat(result.get(1).getUserId()).isEqualTo(TEST_USER_RESPONSE1.getId());
+    }
+
+    @Test
+    @DisplayName("예외 테스트 : 스터디 관리자가 아닌 회원이 스터디 참가 신청을 승인하면 예외가 발생한다.")
+    void createStudyUserWhenNotStudyAdmin(){
+        // given
+        given(studyQueryRepository.findWithWaitUserById(any()))
+                .willReturn(createTestOfflineStudy());
+
+        // when
+        assertThrows(StudyException.class,
+                ()->studyService.createStudyUser(2L,1L,2L));
+    }
+
+    @Test
+    @DisplayName("예외 테스트 : 스터디 관리자가 스터디 참가 신청을 승인할 때 스터디의 상태가 CLOSE 면 예외가 발생한다.")
+    void createStudyUserWhenStatusCLOSE(){
+        // given
+        given(studyQueryRepository.findWithWaitUserById(any()))
+                .willReturn(createTestCloseStudy());
+
+        // when
+        assertThrows(StudyException.class,()->studyService.createStudyUser(1L,1L,2L));
+    }
+
+    @Test
+    @DisplayName("스터디 관리자가 스터디 참가 신청을 승인한다.")
+    void createStudyUser(){
+        // given
+        Study study = createTestOfflineStudy();
+        given(studyQueryRepository.findWithWaitUserById(any()))
+                .willReturn(study);
+        willDoNothing()
+                .given(studyApplySuccessMessageSender)
+                .send(any());
+
+        // when
+        studyService.createStudyUser(1L,1L,2L);
+
+        // then
+        assertThat(study.getStudyUsers().size()).isEqualTo(2);
+        assertThat(study.getStudyUsers().get(1).getUserId()).isEqualTo(2L);
+        assertThat(study.getWaitUsers().size()).isEqualTo(1);
+        then(studyQueryRepository).should(times(1)).findWithWaitUserById(any());
+        then(studyApplySuccessMessageSender).should(times(1)).send(any());
     }
 
 }
