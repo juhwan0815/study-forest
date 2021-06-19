@@ -182,7 +182,7 @@ public class Study extends BaseEntity {
     public void deleteWaitUser(Long userId) {
         WaitUser findWaitUser = waitUsers.stream()
                 .filter(waitUser -> waitUser.getUserId().equals(userId))
-                .findFirst().get();
+                .findFirst().orElseThrow(()-> new StudyException(userId + "는 스터디 참가 대기 인원에 존재하지 않는 회원 ID 입니다."));
         waitUsers.remove(findWaitUser);
     }
 

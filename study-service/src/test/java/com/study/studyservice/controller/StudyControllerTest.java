@@ -9,6 +9,7 @@ import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
+import com.study.studyservice.model.studyuser.StudyUserResponse;
 import com.study.studyservice.model.waituser.WaitUserResponse;
 import com.study.studyservice.service.StudyService;
 import org.junit.jupiter.api.BeforeEach;
@@ -367,7 +368,7 @@ class StudyControllerTest {
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
                         ),
                         pathParameters(
-                                parameterWithName("studyId").description("참여할 스터디 ID")
+                                parameterWithName("studyId").description("스터디 ID")
                         ),
                         responseFields(
                                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("스터디 참가 대기 ID"),
@@ -429,6 +430,35 @@ class StudyControllerTest {
                 ));
 
         then(studyService).should(times(1)).deleteWaitUser(any(),any(),any());
+    }
+
+    @Test
+    @DisplayName("스터디 참가 인원 조회 API 테스트")
+    void findStudyUsersByStudyId() throws Exception{
+        List<StudyUserResponse> studyUserResponseList = Arrays.asList(TEST_STUDY_USER_RESPONSE1, TEST_STUDY_USER_RESPONSE2);
+        given(studyService.findStudyUsersByStudyId(any()))
+                .willReturn(studyUserResponseList);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/studies/{studyId}/users", 1)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(studyUserResponseList)))
+                .andDo(document("study/studyUser/find",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("studyId").description("스터디 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("스터디 참가 ID"),
+                                fieldWithPath("[].userId").type(JsonFieldType.NUMBER).description("스터디 참가 유저 ID"),
+                                fieldWithPath("[].nickName").type(JsonFieldType.STRING).description("스터디 참가 유저 닉네임"),
+                                fieldWithPath("[].role").type(JsonFieldType.STRING).description("스터디 참가 유저 권한")
+                        )
+                ));
+        then(studyService).should(times(1)).findStudyUsersByStudyId(any());
     }
 
 

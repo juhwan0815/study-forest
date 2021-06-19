@@ -3,6 +3,7 @@ package com.study.studyservice.service;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
+import com.study.studyservice.model.studyuser.StudyUserResponse;
 import com.study.studyservice.model.waituser.WaitUserResponse;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,4 +26,7 @@ public interface StudyService {
     void createStudyUser(Long loginUserId, Long studyId, Long userId);
 
     void deleteWaitUser(Long loginUserId, Long studyId, Long userId);
+
+    List<StudyUserResponse> findStudyUsersByStudyId(Long studyId);
+
 }

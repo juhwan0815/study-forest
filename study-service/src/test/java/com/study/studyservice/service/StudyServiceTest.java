@@ -11,6 +11,7 @@ import com.study.studyservice.kafka.sender.StudyApplySuccessMessageSender;
 import com.study.studyservice.kafka.sender.StudyDeleteMessageSender;
 import com.study.studyservice.kafka.sender.StudyApplyCreateMessageSender;
 import com.study.studyservice.model.study.response.StudyResponse;
+import com.study.studyservice.model.studyuser.StudyUserResponse;
 import com.study.studyservice.model.waituser.WaitUserResponse;
 import com.study.studyservice.repository.CategoryRepository;
 import com.study.studyservice.repository.StudyRepository;
@@ -449,7 +450,7 @@ class StudyServiceTest {
     }
 
     @Test
-    @DisplayName("회원이 스터디 대기 인원을 조회한다.")
+    @DisplayName("스터디 대기 인원을 조회한다.")
     void findWaitUserByStudyId(){
         // given
         given(studyQueryRepository.findWithWaitUserById(any()))
@@ -491,6 +492,17 @@ class StudyServiceTest {
     }
 
     @Test
+    @DisplayName("예외 테스트 : 스터디 참가 신청을 승인 할 때 스터디 대기 인원에 존재하지 않으면 예외가 발생한다.")
+    void createStudyUserNotExistWaitUser(){
+        Study study = createTestOfflineStudy();
+        given(studyQueryRepository.findWithWaitUserById(any()))
+                .willReturn(study);
+
+        // when
+        assertThrows(StudyException.class,()->studyService.createStudyUser(1L,1L,4L));
+    }
+
+    @Test
     @DisplayName("스터디 관리자가 스터디 참가 신청을 승인한다.")
     void createStudyUser(){
         // given
@@ -524,6 +536,17 @@ class StudyServiceTest {
     }
 
     @Test
+    @DisplayName("예외테스트 : 스터디 대기유저를 삭제할 때 대기 유저가 존재하지 않으면 예외가 발생한다.")
+    void deleteWaitUserNotExist(){
+        Study study = createTestOfflineStudy();
+        given(studyQueryRepository.findWithWaitUserById(any()))
+                .willReturn(study);
+
+        // when
+        assertThrows(StudyException.class,()->studyService.deleteWaitUser(1L,1L,4L));
+    }
+
+    @Test
     @DisplayName("스터디 관리자가 스터디 참가 신청을 거절한다.")
     void deleteWaitUser(){
         Study study = createTestOfflineStudy();
@@ -541,5 +564,23 @@ class StudyServiceTest {
         assertThat(study.getWaitUsers().size()).isEqualTo(1);
         then(studyQueryRepository).should(times(1)).findWithWaitUserById(any());
         then(studyApplyFailMessageSender).should(times(1)).send(any());
+    }
+
+    @Test
+    @DisplayName("스터디 참가 인원을 조회한다.")
+    void findStudyUsersByStudyId(){
+        // given
+        given(studyQueryRepository.findWithStudyUsersById(any()))
+                .willReturn(createTestOfflineStudy());
+
+        given(userServiceClient.findUserByIdIn(any()))
+                .willReturn(Arrays.asList(TEST_USER_RESPONSE3));
+
+        // when
+        List<StudyUserResponse> result = studyService.findStudyUsersByStudyId(1L);
+
+        // then
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getUserId()).isEqualTo(TEST_USER_RESPONSE3.getId());
     }
 }

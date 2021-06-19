@@ -41,6 +41,7 @@ public class StudyQueryRepository {
                 .selectFrom(study).distinct()
                 .leftJoin(study.studyUsers, studyUser).fetchJoin()
                 .where(study.id.eq(studyId))
+                .orderBy(studyUser.id.asc())
                 .fetchOne();
 
         if(findStudy == null){

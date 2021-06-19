@@ -5,6 +5,7 @@ import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
+import com.study.studyservice.model.studyuser.StudyUserResponse;
 import com.study.studyservice.model.user.UserResponse;
 import com.study.studyservice.model.waituser.WaitUserResponse;
 import org.springframework.http.MediaType;
@@ -94,12 +95,19 @@ public class StudyFixture {
 
     public static final UserResponse TEST_USER_RESPONSE1 = new UserResponse(2L,"황주환");
     public static final UserResponse TEST_USER_RESPONSE2 = new UserResponse(3L,"황철원");
+    public static final UserResponse TEST_USER_RESPONSE3 = new UserResponse(1L,"한다빈");
 
     public static final WaitUserResponse TEST_WAIT_USER_RESPONSE1
             = new WaitUserResponse(1L,3L,"황철원");
 
     public static final WaitUserResponse TEST_WAIT_USER_RESPONSE2
             = new WaitUserResponse(2L,2L,"황주환");
+
+    public static final StudyUserResponse TEST_STUDY_USER_RESPONSE1
+            = new StudyUserResponse(1L,1L,"한다빈",Role.ADMIN);
+
+    public static final StudyUserResponse TEST_STUDY_USER_RESPONSE2
+            = new StudyUserResponse(2L,2L,"황주환",Role.USER);
 
     public static Study createTestOnlineStudy(){
         Study study = new Study(1L,

@@ -5,6 +5,7 @@ import com.study.studyservice.domain.WaitUser;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
+import com.study.studyservice.model.studyuser.StudyUserResponse;
 import com.study.studyservice.model.waituser.WaitUserResponse;
 import com.study.studyservice.service.StudyService;
 import lombok.RequiredArgsConstructor;
@@ -78,5 +79,9 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @GetMapping("/studies/{studyId}/users")
+    public ResponseEntity<List<StudyUserResponse>> findStudyUsersByStudyId(@PathVariable Long studyId){
+        return ResponseEntity.ok(studyService.findStudyUsersByStudyId(studyId));
+    }
 
 }
