@@ -14,7 +14,7 @@ import java.util.Map;
 
 @EnableKafka
 @Configuration
-public class KafkaStudyDeleteProducerConfig {
+public class StudyDeleteProducerConfig {
 
     @Value("${kafka.server}")
     private String kafkaServer;

@@ -1,6 +1,7 @@
 package com.study.studyservice.domain;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +9,7 @@ import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Getter
 public class StudyTag extends BaseEntity {
 
@@ -24,16 +26,13 @@ public class StudyTag extends BaseEntity {
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
-    public static StudyTag createStudyTag(Tag tag){
+    public static StudyTag createStudyTag(Tag tag,Study study){
         StudyTag studyTag = new StudyTag();
         studyTag.tag = tag;
+        studyTag.study = study;
         return studyTag;
     }
 
-    public void setStudy(Study study){
-        study.getStudyTags().add(this);
-        this.study = study;
-    }
 
 
 

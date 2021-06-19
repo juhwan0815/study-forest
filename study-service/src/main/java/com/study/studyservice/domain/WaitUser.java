@@ -1,6 +1,7 @@
 package com.study.studyservice.domain;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -9,6 +10,7 @@ import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 public class WaitUser extends BaseEntity{
@@ -31,11 +33,4 @@ public class WaitUser extends BaseEntity{
         return waitUser;
     }
 
-    public static WaitUser createTestWaitUser(Long id,Long userId,Study study){
-        WaitUser waitUser = new WaitUser();
-        waitUser.id = id;
-        waitUser.userId = userId;
-        waitUser.study = study;
-        return waitUser;
-    }
 }

@@ -5,24 +5,25 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.study.studyservice.client.LocationServiceClient;
+import com.study.studyservice.client.UserServiceClient;
 import com.study.studyservice.domain.*;
 import com.study.studyservice.exception.CategoryException;
 import com.study.studyservice.exception.StudyException;
+import com.study.studyservice.kafka.message.StudyApplyCreateMessage;
 import com.study.studyservice.kafka.message.StudyDeleteMessage;
-import com.study.studyservice.kafka.message.StudyJoinMessage;
-import com.study.studyservice.kafka.sender.KafkaStudyDeleteMessageSender;
-import com.study.studyservice.kafka.sender.KafkaStudyJoinMessageSender;
-import com.study.studyservice.model.image.ImageUploadResult;
+import com.study.studyservice.kafka.sender.StudyApplyCreateMessageSender;
+import com.study.studyservice.kafka.sender.StudyDeleteMessageSender;
 import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
+import com.study.studyservice.model.user.UserResponse;
+import com.study.studyservice.model.waituser.WaitUserResponse;
 import com.study.studyservice.repository.CategoryRepository;
 import com.study.studyservice.repository.StudyRepository;
-import com.study.studyservice.repository.StudyUserRepository;
-import com.study.studyservice.repository.TagRepository;
 import com.study.studyservice.repository.query.StudyQueryRepository;
 import com.study.studyservice.service.StudyService;
+import com.study.studyservice.service.TagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,9 +31,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -40,21 +44,65 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StudyServiceImpl implements StudyService {
 
-    private final TagRepository tagRepository;
-    private final StudyRepository studyRepository;
+    private final TagService tagService;
+
     private final LocationServiceClient locationServiceClient;
-    private final CategoryRepository categoryRepository;
+    private final UserServiceClient userServiceClient;
     private final AmazonS3Client amazonS3Client;
+
+    private final StudyRepository studyRepository;
+    private final CategoryRepository categoryRepository;
     private final StudyQueryRepository studyQueryRepository;
-    private final StudyUserRepository studyUserRepository;
-    private final KafkaStudyDeleteMessageSender kafkaStudyDeleteMessageSender;
-    private final KafkaStudyJoinMessageSender kafkaStudyJoinMessageSender;
+
+    private final StudyDeleteMessageSender studyDeleteMessageSender;
+    private final StudyApplyCreateMessageSender studyApplyCreateMessageSender;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
     @Value("${cloud.aws.s3.thumbnailBucket}")
     private String thumbnailBucket;
+
+    @PostConstruct
+    void init() {
+        IntStream.range(1, 5).forEach(
+                value -> {
+                    Category testParentCategory = Category.createCategory("개발" + value, null);
+                    categoryRepository.save(testParentCategory);
+                }
+        );
+
+        IntStream.range(1, 10).forEach(
+                value -> {
+                    int revalue = value % 3 + 1;
+                    Category parentCategory = categoryRepository.findById(Long.valueOf(revalue)).get();
+                    Category testParentCategory = Category.createCategory("백엔드" + revalue, parentCategory);
+                    categoryRepository.save(testParentCategory);
+                }
+        );
+
+        IntStream.range(1, 10)
+                .forEach(value -> {
+                    Category category = categoryRepository.findById(9L).get();
+                    Study study = Study.createStudy("테스트 스터디" + value,
+                            5,
+                            "테스트 스터디" + value,
+                            true,
+                            true,
+                            category);
+                    study.addWaitUser(Long.valueOf(1 + 10 * value));
+                    study.addWaitUser(Long.valueOf(2 + 10 * value));
+                    study.addWaitUser(Long.valueOf(3 + 10 * value));
+                    study.addWaitUser(Long.valueOf(4 + 10 * value));
+                    study.addWaitUser(Long.valueOf(5 + 10 * value));
+                    study.addWaitUser(Long.valueOf(6 + 10 * value));
+                    study.addWaitUser(Long.valueOf(7 + 10 * value));
+                    study.addWaitUser(Long.valueOf(8 + 10 * value));
+                    study.addWaitUser(Long.valueOf(9 + 10 * value));
+                    Study savedStudy = studyRepository.save(study);
+                });
+    }
+
 
     @Override
     @Transactional
@@ -64,29 +112,21 @@ public class StudyServiceImpl implements StudyService {
 
         LocationResponse location = getLocation(request.isOffline(), request.getLocationCode());
 
-        ImageUploadResult imageUploadResult = uploadImage(image);
+        List<Tag> tags = tagService.FindAndCreate(request.getTags());
 
-        List<Tag> tagList = tagRepository.findByNameIn(request.getTags());
-
-        searchNewTags(request.getTags(), tagList);
-
-        StudyUser studyUser = StudyUser.createStudyUser(userId, Role.ADMIN);
-
-        List<StudyTag> studyTags = tagList.stream()
-                .map(tag -> StudyTag.createStudyTag(tag))
-                .collect(Collectors.toList());
+        Image studyImage = uploadImage(image);
 
         Study study = Study.createStudy(request.getName(),
                 request.getNumberOfPeople(),
                 request.getContent(),
-                request.isOnline(), request.isOffline(),
-                imageUploadResult.getImageStoreName(),
-                imageUploadResult.getStudyImage(),
-                imageUploadResult.getStudyThumbnailImage(),
-                location.getId(),
-                findCategory,
-                studyUser,
-                studyTags);
+                request.isOnline(),
+                request.isOffline(),
+                findCategory);
+
+        study.addStudyUser(userId, Role.ADMIN);
+        study.changeImage(studyImage);
+        study.addStudyTags(tags);
+        study.changeLocation(location.getId());
 
         Study savedStudy = studyRepository.save(study);
 
@@ -98,32 +138,16 @@ public class StudyServiceImpl implements StudyService {
     public StudyResponse update(Long userId, Long studyId, MultipartFile image, StudyUpdateRequest request) {
         Study findStudy = studyQueryRepository.findWithStudyTagsById(studyId);
 
-        StudyUser findStudyAdminUser = studyUserRepository
-                .findByUserIdAndAndRoleAndStudy(userId, Role.ADMIN, findStudy)
-                .orElseThrow(() -> new StudyException("스터디를 수정할 권한이 없습니다."));
+        findStudy.checkStudyAdmin(userId);
+        findStudy.checkNumberOfStudyUser(request.getNumberOfPeople());
 
         Category findCategory = categoryRepository.findWithParentById(request.getCategoryId())
                 .orElseThrow(() -> new CategoryException(request.getCategoryId() + "는 존재하지 않는 카테고리입니다."));
 
         LocationResponse location = getLocation(request.isOffline(), request.getLocationCode());
+        List<Tag> tags = tagService.FindAndCreate(request.getTags());
 
-        List<Tag> tagList = tagRepository.findByNameIn(request.getTags());
-        searchNewTags(request.getTags(), tagList);
-
-        if (request.isDeleteImage()) {
-            deleteImageFromS3(findStudy.getImageStoreName());
-            findStudy.deleteImage();
-        }
-        if (!image.isEmpty()) {
-            validateImageType(image);
-            deleteImageFromS3(findStudy.getImageStoreName());
-            ImageUploadResult imageUploadResult = uploadImage(image);
-
-            findStudy.changeImage(imageUploadResult.getStudyImage(),
-                    imageUploadResult.getStudyThumbnailImage(),
-                    imageUploadResult.getImageStoreName());
-        }
-
+        Image studyImage = updateImage(image, request.isDeleteImage(), findStudy);
 
         findStudy.update(request.getName(),
                 request.getNumberOfPeople(),
@@ -131,9 +155,11 @@ public class StudyServiceImpl implements StudyService {
                 request.isOnline(),
                 request.isOffline(),
                 request.isClose(),
-                location.getId(),
-                findCategory,
-                tagList);
+                findCategory);
+
+        findStudy.changeImage(studyImage);
+        findStudy.updateStudyTags(tags);
+        findStudy.changeLocation(location.getId());
 
         return StudyResponse.from(findStudy, location);
     }
@@ -147,7 +173,7 @@ public class StudyServiceImpl implements StudyService {
 
         studyRepository.delete(findStudy);
 
-        kafkaStudyDeleteMessageSender.send(StudyDeleteMessage.from(findStudy));
+        studyDeleteMessageSender.send(StudyDeleteMessage.from(findStudy));
     }
 
     @Override
@@ -170,17 +196,38 @@ public class StudyServiceImpl implements StudyService {
     public void createWaitUser(Long userId, Long studyId) {
         Study findStudy = studyQueryRepository.findWithWaitUserById(studyId);
 
-        if(studyUserRepository.findByUserIdAndStudy(userId,findStudy).isPresent()){
-            throw new StudyException("이미 스터디에 가입했습니다.");
-        }
+        findStudy.checkExistWaitUserAndStudyUser(userId);
 
         findStudy.addWaitUser(userId);
 
-        kafkaStudyJoinMessageSender.send(StudyJoinMessage.createStudyJoin(userId,studyId));
+        studyApplyCreateMessageSender.send(StudyApplyCreateMessage.from(userId, studyId));
+    }
+
+    @Override
+    public List<WaitUserResponse> findWaitUsersByStudyId(Long studyId) {
+        Study findStudy = studyQueryRepository.findWithWaitUserById(studyId);
+
+        List<Long> userIdList = findStudy.getWaitUsers().stream()
+                .map(waitUser -> waitUser.getUserId())
+                .collect(Collectors.toList());
+
+        List<UserResponse> userList = userServiceClient.findUserByIdIn(userIdList);
+
+        List<WaitUserResponse> waitUserResponses = new ArrayList<>();
+        findStudy.getWaitUsers().stream()
+                .forEach(waitUser -> {
+                    for (UserResponse user : userList) {
+                        if (waitUser.getUserId().equals(user.getId())) {
+                            waitUserResponses.add(WaitUserResponse.from(waitUser, user));
+                            break;
+                        }
+                    }
+                });
+        return waitUserResponses;
     }
 
     private LocationResponse getLocation(boolean offline, String locationCode) {
-        LocationResponse location;
+        LocationResponse location = null;
         if (offline) {
             if (locationCode == null) {
                 throw new StudyException("지역정보 코드가 존재하지 않습니다.");
@@ -193,41 +240,56 @@ public class StudyServiceImpl implements StudyService {
         return location;
     }
 
-    private ImageUploadResult uploadImage(MultipartFile image) {
-        ImageUploadResult imageUploadResult;
-
-        if (image.isEmpty()) {
-            imageUploadResult = ImageUploadResult.from(null, null, null);
-        } else {
-            validateImageType(image);
-            imageUploadResult = uploadImageFromS3(image);
+    private Image updateImage(MultipartFile image, boolean deleteImage, Study study) {
+        Image studyImage = study.getImage();
+        if (deleteImage && image.isEmpty()) {
+            if (studyImage != null) {
+                deleteImageFromS3(studyImage.getImageStoreName());
+                studyImage = null;
+            }
         }
-        return imageUploadResult;
+        if (!deleteImage && !image.isEmpty()) {
+            if (studyImage != null) {
+                deleteImageFromS3(studyImage.getImageStoreName());
+            }
+            validateImageType(image);
+            studyImage = uploadImageToS3(image);
+        }
+        return studyImage;
     }
 
-    private ImageUploadResult uploadImageFromS3(MultipartFile image) {
+    private Image uploadImage(MultipartFile image) {
+        Image uploadResult = null;
+        if (!image.isEmpty()) {
+            validateImageType(image);
+            uploadResult = uploadImageToS3(image);
+        }
+        return uploadResult;
+    }
+
+    private Image uploadImageToS3(MultipartFile image) {
         String imageStoreName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(image.getSize());
         objectMetadata.setContentType(image.getContentType());
 
-        ImageUploadResult imageUploadResult = null;
+        Image uploadResult = null;
 
         try {
-            amazonS3Client.putObject(new PutObjectRequest(bucket, imageStoreName,
-                    image.getInputStream(), objectMetadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
+            amazonS3Client.putObject(
+                    new PutObjectRequest(bucket, imageStoreName, image.getInputStream(), objectMetadata)
+                            .withCannedAcl(CannedAccessControlList.PublicRead));
             String profileImage = amazonS3Client.getUrl(bucket, imageStoreName).toString();
             String thumbnailImage = amazonS3Client.getUrl(thumbnailBucket, imageStoreName).toString();
 
-            imageUploadResult = ImageUploadResult.from(profileImage, thumbnailImage, imageStoreName);
+            uploadResult = Image.createImage(profileImage, thumbnailImage, imageStoreName);
 
         } catch (Exception e) {
             throw new StudyException(e.getMessage());
         }
 
-        return imageUploadResult;
+        return uploadResult;
     }
 
     private void deleteImageFromS3(String imageStoreName) {
@@ -235,7 +297,6 @@ public class StudyServiceImpl implements StudyService {
             amazonS3Client.deleteObject(bucket, imageStoreName);
             amazonS3Client.deleteObject(thumbnailBucket, imageStoreName);
         }
-
     }
 
     private void validateImageType(MultipartFile image) {
@@ -245,25 +306,5 @@ public class StudyServiceImpl implements StudyService {
         }
     }
 
-    private void searchNewTags(List<String> requestTags, List<Tag> tagList) {
-        requestTags
-                .forEach(name -> {
-                    boolean matchResult = false; // false 로 설정
 
-                    // DB의 태그이름과 비교하고 일치하면 true
-                    for (Tag tag : tagList) {
-                        if (name.equals(tag.getName())) {
-                            matchResult = true;
-                            break;
-                        }
-                    }
-
-                    // true일 경우 DB에 존재
-                    // false일 경우 DB에 없는 태그이므로 생성하고 저장
-                    if (matchResult == false) {
-                        Tag savedTag = tagRepository.save(Tag.createTag(name));
-                        tagList.add(savedTag);
-                    }
-                });
-    }
 }

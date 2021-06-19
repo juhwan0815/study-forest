@@ -3,6 +3,7 @@ package com.study.studyservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.studyservice.config.LoginUserArgumentResolver;
 import com.study.studyservice.domain.StudyStatus;
+import com.study.studyservice.fixture.StudyFixture;
 import com.study.studyservice.model.category.response.CategoryResponse;
 import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.study.studyservice.fixture.StudyFixture.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
@@ -88,84 +90,30 @@ class StudyControllerTest {
     @DisplayName("스터디 생성 API 테스트")
     void create() throws Exception {
 
-        MockMultipartFile image = new MockMultipartFile(
-                "image",
-                "프로필사진.png",
-                "image/png",
-                "<<image>>".getBytes(StandardCharsets.UTF_8));
-
-        StudyCreateRequest studyCreateRequest = new StudyCreateRequest();
-        studyCreateRequest.setName("스프링 스터디");
-        studyCreateRequest.setLocationCode("1111051500");
-        studyCreateRequest.setCategoryId(1L);
-        studyCreateRequest.setContent("안녕하세요 스프링 스터디입니다.");
-        studyCreateRequest.setOnline(true);
-        studyCreateRequest.setOffline(true);
-        studyCreateRequest.setTags(Arrays.asList("JPA", "스프링"));
-        studyCreateRequest.setNumberOfPeople(5);
-
         MockMultipartFile request = new MockMultipartFile("request",
                 "request",
                 MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsString(studyCreateRequest).getBytes(StandardCharsets.UTF_8));
-
-        CategoryResponse parentCategory = new CategoryResponse();
-        parentCategory.setId(1L);
-        parentCategory.setName("개발");
-        CategoryResponse childCategory = new CategoryResponse();
-        childCategory.setId(2L);
-        childCategory.setName("백엔드");
-
-        LocationResponse locationResponse = new LocationResponse();
-        locationResponse.setId(1L);
-        locationResponse.setCity("서울특별시");
-        locationResponse.setCode("1111051500");
-        locationResponse.setGu("종로구");
-        locationResponse.setDong("삼청동");
-        locationResponse.setRi("--리");
-        locationResponse.setLen(126.980996);
-        locationResponse.setLet(37.590758);
-        locationResponse.setCodeType("H");
-
-        List<String> studyTagList = new ArrayList<>();
-        studyTagList.add("JPA");
-        studyTagList.add("스프링");
-
-        StudyResponse studyResponse = new StudyResponse();
-        studyResponse.setId(1L);
-        studyResponse.setName("스프링 스터디");
-        studyResponse.setContent("스프링 스터디입니다.");
-        studyResponse.setLocation(locationResponse);
-        studyResponse.setOffline(true);
-        studyResponse.setOffline(true);
-        studyResponse.setCurrentNumberOfPeople(1);
-        studyResponse.setNumberOfPeople(5);
-        studyResponse.setStudyThumbnailImage("스터디 썸네일 이미지 URL");
-        studyResponse.setStudyImage("스터디 이미지 URL");
-        studyResponse.setStatus(StudyStatus.OPEN);
-        studyResponse.setParentCategory(parentCategory);
-        studyResponse.setChildCategory(childCategory);
-        studyResponse.setStudyTags(studyTagList);
+                objectMapper.writeValueAsString(TEST_STUDY_CREATE_REQUEST1).getBytes(StandardCharsets.UTF_8));
 
         given(studyService.create(any(), any(), any()))
-                .willReturn(studyResponse);
+                .willReturn(TEST_STUDY_RESPONSE1);
 
         given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
                 .willReturn(1L);
 
-        mockMvc.perform(multipart("/studies").file(image).file(request)
+        mockMvc.perform(multipart("/studies").file(TEST_IMAGE_FILE).file(request)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
                 .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(studyResponse)))
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_STUDY_RESPONSE1)))
                 .andDo(document("study/create",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
                         ),
                         requestParts(
                                 partWithName("image").description("스터디 이미지 파일").optional(),
-                                partWithName("request").ignored()
+                                partWithName("request").description("스터디 생성 요청 데이터")
                         ),
                         requestPartFields("request",
                                 fieldWithPath("name").type(JsonFieldType.STRING).description("스터디 이름"),
@@ -186,8 +134,9 @@ class StudyControllerTest {
                                 fieldWithPath("online").type(JsonFieldType.BOOLEAN).description("스터디 온라인 여부"),
                                 fieldWithPath("offline").type(JsonFieldType.BOOLEAN).description("스터디 오프라인여부"),
                                 fieldWithPath("status").type(JsonFieldType.STRING).description("스터디 상태"),
-                                fieldWithPath("studyImage").type(JsonFieldType.STRING).description("스터디 이미지 URL"),
-                                fieldWithPath("studyThumbnailImage").type(JsonFieldType.STRING).description("스터디 썸네일 이미지 URL"),
+                                fieldWithPath("image").type(JsonFieldType.OBJECT).description("스터디 이미지"),
+                                fieldWithPath("image.studyImage").type(JsonFieldType.STRING).description("스터디 이미지 URL"),
+                                fieldWithPath("image.thumbnailImage").type(JsonFieldType.STRING).description("스터디 썸네일 이미지 URL"),
                                 fieldWithPath("location").type(JsonFieldType.OBJECT).description("지역 정보"),
                                 fieldWithPath("location.id").type(JsonFieldType.NUMBER).description("지역 ID"),
                                 fieldWithPath("location.code").type(JsonFieldType.STRING).description("지역 코드"),
@@ -214,62 +163,11 @@ class StudyControllerTest {
     @Test
     @DisplayName("스터디 수정 API 테스트")
     void update() throws Exception {
-        MockMultipartFile image = new MockMultipartFile(
-                "image",
-                "프로필사진.png",
-                MediaType.IMAGE_PNG_VALUE,
-                "<<image>>".getBytes(StandardCharsets.UTF_8));
-
-        StudyUpdateRequest studyUpdateRequest = new StudyUpdateRequest();
-        studyUpdateRequest.setName("노드 스터디");
-        studyUpdateRequest.setNumberOfPeople(10);
-        studyUpdateRequest.setDeleteImage(false);
-        studyUpdateRequest.setOnline(true);
-        studyUpdateRequest.setOffline(true);
-        studyUpdateRequest.setClose(false);
-        studyUpdateRequest.setContent("노드 스터디 입니다.");
-        studyUpdateRequest.setTags(Arrays.asList("노드", "자바스크립트"));
-        studyUpdateRequest.setLocationCode("1111051500");
-        studyUpdateRequest.setCategoryId(3L);
-
         MockMultipartFile request = new MockMultipartFile("request",
                 "request",
                 MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsString(studyUpdateRequest).getBytes(StandardCharsets.UTF_8));
-
-        CategoryResponse parentCategory = new CategoryResponse();
-        parentCategory.setId(1L);
-        parentCategory.setName("개발");
-        CategoryResponse childCategory = new CategoryResponse();
-        childCategory.setId(3L);
-        childCategory.setName("백엔드");
-
-        LocationResponse locationResponse = new LocationResponse();
-        locationResponse.setId(1L);
-        locationResponse.setCity("서울특별시");
-        locationResponse.setCode("1111051500");
-        locationResponse.setGu("종로구");
-        locationResponse.setDong("삼청동");
-        locationResponse.setRi("--리");
-        locationResponse.setLen(126.980996);
-        locationResponse.setLet(37.590758);
-        locationResponse.setCodeType("H");
-
-        StudyResponse studyResponse = new StudyResponse();
-        studyResponse.setId(1L);
-        studyResponse.setName(studyUpdateRequest.getName());
-        studyResponse.setContent(studyUpdateRequest.getContent());
-        studyResponse.setLocation(locationResponse);
-        studyResponse.setOffline(true);
-        studyResponse.setOffline(true);
-        studyResponse.setCurrentNumberOfPeople(1);
-        studyResponse.setNumberOfPeople(studyUpdateRequest.getNumberOfPeople());
-        studyResponse.setStudyThumbnailImage("변경된 스터디 썸네일 이미지 URL");
-        studyResponse.setStudyImage("변경된 스터디 이미지 URL");
-        studyResponse.setStatus(StudyStatus.OPEN);
-        studyResponse.setParentCategory(parentCategory);
-        studyResponse.setChildCategory(childCategory);
-        studyResponse.setStudyTags(studyUpdateRequest.getTags());
+                objectMapper.writeValueAsString(TEST_STUDY_UPDATE_REQUEST4)
+                        .getBytes(StandardCharsets.UTF_8));
 
         MockMultipartHttpServletRequestBuilder builder =
                 RestDocumentationRequestBuilders.fileUpload("/studies/{studyId}", 1);
@@ -279,24 +177,24 @@ class StudyControllerTest {
         });
 
         given(studyService.update(any(), any(), any(), any()))
-                .willReturn(studyResponse);
+                .willReturn(TEST_STUDY_RESPONSE2);
 
         given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
                 .willReturn(1L);
 
-        mockMvc.perform(builder.file(image).file(request)
+        mockMvc.perform(builder.file(TEST_IMAGE_FILE).file(request)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
                 .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(studyResponse)))
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_STUDY_RESPONSE2)))
                 .andDo(document("study/update",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
                         ),
                         requestParts(
                                 partWithName("image").description("변경할 이미지 파일").optional(),
-                                partWithName("request").ignored()
+                                partWithName("request").description("스터디 수정 요청 데이터")
                         ),
                         requestPartFields("request",
                                 fieldWithPath("name").type(JsonFieldType.STRING).description("변경할 스터디 이름"),
@@ -319,8 +217,9 @@ class StudyControllerTest {
                                 fieldWithPath("online").type(JsonFieldType.BOOLEAN).description("스터디 온라인 여부"),
                                 fieldWithPath("offline").type(JsonFieldType.BOOLEAN).description("스터디 오프라인여부"),
                                 fieldWithPath("status").type(JsonFieldType.STRING).description("스터디 상태"),
-                                fieldWithPath("studyImage").type(JsonFieldType.STRING).description("스터디 이미지 URL"),
-                                fieldWithPath("studyThumbnailImage").type(JsonFieldType.STRING).description("스터디 썸네일 이미지 URL"),
+                                fieldWithPath("image").type(JsonFieldType.OBJECT).description("변경된 스터디 이미지"),
+                                fieldWithPath("image.studyImage").type(JsonFieldType.STRING).description("변경된 스터디 이미지 URL"),
+                                fieldWithPath("image.thumbnailImage").type(JsonFieldType.STRING).description("변경된 스터디 썸네일 이미지 URL"),
                                 fieldWithPath("location").type(JsonFieldType.OBJECT).description("지역 정보"),
                                 fieldWithPath("location.id").type(JsonFieldType.NUMBER).description("지역 ID"),
                                 fieldWithPath("location.code").type(JsonFieldType.STRING).description("지역 코드"),
@@ -376,53 +275,14 @@ class StudyControllerTest {
     @DisplayName("스터디 상세 조회 API 테스트")
     void findById() throws Exception {
         // given
-        CategoryResponse parentCategory = new CategoryResponse();
-        parentCategory.setId(1L);
-        parentCategory.setName("개발");
-
-        CategoryResponse childCategory = new CategoryResponse();
-        childCategory.setId(2L);
-        childCategory.setName("백엔드");
-
-        LocationResponse locationResponse = new LocationResponse();
-        locationResponse.setId(1L);
-        locationResponse.setCity("서울특별시");
-        locationResponse.setCode("1111051500");
-        locationResponse.setGu("종로구");
-        locationResponse.setDong("삼청동");
-        locationResponse.setRi("--리");
-        locationResponse.setLen(126.980996);
-        locationResponse.setLet(37.590758);
-        locationResponse.setCodeType("H");
-
-        List<String> studyTagList = new ArrayList<>();
-        studyTagList.add("JPA");
-        studyTagList.add("스프링");
-
-        StudyResponse studyResponse = new StudyResponse();
-        studyResponse.setId(1L);
-        studyResponse.setName("스프링 스터디");
-        studyResponse.setContent("스프링 스터디입니다.");
-        studyResponse.setLocation(locationResponse);
-        studyResponse.setOffline(true);
-        studyResponse.setOffline(true);
-        studyResponse.setCurrentNumberOfPeople(1);
-        studyResponse.setNumberOfPeople(5);
-        studyResponse.setStudyThumbnailImage("스터디 썸네일 이미지 URL");
-        studyResponse.setStudyImage("스터디 이미지 URL");
-        studyResponse.setStatus(StudyStatus.OPEN);
-        studyResponse.setParentCategory(parentCategory);
-        studyResponse.setChildCategory(childCategory);
-        studyResponse.setStudyTags(studyTagList);
-
         given(studyService.findById(any()))
-                .willReturn(studyResponse);
+                .willReturn(TEST_STUDY_RESPONSE1);
 
         // when
         mockMvc.perform(RestDocumentationRequestBuilders.get("/studies/{studyId}", 1)
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(studyResponse)))
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_STUDY_RESPONSE1)))
                 .andDo(document("study/findById",
                         pathParameters(
                                 parameterWithName("studyId").description("조회할 스터디 ID")
@@ -436,8 +296,9 @@ class StudyControllerTest {
                                 fieldWithPath("online").type(JsonFieldType.BOOLEAN).description("스터디 온라인 여부"),
                                 fieldWithPath("offline").type(JsonFieldType.BOOLEAN).description("스터디 오프라인여부"),
                                 fieldWithPath("status").type(JsonFieldType.STRING).description("스터디 상태"),
-                                fieldWithPath("studyImage").type(JsonFieldType.STRING).description("스터디 이미지 URL"),
-                                fieldWithPath("studyThumbnailImage").type(JsonFieldType.STRING).description("스터디 썸네일 이미지 URL"),
+                                fieldWithPath("image").type(JsonFieldType.OBJECT).description("스터디 이미지"),
+                                fieldWithPath("image.studyImage").type(JsonFieldType.STRING).description("스터디 이미지 URL"),
+                                fieldWithPath("image.thumbnailImage").type(JsonFieldType.STRING).description("스터디 썸네일 이미지 URL"),
                                 fieldWithPath("location").type(JsonFieldType.OBJECT).description("지역 정보"),
                                 fieldWithPath("location.id").type(JsonFieldType.NUMBER).description("지역 ID"),
                                 fieldWithPath("location.code").type(JsonFieldType.STRING).description("지역 코드"),

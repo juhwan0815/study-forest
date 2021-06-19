@@ -1,6 +1,7 @@
 package com.study.studyservice.domain;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +9,7 @@ import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Getter
 public class StudyUser extends BaseEntity{
 
@@ -25,19 +27,12 @@ public class StudyUser extends BaseEntity{
     @JoinColumn(name = "study_id")
     private Study study;
 
-    public static StudyUser createStudyUser(Long userId,Role role){
+    public static StudyUser createStudyUser(Long userId,Role role,Study study){
         StudyUser studyUser = new StudyUser();
         studyUser.userId = userId;
         studyUser.role = role;
+        studyUser.study = study;
         return studyUser;
     }
-
-    public void setStudy(Study study){
-        study.getStudyUsers().add(this);
-        study.plusCurrentNumberOfPeople();
-        this.study = study;
-    }
-
-
 
 }

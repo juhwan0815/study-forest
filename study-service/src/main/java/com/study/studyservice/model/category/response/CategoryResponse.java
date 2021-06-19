@@ -1,9 +1,13 @@
 package com.study.studyservice.model.category.response;
 
 import com.study.studyservice.domain.Category;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class CategoryResponse {
 
     private Long id;

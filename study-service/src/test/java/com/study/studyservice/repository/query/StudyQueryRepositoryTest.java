@@ -45,29 +45,18 @@ class StudyQueryRepositoryTest {
     }
 
     @Test
-    @DisplayName("스터디 ID 조회 + 스터디 태그")
+    @DisplayName("스터디와 스터디 태그를 같이 조회한다.")
     void findWithStudyTagById(){
         // given
-        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
 
-        List<Tag> tagList = new ArrayList<>();
-        Tag tag1 = Tag.createTag("스프링");
-        Tag tag2 = Tag.createTag("JPA");
-        tagList.add(tag1);
-        tagList.add(tag2);
+        List<Tag> tags = new ArrayList<>();
+        tags.add(Tag.createTag("JPA"));
+        tags.add(Tag.createTag("스프링"));
+        tagRepository.saveAll(tags);
 
-        tagRepository.saveAll(tagList);
-
-        List<StudyTag> studyTagList = new ArrayList<>();
-        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
-        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
-        studyTagList.add(studyTag1);
-        studyTagList.add(studyTag2);
-
-        Study study = Study.createStudy("스프링 스터디",
-                5, "안녕하세요 스프링 스터디입니다.",
-                true, true, "이미지 저장 이름",
-                "이미지", "썸네일 이미지", 1L, null, studyUser, studyTagList);
+        study.addStudyTags(tags);
 
         Study savedStudy = studyRepository.save(study);
 
@@ -75,46 +64,22 @@ class StudyQueryRepositoryTest {
         em.clear();
 
         // when
-        Study findStudy = studyQueryRepository.findWithStudyTagsById(savedStudy.getId());
+        Study result = studyQueryRepository.findWithStudyTagsById(savedStudy.getId());
 
         // then
-        assertThat(findStudy.getId()).isEqualTo(savedStudy.getId());
-        assertThat(findStudy.getName()).isEqualTo("스프링 스터디");
-        assertThat(findStudy.getNumberOfPeople()).isEqualTo(5);
-        assertThat(findStudy.getContent()).isEqualTo("안녕하세요 스프링 스터디입니다.");
-        assertThat(findStudy.isOnline()).isEqualTo(true);
-        assertThat(findStudy.isOffline()).isEqualTo(true);
-        assertThat(findStudy.getImageStoreName()).isEqualTo("이미지 저장 이름");
-        assertThat(findStudy.getStudyImage()).isEqualTo("이미지");
-        assertThat(findStudy.getStudyThumbnailImage()).isEqualTo("썸네일 이미지");
-        assertThat(findStudy.getLocationId()).isEqualTo(1L);
-        assertThat(findStudy.getStudyTags().size()).isEqualTo(2);
+        assertThat(result.getId()).isEqualTo(savedStudy.getId());
+        assertThat(result.getStudyTags().size()).isEqualTo(2);
     }
 
     @Test
-    @DisplayName("스터디 ID 조회 + 스터디 유저")
-    void findWithStudyUserById(){
+    @DisplayName("스터디와 스터디 유저를 같이 조회한다.")
+    void findWithStudyUsersById(){
         // given
-        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
 
-        List<Tag> tagList = new ArrayList<>();
-        Tag tag1 = Tag.createTag("스프링");
-        Tag tag2 = Tag.createTag("JPA");
-        tagList.add(tag1);
-        tagList.add(tag2);
-
-        tagRepository.saveAll(tagList);
-
-        List<StudyTag> studyTagList = new ArrayList<>();
-        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
-        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
-        studyTagList.add(studyTag1);
-        studyTagList.add(studyTag2);
-
-        Study study = Study.createStudy("스프링 스터디",
-                5, "안녕하세요 스프링 스터디입니다.",
-                true, true, "이미지 저장 이름",
-                "이미지", "썸네일 이미지", 1L, null, studyUser, studyTagList);
+        study.addStudyUser(1L,Role.ADMIN);
+        study.addStudyUser(2L,Role.USER);
 
         Study savedStudy = studyRepository.save(study);
 
@@ -122,52 +87,34 @@ class StudyQueryRepositoryTest {
         em.clear();
 
         // when
-        Study findStudy = studyQueryRepository.findWithStudyUsersById(savedStudy.getId());
+        Study result = studyQueryRepository.findWithStudyUsersById(savedStudy.getId());
 
         // then
-        assertThat(findStudy.getId()).isEqualTo(savedStudy.getId());
-        assertThat(findStudy.getName()).isEqualTo("스프링 스터디");
-        assertThat(findStudy.getNumberOfPeople()).isEqualTo(5);
-        assertThat(findStudy.getContent()).isEqualTo("안녕하세요 스프링 스터디입니다.");
-        assertThat(findStudy.isOnline()).isEqualTo(true);
-        assertThat(findStudy.isOffline()).isEqualTo(true);
-        assertThat(findStudy.getImageStoreName()).isEqualTo("이미지 저장 이름");
-        assertThat(findStudy.getStudyImage()).isEqualTo("이미지");
-        assertThat(findStudy.getStudyThumbnailImage()).isEqualTo("썸네일 이미지");
-        assertThat(findStudy.getLocationId()).isEqualTo(1L);
-        assertThat(findStudy.getStudyUsers().size()).isEqualTo(1);
+        assertThat(result.getId()).isEqualTo(savedStudy.getId());
+        assertThat(result.getStudyUsers().size()).isEqualTo(2);
+
     }
 
     @Test
-    @DisplayName("스터디 ID 조회 + 스터디 태그 + 태그 + 자식 카테고리 + 부모 카테고리")
+    @DisplayName("스터디와 카테고리,스터디태그와 태그를 같이 조회한다.")
     void findWithCategoryAndStudyTagAndTagById(){
         // given
         Category parentCategory = Category.createCategory("개발", null);
         categoryRepository.save(parentCategory);
-
         Category childCategory = Category.createCategory("백엔드", parentCategory);
         categoryRepository.save(childCategory);
 
-        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, childCategory);
 
-        List<Tag> tagList = new ArrayList<>();
-        Tag tag1 = Tag.createTag("스프링");
-        Tag tag2 = Tag.createTag("JPA");
-        tagList.add(tag1);
-        tagList.add(tag2);
+        List<Tag> tags = new ArrayList<>();
+        Tag tag1 = Tag.createTag("JPA");
+        Tag tag2 = Tag.createTag("스프링");
+        tags.add(tag1);
+        tags.add(tag2);
+        tagRepository.saveAll(tags);
 
-        tagRepository.saveAll(tagList);
-
-        List<StudyTag> studyTagList = new ArrayList<>();
-        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
-        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
-        studyTagList.add(studyTag1);
-        studyTagList.add(studyTag2);
-
-        Study study = Study.createStudy("스프링 스터디",
-                5, "안녕하세요 스프링 스터디입니다.",
-                true, true, "이미지 저장 이름",
-                "이미지", "썸네일 이미지", 1L, childCategory, studyUser, studyTagList);
+        study.addStudyTags(tags);
 
         Study savedStudy = studyRepository.save(study);
 
@@ -175,60 +122,25 @@ class StudyQueryRepositoryTest {
         em.clear();
 
         // when
-        Study findStudy = studyQueryRepository.findWithCategoryAndStudyTagsAndTagById(savedStudy.getId());
+        Study result = studyQueryRepository.findWithCategoryAndStudyTagsAndTagById(savedStudy.getId());
 
         // then
-        assertThat(findStudy.getId()).isEqualTo(savedStudy.getId());
-        assertThat(findStudy.getName()).isEqualTo("스프링 스터디");
-        assertThat(findStudy.getNumberOfPeople()).isEqualTo(5);
-        assertThat(findStudy.getContent()).isEqualTo("안녕하세요 스프링 스터디입니다.");
-        assertThat(findStudy.isOnline()).isEqualTo(true);
-        assertThat(findStudy.isOffline()).isEqualTo(true);
-        assertThat(findStudy.getImageStoreName()).isEqualTo("이미지 저장 이름");
-        assertThat(findStudy.getStudyImage()).isEqualTo("이미지");
-        assertThat(findStudy.getStudyThumbnailImage()).isEqualTo("썸네일 이미지");
-        assertThat(findStudy.getLocationId()).isEqualTo(1L);
-        assertThat(findStudy.getStudyTags().size()).isEqualTo(2);
-        assertThat(findStudy.getStudyTags().get(0).getTag().getName()).isEqualTo("스프링");
-        assertThat(findStudy.getStudyTags().get(1).getTag().getName()).isEqualTo("JPA");
-        assertThat(findStudy.getCategory().getName()).isEqualTo("백엔드");
-        assertThat(findStudy.getCategory().getParent().getName()).isEqualTo("개발");
+        assertThat(result.getId()).isEqualTo(savedStudy.getId());
+        assertThat(result.getCategory().getId()).isEqualTo(childCategory.getId());
+        assertThat(result.getCategory().getParent().getId()).isEqualTo(parentCategory.getId());
+        assertThat(result.getStudyTags().size()).isEqualTo(2);
+        assertThat(result.getStudyTags().get(0).getTag().getName()).isEqualTo("스프링");
+        assertThat(result.getStudyTags().get(1).getTag().getName()).isEqualTo("JPA");
     }
 
     @Test
-    @DisplayName("스터디 ID 조회 + 스터디 가입 신청 유저")
+    @DisplayName("스터디와 스터디 가입 대기 유저를 같이 조회한다.")
     void findWithWaitUsersById(){
-
         // given
-        Category parentCategory = Category.createCategory("개발", null);
-        categoryRepository.save(parentCategory);
-
-        Category childCategory = Category.createCategory("백엔드", parentCategory);
-        categoryRepository.save(childCategory);
-
-        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
-
-        List<Tag> tagList = new ArrayList<>();
-        Tag tag1 = Tag.createTag("스프링");
-        Tag tag2 = Tag.createTag("JPA");
-        tagList.add(tag1);
-        tagList.add(tag2);
-
-        tagRepository.saveAll(tagList);
-
-        List<StudyTag> studyTagList = new ArrayList<>();
-        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
-        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
-        studyTagList.add(studyTag1);
-        studyTagList.add(studyTag2);
-
-        Study study = Study.createStudy("스프링 스터디",
-                5, "안녕하세요 스프링 스터디입니다.",
-                true, true, "이미지 저장 이름",
-                "이미지", "썸네일 이미지", 1L, childCategory, studyUser, studyTagList);
-
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
+        study.addWaitUser(1L);
         study.addWaitUser(2L);
-        study.addWaitUser(3L);
 
         Study savedStudy = studyRepository.save(study);
 
@@ -241,8 +153,8 @@ class StudyQueryRepositoryTest {
         // then
         assertThat(result.getId()).isEqualTo(savedStudy.getId());
         assertThat(result.getWaitUsers().size()).isEqualTo(2);
-        assertThat(result.getWaitUsers().get(0).getUserId()).isEqualTo(2L);
-        assertThat(result.getWaitUsers().get(1).getUserId()).isEqualTo(3L);
+        assertThat(result.getWaitUsers().get(0).getUserId()).isEqualTo(1L);
+        assertThat(result.getWaitUsers().get(1).getUserId()).isEqualTo(2L);
     }
 
 }

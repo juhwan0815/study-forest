@@ -1,11 +1,15 @@
 package com.study.studyservice.model.study.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class StudyCreateRequest {
 
     @NotBlank

@@ -1,9 +1,11 @@
 package com.study.studyservice.controller;
 
 import com.study.studyservice.config.LoginUser;
+import com.study.studyservice.domain.WaitUser;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
+import com.study.studyservice.model.waituser.WaitUserResponse;
 import com.study.studyservice.service.StudyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import javax.ws.rs.Path;
+import java.util.List;
 
 @Slf4j
 @CrossOrigin(origins = "*",allowedHeaders = "*")
@@ -55,5 +57,10 @@ public class StudyController {
                                                  @PathVariable Long studyId){
         studyService.createWaitUser(userId,studyId);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/studies/{studyId}/waitUsers")
+    public ResponseEntity<List<WaitUserResponse>> findWaitUsersByStudyId(@PathVariable Long studyId){
+        return ResponseEntity.ok(studyService.findWaitUsersByStudyId(studyId));
     }
 }

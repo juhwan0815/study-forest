@@ -1,6 +1,7 @@
 package com.study.studyservice.domain;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -11,9 +12,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
+@AllArgsConstructor
 @Getter
-public class Tag{
+public class Tag extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,20 +23,10 @@ public class Tag{
 
     private String name;
 
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-
     public static Tag createTag(String name){
         Tag tag = new Tag();
         tag.name = name;
         return tag;
     }
 
-    public static Tag createTestTag(Long id,String name){
-        Tag tag = new Tag();
-        tag.id = id;
-        tag.name = name;
-        return tag;
-    }
 }

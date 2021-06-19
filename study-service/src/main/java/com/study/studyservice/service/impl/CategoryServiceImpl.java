@@ -30,7 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category parent = null;
 
-        if(categoryRepository.findByName(request.getName()).isPresent()){
+        if(categoryRepository.findByNameAndStatus(request.getName(),CategoryStatus.ACTIVE).isPresent()){
             throw new CategoryException(request.getName() + "은 이미 존재하는 카테고리입니다.");
         }
 
@@ -49,7 +49,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public CategoryResponse update(Long categoryId,CategoryUpdateRequest request) {
 
-        if(categoryRepository.findByName(request.getName()).isPresent()){
+        if(categoryRepository.findByNameAndStatus(request.getName(),CategoryStatus.ACTIVE).isPresent()){
             throw new CategoryException(request.getName() + "은 이미 존재하는 카테고리입니다.");
         }
 
@@ -83,8 +83,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category findCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryException(categoryId + "는 존재하지 않는 카테고리 ID입니다."));
 
-        return categoryRepository.findByParentAndStatus(findCategory,CategoryStatus.ACTIVE)
-                .stream()
+        return categoryRepository.findByParentAndStatus(findCategory,CategoryStatus.ACTIVE).stream()
                 .map(category -> CategoryResponse.from(category))
                 .collect(Collectors.toList());
     }

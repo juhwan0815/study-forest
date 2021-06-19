@@ -3,8 +3,6 @@ package com.study.studyservice.service;
 import com.study.studyservice.domain.Category;
 import com.study.studyservice.domain.CategoryStatus;
 import com.study.studyservice.exception.CategoryException;
-import com.study.studyservice.model.category.request.CategorySaveRequest;
-import com.study.studyservice.model.category.request.CategoryUpdateRequest;
 import com.study.studyservice.model.category.response.CategoryResponse;
 import com.study.studyservice.repository.CategoryRepository;
 import com.study.studyservice.service.impl.CategoryServiceImpl;
@@ -19,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.study.studyservice.fixture.CategoryFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,96 +36,99 @@ class CategoryServiceTest {
     private CategoryRepository categoryRepository;
 
     @Test
-    @DisplayName("카테고리 생성 - 성공")
-    void createCategory(){
+    @DisplayName("부모 카테고리를 생성한다.")
+    void createParentCategory(){
         // given
-        CategorySaveRequest categorySaveRequest = new CategorySaveRequest();
-        categorySaveRequest.setId(1L);
-        categorySaveRequest.setName("백엔드");
-
-        Category category = Category.createCategory("개발", null);
-        Category childParent = Category.createCategory("백엔드", category);
-
-        given(categoryRepository.findByName(anyString()))
+        given(categoryRepository.findByNameAndStatus(anyString(),any()))
                 .willReturn(Optional.empty());
-
-        given(categoryRepository.findById(any()))
-                .willReturn(Optional.of(category));
 
         given(categoryRepository.save(any()))
-                .willReturn(childParent);
+                .willReturn(TEST_CATEGORY1);
 
         // when
-        CategoryResponse result = categoryService.save(categorySaveRequest);
+        CategoryResponse result = categoryService.save(TEST_CATEGORY_SAVE_REQUEST1);
 
         // then
-        assertThat(result.getName()).isEqualTo(childParent.getName());
+        assertThat(result.getId()).isEqualTo(TEST_CATEGORY1.getId());
+        assertThat(result.getName()).isEqualTo(TEST_CATEGORY_SAVE_REQUEST1.getName());
+        then(categoryRepository).should(times(1)).findByNameAndStatus(any(),any());
         then(categoryRepository).should(times(1)).save(any());
-        then(categoryRepository).should(times(1)).findById(any());
-        then(categoryRepository).should(times(1)).findByName(any());
     }
 
     @Test
-    @DisplayName("카테고리 생성 - 실패")
-    void createDuplicatedCategory(){
+    @DisplayName("자식 카테고리를 생성한다.")
+    void createChildCategory(){
         // given
-        CategorySaveRequest categorySaveRequest = new CategorySaveRequest();
-        categorySaveRequest.setId(1L);
-        categorySaveRequest.setName("백엔드");
+        given(categoryRepository.findByNameAndStatus(anyString(),any()))
+                .willReturn(Optional.empty());
 
-        Category category = Category.createCategory("백엔드", null);
+        given(categoryRepository.findById(any()))
+                .willReturn(Optional.of(TEST_CATEGORY1));
 
-        given(categoryRepository.findByName(anyString()))
-                .willReturn(Optional.of(category));
+        given(categoryRepository.save(any()))
+                .willReturn(TEST_CATEGORY2);
 
         // when
-        assertThrows(CategoryException.class,()-> categoryService.save(categorySaveRequest));
+        CategoryResponse result = categoryService.save(TEST_CATEGORY_SAVE_REQUEST2);
+
+        // then
+        assertThat(result.getId()).isEqualTo(TEST_CATEGORY2.getId());
+        assertThat(result.getName()).isEqualTo(TEST_CATEGORY_SAVE_REQUEST2.getName());
+        then(categoryRepository).should(times(1)).findByNameAndStatus(any(),any());
+        then(categoryRepository).should(times(1)).findById(any());
+        then(categoryRepository).should(times(1)).save(any());
     }
 
     @Test
-    @DisplayName("카테고리 수정 - 성공")
+    @DisplayName("예외테스트 : 중복된 이름의 카테고리를 생성할 경우 예외가 발생한다.")
+    void createDuplicatedNameCategory(){
+        // given
+        given(categoryRepository.findByNameAndStatus(anyString(),any()))
+                .willReturn(Optional.of(TEST_CATEGORY1));
+
+        // when
+        assertThrows(CategoryException.class,()-> categoryService.save(TEST_CATEGORY_SAVE_REQUEST1));
+    }
+
+    @Test
+    @DisplayName("카테고리의 이름을 수정한다.")
     void updateCategory(){
         // given
-        CategoryUpdateRequest categoryUpdateRequest = new CategoryUpdateRequest();
-        categoryUpdateRequest.setName("프론트엔드");
+        Category category = createTestCategory();
 
-        Category category = Category.createCategory("백엔드", null);
-
-        given(categoryRepository.findByName(anyString()))
+        given(categoryRepository.findByNameAndStatus(anyString(),any()))
                 .willReturn(Optional.empty());
 
         given(categoryRepository.findById(any()))
                 .willReturn(Optional.of(category));
 
         // when
-        CategoryResponse result = categoryService.update(1L, categoryUpdateRequest);
+        CategoryResponse result = categoryService.update(1L, TEST_CATEGORY_UPDATE_REQUEST);
 
         // then
-        assertThat(result.getName()).isEqualTo(categoryUpdateRequest.getName());
-        then(categoryRepository).should(times(1)).findByName(any());
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getName()).isEqualTo(TEST_CATEGORY_UPDATE_REQUEST.getName());
+
+        then(categoryRepository).should(times(1)).findByNameAndStatus(any(),any());
         then(categoryRepository).should(times(1)).findById(any());
     }
 
     @Test
-    @DisplayName("카테고리 수정 - 실패")
-    void updateDuplicatedCategory() {
+    @DisplayName("예외테스트 : 중복된 이름의 카테고리로 변경할 경우 예외가 발생한다.")
+    void updateDuplicatedNameCategory() {
         // given
-        CategoryUpdateRequest categoryUpdateRequest = new CategoryUpdateRequest();
-        categoryUpdateRequest.setName("프론트엔드");
-
-        Category category = Category.createCategory("프론트엔드", null);
-
-        given(categoryRepository.findByName(anyString()))
-                .willReturn(Optional.of(category));
+        given(categoryRepository.findByNameAndStatus(anyString(),any()))
+                .willReturn(Optional.of(TEST_CATEGORY1));
 
         // when
-        assertThrows(CategoryException.class,()->categoryService.update(1L,categoryUpdateRequest));
+        assertThrows(CategoryException.class,()->categoryService.update(1L,TEST_CATEGORY_UPDATE_REQUEST));
     }
 
     @Test
-    @DisplayName("카테고리 삭제")
+    @DisplayName("카테고리의 상태를 삭제 상태로 변경한다.")
     void deleteCategory(){
-        Category category = Category.createCategory("프론트엔드", null);
+        // given
+        Category category = createTestCategory();
 
         given(categoryRepository.findById(any()))
                 .willReturn(Optional.of(category));
@@ -140,11 +142,8 @@ class CategoryServiceTest {
     @DisplayName("부모 카테고리 조회")
     void findParentCategory(){
         // given
-        Category parentCategory = Category.createCategory("개발", null);
-        Category childCategory = Category.createCategory("백엔드",parentCategory);
-
         List<Category> parentList = new ArrayList<>();
-        parentList.add(parentCategory);
+        parentList.add(TEST_CATEGORY1);
 
         given(categoryRepository.findByParentIsNullAndStatus(any()))
                 .willReturn(parentList);
@@ -154,7 +153,8 @@ class CategoryServiceTest {
 
         // then
         assertThat(result.size()).isEqualTo(1);
-        assertThat(result.get(0).getName()).isEqualTo(parentCategory.getName());
+        assertThat(result.get(0).getName()).isEqualTo(TEST_CATEGORY1.getName());
+
         then(categoryRepository).should(times(1)).findByParentIsNullAndStatus((any()));
     }
 
@@ -162,14 +162,11 @@ class CategoryServiceTest {
     @DisplayName("자식 카테고리 조회")
     void findChildCategory(){
         // given
-        Category parentCategory = Category.createCategory("개발", null);
-        Category childCategory = Category.createCategory("백엔드",parentCategory);
-
         List<Category> childList = new ArrayList<>();
-        childList.add(childCategory);
+        childList.add(TEST_CATEGORY2);
 
         given(categoryRepository.findById(any()))
-                .willReturn(Optional.of(parentCategory));
+                .willReturn(Optional.of(TEST_CATEGORY1));
 
         given(categoryRepository.findByParentAndStatus(any(),any()))
                 .willReturn(childList);
@@ -179,7 +176,8 @@ class CategoryServiceTest {
 
         // then
         assertThat(result.size()).isEqualTo(1);
-        assertThat(result.get(0).getName()).isEqualTo(childCategory.getName());
+        assertThat(result.get(0).getName()).isEqualTo(TEST_CATEGORY2.getName());
+
         then(categoryRepository).should(times(1)).findById(any());
         then(categoryRepository).should(times(1)).findByParentAndStatus(any(),any());
     }

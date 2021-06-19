@@ -7,202 +7,163 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.study.studyservice.fixture.TagFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class StudyTest {
 
     @Test
-    @DisplayName("스터디의 현재 인원 증가")
-    void plusCurrentNumberOfPeople(){
-        Category category = Category.createCategory("백엔드", null);
-        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
-
-        List<Tag> tagList = new ArrayList<>();
-        Tag tag1 = Tag.createTag("스프링");
-        Tag tag2 = Tag.createTag("JPA");
-        tagList.add(tag1);
-        tagList.add(tag2);
-
-        List<StudyTag> studyTagList = new ArrayList<>();
-        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
-        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
-        studyTagList.add(studyTag1);
-        studyTagList.add(studyTag2);
-
-        Study study = Study.createStudy("스프링 스터디",
-                5, "안녕하세요 스프링 스터디입니다.",
-                true, true, "이미지 저장 이름",
-                "이미지", "썸네일 이미지", 1L, category, studyUser, studyTagList);
-
-        study.plusCurrentNumberOfPeople();
-
-        assertThat(study.getCurrentNumberOfPeople()).isEqualTo(2);
-    }
-
-    @Test
-    @DisplayName("스터디 이미지 삭제")
-    void deleteImage(){
+    @DisplayName("스터디 참가자를 추가한다.")
+    void addStudyUser(){
         // given
-        Category category = Category.createCategory("백엔드", null);
-        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
-
-        List<Tag> tagList = new ArrayList<>();
-        Tag tag1 = Tag.createTag("스프링");
-        Tag tag2 = Tag.createTag("JPA");
-        tagList.add(tag1);
-        tagList.add(tag2);
-
-        List<StudyTag> studyTagList = new ArrayList<>();
-        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
-        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
-        studyTagList.add(studyTag1);
-        studyTagList.add(studyTag2);
-
-        Study study = Study.createStudy("스프링 스터디",
-                5, "안녕하세요 스프링 스터디입니다.",
-                true, true, "이미지 저장 이름",
-                "이미지", "썸네일 이미지", 1L, category, studyUser, studyTagList);
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
 
         // when
-        study.deleteImage();
+        study.addStudyUser(1L,Role.USER);
 
         // then
-        assertThat(study.getImageStoreName()).isNull();
-        assertThat(study.getStudyImage()).isNull();
-        assertThat(study.getStudyThumbnailImage()).isNull();
+        assertThat(study.getCurrentNumberOfPeople()).isEqualTo(1);
+        assertThat(study.getStudyUsers().size()).isEqualTo(1);
+        assertThat(study.getStudyUsers().get(0).getUserId()).isEqualTo(1L);
+        assertThat(study.getStudyUsers().get(0).getRole()).isEqualTo(Role.USER);
     }
 
     @Test
-    @DisplayName("스터디 이미지 변경")
+    @DisplayName("스터디의 이미지를 변경한다.")
     void changeImage(){
         // given
-        Category category = Category.createCategory("백엔드", null);
-        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
 
-        List<Tag> tagList = new ArrayList<>();
-        Tag tag1 = Tag.createTag("스프링");
-        Tag tag2 = Tag.createTag("JPA");
-        tagList.add(tag1);
-        tagList.add(tag2);
-
-        List<StudyTag> studyTagList = new ArrayList<>();
-        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
-        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
-        studyTagList.add(studyTag1);
-        studyTagList.add(studyTag2);
-
-        Study study = Study.createStudy("스프링 스터디",
-                5, "안녕하세요 스프링 스터디입니다.",
-                true, true, "이미지 저장 이름",
-                "이미지", "썸네일 이미지", 1L, category, studyUser, studyTagList);
+        Image image = Image.createImage("테스트 이미지", "테스트 썸네일 이미지", "테스트 이미지 저장 이름");
 
         // when
-        study.changeImage("변경된 이미지","변경된 썸네일 이미지","변경된 이미지 저장 이름");
+        study.changeImage(image);
 
         // then
-        assertThat(study.getImageStoreName()).isEqualTo("변경된 이미지 저장 이름");
-        assertThat(study.getStudyImage()).isEqualTo("변경된 이미지");
-        assertThat(study.getStudyThumbnailImage()).isEqualTo("변경된 썸네일 이미지");
-
+        assertThat(study.getImage()).isEqualTo(image);
+        assertThat(study.getImage().getStudyImage()).isEqualTo("테스트 이미지");
+        assertThat(study.getImage().getThumbnailImage()).isEqualTo("테스트 썸네일 이미지");
+        assertThat(study.getImage().getImageStoreName()).isEqualTo("테스트 이미지 저장 이름");
     }
 
     @Test
-    @DisplayName("스터디 수정")
+    @DisplayName("스터디의 지역정보를 변경한다.")
+    void changeLocation(){
+        // given
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
+
+        // when
+        study.changeLocation(1L);
+
+        // then
+        assertThat(study.getLocationId()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("스터디의 태그를 추가한다.")
+    void addStudyTags(){
+       // given
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
+
+        List<Tag> tags = new ArrayList<>();
+        tags.add(TEST_TAG1);
+        tags.add(TEST_TAG2);
+        tags.add(TEST_TAG3);
+
+        // when
+        study.addStudyTags(tags);
+
+        // then
+        assertThat(study.getStudyTags().size()).isEqualTo(3);
+        assertThat(study.getStudyTags().get(0).getTag()).isEqualTo(TEST_TAG1);
+        assertThat(study.getStudyTags().get(1).getTag()).isEqualTo(TEST_TAG2);
+        assertThat(study.getStudyTags().get(2).getTag()).isEqualTo(TEST_TAG3);
+    }
+
+    @Test
+    @DisplayName("예외테스트 : 스터디의 현재 인원이 변경할 인원보다 많을 경우 예외가 발생한다.")
+    void checkNumberOfStudyUser(){
+        // given
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
+
+        study.addStudyUser(1L,Role.USER);
+
+        // when
+        assertThrows(StudyException.class,()->study.checkNumberOfStudyUser(0));
+    }
+
+    @Test
+    @DisplayName("스터디를 수정한다.")
     void update(){
         // given
         Category category = Category.createCategory("백엔드", null);
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, category);
+
         Category changeCategory = Category.createCategory("프론트엔드", null);
-        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
 
-        List<Tag> tagList = new ArrayList<>();
-        Tag tag1 = Tag.createTestTag(1L,"스프링");
-        Tag tag2 = Tag.createTestTag(2L,"JPA");
-        tagList.add(tag1);
-        tagList.add(tag2);
+        // when
+        study.update("스프링 스터디",10,"스프링 스터디입니다.",
+                false,false,true,changeCategory);
 
-        List<Tag> changeTagList = new ArrayList<>();
-        Tag tag3 = Tag.createTestTag(3L,"노드");
-        Tag tag4 = Tag.createTestTag(4L,"sequlize");
-        changeTagList.add(tag3);
-        changeTagList.add(tag4);
-
-        List<StudyTag> studyTagList = new ArrayList<>();
-        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
-        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
-        studyTagList.add(studyTag1);
-        studyTagList.add(studyTag2);
-
-        Study study = Study.createStudy("스프링 스터디",
-                5, "안녕하세요 스프링 스터디입니다.",
-                true, true, "이미지 저장 이름",
-                "이미지", "썸네일 이미지", 1L, category, studyUser, studyTagList);
-
-        study.update("노드 스터디",10,"안녕하세요 노드 스터디입니다.",
-                false,false,true,2L,changeCategory,changeTagList);
-
-        assertThat(study.getName()).isEqualTo("노드 스터디");
+        assertThat(study.getName()).isEqualTo("스프링 스터디");
         assertThat(study.getNumberOfPeople()).isEqualTo(10);
-        assertThat(study.getContent()).isEqualTo("안녕하세요 노드 스터디입니다.");
+        assertThat(study.getContent()).isEqualTo("스프링 스터디입니다.");
         assertThat(study.isOnline()).isEqualTo(false);
         assertThat(study.isOffline()).isEqualTo(false);
         assertThat(study.getStatus()).isEqualTo(StudyStatus.CLOSE);
-        assertThat(study.getLocationId()).isEqualTo(2L);
-        assertThat(study.getStudyTags().size()).isEqualTo(2);
         assertThat(study.getCategory()).isEqualTo(changeCategory);
     }
 
     @Test
-    @DisplayName("스터디 관리자 권한 확인")
-    void checkStudyAdminError(){
+    @DisplayName("스터디의 태그를 수정한다.")
+    void updateStudyTags(){
         // given
-        Category category = Category.createCategory("백엔드", null);
-        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
 
-        List<Tag> tagList = new ArrayList<>();
-        Tag tag1 = Tag.createTag("스프링");
-        Tag tag2 = Tag.createTag("JPA");
-        tagList.add(tag1);
-        tagList.add(tag2);
+        List<Tag> tags = new ArrayList<>();
+        tags.add(TEST_TAG1);
+        tags.add(TEST_TAG2);
+        tags.add(TEST_TAG3);
+        study.addStudyTags(tags);
 
-        List<StudyTag> studyTagList = new ArrayList<>();
-        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
-        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
-        studyTagList.add(studyTag1);
-        studyTagList.add(studyTag2);
-
-        Study study = Study.createStudy("스프링 스터디",
-                5, "안녕하세요 스프링 스터디입니다.",
-                true, true, "이미지 저장 이름",
-                "이미지", "썸네일 이미지", 1L, category, studyUser, studyTagList);
+        List<Tag> changeTags = new ArrayList<>();
+        changeTags.add(TEST_TAG3);
+        changeTags.add(TEST_TAG4);
 
         // when
-        assertThrows(StudyException.class,()->study.checkStudyAdmin(2L));
+        study.updateStudyTags(changeTags);
+
+        // given
+        assertThat(study.getStudyTags().size()).isEqualTo(2);
+        assertThat(study.getStudyTags().get(0).getTag()).isEqualTo(TEST_TAG3);
+        assertThat(study.getStudyTags().get(1).getTag()).isEqualTo(TEST_TAG4);
     }
 
     @Test
-    @DisplayName("스터디 참가 대기 인원 추가")
+    @DisplayName("예외테스트 : 스터디 관리자가 아닌 회원이 스터디를 수정하면 예외가 발생한다.")
+    void checkStudyAdmin(){
+        // given
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
+
+        // when
+        assertThrows(StudyException.class,()->study.checkStudyAdmin(1L));
+    }
+
+    @Test
+    @DisplayName("스터디 참가 대기 인원 추가한다.")
     void addWaitUser(){
         // given
-        Category category = Category.createCategory("백엔드", null);
-        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
-
-        List<Tag> tagList = new ArrayList<>();
-        Tag tag1 = Tag.createTag("스프링");
-        Tag tag2 = Tag.createTag("JPA");
-        tagList.add(tag1);
-        tagList.add(tag2);
-
-        List<StudyTag> studyTagList = new ArrayList<>();
-        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
-        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
-        studyTagList.add(studyTag1);
-        studyTagList.add(studyTag2);
-
-        Study study = Study.createStudy("스프링 스터디",
-                5, "안녕하세요 스프링 스터디입니다.",
-                true, true, "이미지 저장 이름",
-                "이미지", "썸네일 이미지", 1L, category, studyUser, studyTagList);
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
 
         // when
         study.addWaitUser(2L);
@@ -214,31 +175,26 @@ class StudyTest {
     }
 
     @Test
-    @DisplayName("스터디 참가 대기 인원 추가")
-    void addDuplicatedWaitUser() {
+    @DisplayName("예외테스트 : 이미 스터디 참가 대기 인원에 속한 회원이 참가 신청을 할 경우 예외가 발생한다.")
+    void checkExistDuplicatedWaitUserAndStudyUser() {
         // given
-        Category category = Category.createCategory("백엔드", null);
-        StudyUser studyUser = StudyUser.createStudyUser(1L, Role.ADMIN);
-
-        List<Tag> tagList = new ArrayList<>();
-        Tag tag1 = Tag.createTag("스프링");
-        Tag tag2 = Tag.createTag("JPA");
-        tagList.add(tag1);
-        tagList.add(tag2);
-
-        List<StudyTag> studyTagList = new ArrayList<>();
-        StudyTag studyTag1 = StudyTag.createStudyTag(tag1);
-        StudyTag studyTag2 = StudyTag.createStudyTag(tag2);
-        studyTagList.add(studyTag1);
-        studyTagList.add(studyTag2);
-
-        Study study = Study.createStudy("스프링 스터디",
-                5, "안녕하세요 스프링 스터디입니다.",
-                true, true, "이미지 저장 이름",
-                "이미지", "썸네일 이미지", 1L, category, studyUser, studyTagList);
-        study.addWaitUser(2L);
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
+        study.addWaitUser(1L);
 
         // when
-        assertThrows(StudyException.class,()->study.addWaitUser(2L));
+        assertThrows(StudyException.class,()->study.checkExistWaitUserAndStudyUser(1L));
+    }
+
+    @Test
+    @DisplayName("예외테스트 : 이미 스터디 참가 인원에 속한 회원이 참가 신청을 할 경우 예외가 발생한다.")
+    void checkExistWaitUserAndDuplicatedStudyUser() {
+        // given
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
+        study.addStudyUser(1L,Role.USER);
+
+        // when
+        assertThrows(StudyException.class,()->study.checkExistWaitUserAndStudyUser(1L));
     }
 }

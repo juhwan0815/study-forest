@@ -24,7 +24,7 @@ public class StudyQueryRepository {
 
     public Study findWithStudyTagsById(Long studyId){
         Study findStudy = queryFactory
-                .selectFrom(study)
+                .selectFrom(study).distinct()
                 .leftJoin(study.studyTags, studyTag).fetchJoin()
                 .where(study.id.eq(studyId))
                 .fetchOne();
@@ -38,7 +38,7 @@ public class StudyQueryRepository {
 
     public Study findWithStudyUsersById(Long studyId){
         Study findStudy = queryFactory
-                .selectFrom(study)
+                .selectFrom(study).distinct()
                 .leftJoin(study.studyUsers, studyUser).fetchJoin()
                 .where(study.id.eq(studyId))
                 .fetchOne();
@@ -52,7 +52,7 @@ public class StudyQueryRepository {
 
     public Study findWithCategoryAndStudyTagsAndTagById(Long studyId){
         Study findStudy = queryFactory
-                .selectFrom(study)
+                .selectFrom(study).distinct()
                 .leftJoin(study.category, category).fetchJoin()
                 .leftJoin(category.parent, category).fetchJoin()
                 .leftJoin(study.studyTags, studyTag).fetchJoin()
@@ -69,9 +69,10 @@ public class StudyQueryRepository {
 
     public Study findWithWaitUserById(Long studyId){
         Study findStudy = queryFactory
-                .selectFrom(study)
+                .selectFrom(study).distinct()
                 .leftJoin(study.waitUsers, waitUser).fetchJoin()
                 .where(study.id.eq(studyId))
+                .orderBy(waitUser.id.asc())
                 .fetchOne();
 
         if(findStudy == null){

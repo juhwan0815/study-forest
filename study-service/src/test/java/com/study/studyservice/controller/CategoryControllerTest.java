@@ -1,9 +1,6 @@
 package com.study.studyservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.study.studyservice.domain.Category;
-import com.study.studyservice.model.category.request.CategorySaveRequest;
-import com.study.studyservice.model.category.request.CategoryUpdateRequest;
 import com.study.studyservice.model.category.response.CategoryResponse;
 import com.study.studyservice.service.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +25,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static com.study.studyservice.fixture.CategoryFixture.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
@@ -77,32 +74,22 @@ class CategoryControllerTest {
     @Test
     @DisplayName("카테고리 생성 API 테스트")
     void create() throws Exception {
-
-        CategorySaveRequest categorySaveRequest = new CategorySaveRequest();
-        categorySaveRequest.setId(1L);
-        categorySaveRequest.setName("백엔드");
-
-        CategoryResponse categoryResponse = new CategoryResponse();
-        categoryResponse.setId(10L);
-        categoryResponse.setName("백엔드");
-
         given(categoryService.save(any()))
-                .willReturn(categoryResponse);
+                .willReturn(TEST_CATEGORY_RESPONSE2);
 
         mockMvc.perform(post("/categories")
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(categorySaveRequest))
+                .content(objectMapper.writeValueAsString(TEST_CATEGORY_SAVE_REQUEST2))
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(categoryResponse)))
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_CATEGORY_RESPONSE2)))
                 .andDo(document("category/create",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
                         ),
                         requestFields(
-                                fieldWithPath("id").type(JsonFieldType.NUMBER)
-                                        .description("부모 카테고리가 존재할 경우 부모 카테고리의 ID"),
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("부모 카테고리가 존재할 경우 부모 카테고리의 ID"),
                                 fieldWithPath("name").type(JsonFieldType.STRING).description("생성할 카테고리의 이름")
                         ),
                         responseFields(
@@ -117,29 +104,22 @@ class CategoryControllerTest {
     @Test
     @DisplayName("카테고리 수정 API 테스트")
     void update() throws Exception {
-        CategoryUpdateRequest categoryUpdateRequest = new CategoryUpdateRequest();
-        categoryUpdateRequest.setName("백엔드");
-
-        CategoryResponse categoryResponse = new CategoryResponse();
-        categoryResponse.setId(1L);
-        categoryResponse.setName(categoryUpdateRequest.getName());
-
         given(categoryService.update(any(), any()))
-                .willReturn(categoryResponse);
+                .willReturn(TEST_CATEGORY_RESPONSE2);
 
-        mockMvc.perform(put("/categories/{categoryId}", 1)
+        mockMvc.perform(put("/categories/{categoryId}", 2)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(categoryUpdateRequest)))
+                .content(objectMapper.writeValueAsString(TEST_CATEGORY_UPDATE_REQUEST2)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(categoryResponse)))
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_CATEGORY_RESPONSE2)))
                 .andDo(document("category/update",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
                         ),
                         pathParameters(
-                                parameterWithName("categoryId").description("카테고리 ID")
+                                parameterWithName("categoryId").description("변경할 카테고리 ID")
                         ),
                         requestFields(
                                 fieldWithPath("name").type(JsonFieldType.STRING).description("변경할 카테고리의 이름")
@@ -177,17 +157,8 @@ class CategoryControllerTest {
     @Test
     @DisplayName("부모 카테고리 조회 API 테스트")
     void findParentCategory() throws Exception {
-        CategoryResponse categoryResponse1 = new CategoryResponse();
-        categoryResponse1.setId(1L);
-        categoryResponse1.setName("개발");
-
-        CategoryResponse categoryResponse2 = new CategoryResponse();
-        categoryResponse2.setId(2L);
-        categoryResponse2.setName("게임");
-
         List<CategoryResponse> parentList = new ArrayList<>();
-        parentList.add(categoryResponse1);
-        parentList.add(categoryResponse2);
+        parentList.add(TEST_CATEGORY_RESPONSE1);
 
         given(categoryService.findParent())
                 .willReturn(parentList);
@@ -206,19 +177,11 @@ class CategoryControllerTest {
     }
 
     @Test
-    @DisplayName("자식 카테고리 조회")
+    @DisplayName("자식 카테고리 조회 API 테스트")
     void findChildCategory() throws Exception {
-        CategoryResponse categoryResponse1 = new CategoryResponse();
-        categoryResponse1.setId(3L);
-        categoryResponse1.setName("프론트엔드");
-
-        CategoryResponse categoryResponse2 = new CategoryResponse();
-        categoryResponse2.setId(4L);
-        categoryResponse2.setName("백엔드");
-
         List<CategoryResponse> childList = new ArrayList<>();
-        childList.add(categoryResponse1);
-        childList.add(categoryResponse2);
+        childList.add(TEST_CATEGORY_RESPONSE2);
+        childList.add(TEST_CATEGORY_RESPONSE3);
 
         given(categoryService.findChild(any()))
                 .willReturn(childList);

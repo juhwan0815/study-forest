@@ -2,6 +2,7 @@ package com.study.studyservice.domain;
 
 import com.study.studyservice.exception.StudyException;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,10 +10,12 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Study extends BaseEntity {
 
     @Id
@@ -36,11 +39,8 @@ public class Study extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private StudyStatus status; // 스터디 상태
 
-    private String imageStoreName; // 이미지 저장 명
-
-    private String studyImage; // 이미지 URL
-
-    private String studyThumbnailImage; // 썸네일 이미지 URL
+    @Embedded
+    private Image image;
 
     private Long locationId; // 지역정보
 
@@ -58,9 +58,7 @@ public class Study extends BaseEntity {
     private List<WaitUser> waitUsers = new ArrayList<>();
 
     public static Study createStudy(String name, Integer numberOfPeople, String content, boolean online,
-                                    boolean offline, String imageStoreName, String studyImage,
-                                    String studyThumbnailImage, Long locationId,
-                                    Category category, StudyUser user, List<StudyTag> studyTags) {
+                                    boolean offline, Category category) {
         Study study = new Study();
         study.name = name;
         study.numberOfPeople = numberOfPeople;
@@ -69,81 +67,73 @@ public class Study extends BaseEntity {
         study.online = online;
         study.offline = offline;
         study.status = StudyStatus.OPEN;
-        study.studyImage = studyImage;
-        study.studyThumbnailImage = studyThumbnailImage;
-        study.imageStoreName = imageStoreName;
-        study.locationId = locationId;
         study.category = category;
-        user.setStudy(study);
-        for (StudyTag studyTag : studyTags) {
-            studyTag.setStudy(study);
-        }
         return study;
     }
 
-    public void plusCurrentNumberOfPeople() {
+    public void addStudyUser(Long userId,Role role){
+        StudyUser studyUser = StudyUser.createStudyUser(userId, role, this);
+        studyUsers.add(studyUser);
         this.currentNumberOfPeople += 1;
     }
 
-    public void deleteImage() {
-        this.studyImage = null;
-        this.studyThumbnailImage = null;
-        this.imageStoreName = null;
+    public void changeImage(Image image){
+        this.image = image;
     }
 
-    public void changeImage(String studyImage, String studyThumbnailImage, String imageStoreName) {
-        this.studyImage = studyImage;
-        this.studyThumbnailImage = studyThumbnailImage;
-        this.imageStoreName = imageStoreName;
+    public void changeLocation(Long locationId) {
+        this.locationId = locationId;
     }
 
-    public void update(String name, Integer numberOfPeople, String content, boolean online, boolean offline,
-                       boolean close, Long locationId, Category category, List<Tag> tags) {
-        this.name = name;
+    public void addStudyTags(List<Tag> tags){
+        tags.forEach(tag -> {
+            StudyTag studyTag = StudyTag.createStudyTag(tag, this);
+            studyTags.add(studyTag);
+        });
+    }
 
+    public void checkNumberOfStudyUser(Integer numberOfPeople) {
         if (currentNumberOfPeople > numberOfPeople) {
             throw new StudyException("현재 스터디 인원이 수정할 인원보다 많습니다.");
         }
-        this.numberOfPeople = numberOfPeople;
+    }
 
+    public void update(String name, Integer numberOfPeople, String content, boolean online, boolean offline,
+                       boolean close, Category category) {
+        this.name = name;
+        this.numberOfPeople = numberOfPeople;
         this.content = content;
         this.online = online;
         this.offline = offline;
         if (close) {
             this.status = StudyStatus.CLOSE;
-        }else{
+        }else {
             this.status = StudyStatus.OPEN;
         }
-
-        this.locationId = locationId;
         this.category = category;
-
-        // 요청 태그와 일치하지 않는 원래 태그들 제거
-        deleteStudyTagNotMatchRequestTag(tags);
-
-        // 요청 태그들를 추가
-        tags.forEach(tag -> {
-            StudyTag studyTag = StudyTag.createStudyTag(tag);
-            studyTag.setStudy(this);
-        });
     }
 
-    private void deleteStudyTagNotMatchRequestTag(List<Tag> tags) {
+    public void updateStudyTags(List<Tag> tags){
+        deleteStudyTags(tags);
+        addStudyTags(tags);
+    }
+
+    private void deleteStudyTags(List<Tag> tags) {
         Iterator<StudyTag> studyTagIter = studyTags.iterator();
+
         while (studyTagIter.hasNext()){
             StudyTag studyTag = studyTagIter.next();
 
             boolean matchResult = false;
 
             for (Tag tag : tags) {
-                if (studyTag.getTag().getId().equals(tag.getId())) { // 태그의 ID값과 일치하는지 확인
+                if (studyTag.getTag().getId().equals(tag.getId())) {
                     matchResult = true;
-                    tags.remove(tag); // 일치하면 추가할 스터디 태그가 아니므로 TagList에서 삭제
+                    tags.remove(tag);
                     break;
                 }
             }
 
-            // 일치하지 않으면 스터디 태그에서 제거
             if (!matchResult) {
                 studyTagIter.remove();
             }
@@ -151,34 +141,33 @@ public class Study extends BaseEntity {
     }
 
     public void checkStudyAdmin(Long userId) {
-        boolean matchResult = false;
+        boolean checkResult = studyUsers
+                .stream()
+                .anyMatch(studyUser ->
+                        studyUser.getUserId().equals(userId) && studyUser.getRole().equals(Role.ADMIN));
 
-        for (StudyUser studyUser : studyUsers) {
-            if(studyUser.getUserId().equals(userId) && studyUser.getRole().equals(Role.ADMIN)){
-                matchResult = true;
-                break;
-            }
+        if(!checkResult){
+            throw new StudyException("스터디를 수정할 권한이 없습니다.");
+        }
+    }
+
+    public void checkExistWaitUserAndStudyUser(Long userId) {
+        boolean checkWaitUserResult = waitUsers.stream()
+                .anyMatch(waitUser -> waitUser.getUserId().equals(userId));
+
+        if(checkWaitUserResult){
+            throw new StudyException("이미 참가 신청을 한 회원입니다.");
         }
 
-        if(matchResult == false){
-            throw new StudyException("스터디를 삭제할 권한이 없습니다.");
+        boolean studyUserCheckResult = studyUsers.stream()
+                .anyMatch(studyUser -> studyUser.getUserId().equals(userId));
+        if (studyUserCheckResult){
+            throw new StudyException("이미 스터디에 가입하신 회원입니다.");
         }
     }
 
     public void addWaitUser(Long userId) {
-        boolean matchResult = false;
-
-        for (WaitUser waitUser : waitUsers) {
-            if(waitUser.getUserId().equals(userId)){
-                matchResult = true;
-                break;
-            }
-        }
-
-        if(matchResult){
-            throw new StudyException("이미 스터디에 가입신청을 한 회원입니다.");
-        }
-
-        waitUsers.add(WaitUser.createWaitUser(userId,this));
+        WaitUser waitUser = WaitUser.createWaitUser(userId,this);
+        waitUsers.add(waitUser);
     }
 }

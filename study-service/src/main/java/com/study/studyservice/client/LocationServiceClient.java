@@ -2,9 +2,12 @@ package com.study.studyservice.client;
 
 import com.study.studyservice.model.location.response.LocationResponse;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.concurrent.CompletableFuture;
 
 @FeignClient(name = "location-service")
 public interface LocationServiceClient {

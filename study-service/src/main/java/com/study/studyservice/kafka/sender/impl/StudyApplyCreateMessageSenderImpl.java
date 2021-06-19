@@ -1,8 +1,7 @@
 package com.study.studyservice.kafka.sender.impl;
 
-import com.study.studyservice.kafka.message.StudyDeleteMessage;
-import com.study.studyservice.kafka.message.StudyJoinMessage;
-import com.study.studyservice.kafka.sender.KafkaStudyJoinMessageSender;
+import com.study.studyservice.kafka.message.StudyApplyCreateMessage;
+import com.study.studyservice.kafka.sender.StudyApplyCreateMessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,26 +18,26 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class KafkaStudyJoinMessageSenderImpl implements KafkaStudyJoinMessageSender {
+public class StudyApplyCreateMessageSenderImpl implements StudyApplyCreateMessageSender {
 
-    @Qualifier("studyJoinKafkaTemplate")
-    private final KafkaTemplate<String, StudyJoinMessage> kafkaTemplate;
+    @Qualifier("studyApplyCreateKafkaTemplate")
+    private final KafkaTemplate<String, StudyApplyCreateMessage> kafkaTemplate;
 
-    @Value("${kafka.topic.study.join.name}")
+    @Value("${kafka.topic.studyApply.create}")
     private String topic;
 
     @Override
-    public void send(StudyJoinMessage studyJoinMessage) {
-        Message<StudyJoinMessage> message = MessageBuilder
-                .withPayload(studyJoinMessage)
+    public void send(StudyApplyCreateMessage studyApplyCreateMessage) {
+        Message<StudyApplyCreateMessage> message = MessageBuilder
+                .withPayload(studyApplyCreateMessage)
                 .setHeader(KafkaHeaders.TOPIC, topic)
                 .build();
 
-        ListenableFuture<SendResult<String, StudyJoinMessage>> future = kafkaTemplate.send(message);
+        ListenableFuture<SendResult<String, StudyApplyCreateMessage>> future = kafkaTemplate.send(message);
 
-        future.addCallback(new ListenableFutureCallback<SendResult<String, StudyJoinMessage>>() {
+        future.addCallback(new ListenableFutureCallback<SendResult<String, StudyApplyCreateMessage>>() {
             @Override
-            public void onSuccess(SendResult<String, StudyJoinMessage> result) {
+            public void onSuccess(SendResult<String, StudyApplyCreateMessage> result) {
                 log.info("Send Message={} to topic {} with offset = {}",
                         result.getProducerRecord().value().toString(),
                         result.getRecordMetadata().topic(),

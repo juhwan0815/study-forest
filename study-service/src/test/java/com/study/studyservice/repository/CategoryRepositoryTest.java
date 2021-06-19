@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,96 +20,87 @@ class CategoryRepositoryTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private EntityManager em;
+
     @Test
-    @DisplayName("카테고리 저장")
-    void save(){
+    @DisplayName("이름으로 삭제 상태가 아닌 카테고리를 조회한다.")
+    void findByNameAndStatus(){
         // given
         Category category = Category.createCategory("토익", null);
+        categoryRepository.save(category);
+
+        em.flush();
+        em.clear();
 
         // when
-        Category savedCategory = categoryRepository.save(category);
+        Category result = categoryRepository
+                .findByNameAndStatus("토익",CategoryStatus.ACTIVE).get();
 
         // then
-        assertThat(savedCategory.getId()).isNotNull();
+        assertThat(result.getId()).isEqualTo(category.getId());
+        assertThat(result.getName()).isEqualTo(category.getName());
     }
 
     @Test
-    @DisplayName("카테고리ID로 조회")
-    void findById(){
+    @DisplayName("삭제 상태가 아닌 부모 카테고리를 조회한다.")
+    void findByParentIsNullAndStatus(){
         // given
-        Category category = Category.createCategory("토익", null);
-
-        Category savedCategory = categoryRepository.save(category);
-
-
-        // when
-        Category findCategory = categoryRepository.findById(savedCategory.getId()).get();
-
-        assertThat(findCategory.getId()).isEqualTo(savedCategory.getId());
-        assertThat(findCategory.getName()).isEqualTo(savedCategory.getName());
-    }
-
-    @Test
-    @DisplayName("카테고리 이름으로 조회")
-    void findByName(){
-        // given
-        Category category = Category.createCategory("토익", null);
-
-        Category savedCategory = categoryRepository.save(category);
-
-        // when
-        Category findCategory = categoryRepository.findByName("토익").get();
-
-        // then
-        assertThat(findCategory.getId()).isEqualTo(savedCategory.getId());
-        assertThat(findCategory.getName()).isEqualTo(savedCategory.getName());
-    }
-
-    @Test
-    @DisplayName("부모 카테고리 조회")
-    void findByParentIsNull(){
         Category parentCategory = Category.createCategory("개발", null);
         Category childCategory = Category.createCategory("백엔드",parentCategory);
 
-        Category savedParentCategory = categoryRepository.save(parentCategory);
-        Category savedChildCategory = categoryRepository.save(childCategory);
+        categoryRepository.save(parentCategory);
+        categoryRepository.save(childCategory);
 
+        em.flush();
+        em.clear();
+
+        // when
         List<Category> result = categoryRepository.findByParentIsNullAndStatus(CategoryStatus.ACTIVE);
 
+        // then
         assertThat(result.size()).isEqualTo(1);
-        assertThat(result.get(0).getId()).isEqualTo(savedParentCategory.getId());
+        assertThat(result.get(0).getId()).isEqualTo(parentCategory.getId());
     }
 
     @Test
-    @DisplayName("자식 카테고리 조회")
-    void findByParent(){
+    @DisplayName("삭제 상태가 아닌 자식 카테고리를 조회한다")
+    void findByParentAndStatus(){
+        // given
         Category parentCategory = Category.createCategory("개발", null);
         Category childCategory = Category.createCategory("백엔드",parentCategory);
 
-        Category savedParentCategory = categoryRepository.save(parentCategory);
-        Category savedChildCategory = categoryRepository.save(childCategory);
+        categoryRepository.save(parentCategory);
+        categoryRepository.save(childCategory);
 
-        List<Category> result = categoryRepository.findByParentAndStatus(savedParentCategory,CategoryStatus.ACTIVE);
+        em.flush();
+        em.clear();
+
+        // when
+        List<Category> result = categoryRepository
+                .findByParentAndStatus(parentCategory,CategoryStatus.ACTIVE);
+
         assertThat(result.size()).isEqualTo(1);
-        assertThat(result.get(0).getId()).isEqualTo(savedChildCategory.getId());
+        assertThat(result.get(0).getId()).isEqualTo(childCategory.getId());
     }
 
     @Test
-    @DisplayName("카테고리 (부모포함) 조회")
+    @DisplayName("카테고리 ID 로 카테고리와 카테고리의 부모를 조회한다.")
     void findWithParentById(){
         Category parentCategory = Category.createCategory("개발", null);
         Category childCategory = Category.createCategory("백엔드",parentCategory);
 
-        Category savedParentCategory = categoryRepository.save(parentCategory);
-        Category savedChildCategory = categoryRepository.save(childCategory);
+        categoryRepository.save(parentCategory);
+        categoryRepository.save(childCategory);
 
-        Category result = categoryRepository.findWithParentById(savedChildCategory.getId()).get();
+        em.flush();
+        em.clear();
 
-        assertThat(result.getId()).isEqualTo(savedChildCategory.getId());
-        assertThat(result.getName()).isEqualTo(savedChildCategory.getName());
-        assertThat(result.getParent().getId()).isEqualTo(savedParentCategory.getId());
-        assertThat(result.getParent().getName()).isEqualTo(savedParentCategory.getName());
+        Category result = categoryRepository.findWithParentById(childCategory.getId()).get();
+
+        assertThat(result.getId()).isEqualTo(childCategory.getId());
+        assertThat(result.getName()).isEqualTo(childCategory.getName());
+        assertThat(result.getParent().getId()).isEqualTo(parentCategory.getId());
+        assertThat(result.getParent().getName()).isEqualTo(parentCategory.getName());
     }
-
-
 }

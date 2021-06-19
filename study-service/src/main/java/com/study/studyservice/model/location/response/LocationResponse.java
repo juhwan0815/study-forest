@@ -1,8 +1,12 @@
 package com.study.studyservice.model.location.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class LocationResponse {
 
     private Long id; // 지역 ID

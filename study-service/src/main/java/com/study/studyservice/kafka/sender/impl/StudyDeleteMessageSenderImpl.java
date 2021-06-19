@@ -2,7 +2,7 @@ package com.study.studyservice.kafka.sender.impl;
 
 
 import com.study.studyservice.kafka.message.StudyDeleteMessage;
-import com.study.studyservice.kafka.sender.KafkaStudyDeleteMessageSender;
+import com.study.studyservice.kafka.sender.StudyDeleteMessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,12 +19,12 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class KafkaStudyDeleteMessageSenderImpl implements KafkaStudyDeleteMessageSender {
+public class StudyDeleteMessageSenderImpl implements StudyDeleteMessageSender {
 
     @Qualifier("studyDeleteKafkaTemplate")
     private final KafkaTemplate<String,StudyDeleteMessage> kafkaTemplate;
 
-    @Value("${kafka.topic.study.delete.name}")
+    @Value("${kafka.topic.study.delete}")
     private String topic;
 
     @Override

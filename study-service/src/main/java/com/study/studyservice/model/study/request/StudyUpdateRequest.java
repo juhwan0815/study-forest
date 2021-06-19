@@ -1,11 +1,15 @@
 package com.study.studyservice.model.study.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class StudyUpdateRequest {
 
     @NotBlank
@@ -17,7 +21,7 @@ public class StudyUpdateRequest {
 
     private Long categoryId; // 카테고리 ID
 
-    private List<String> tags; // 스터디 태그 (주제)
+    private List<String> tags; // 스터디 태그들
 
     private boolean deleteImage; // 이미지 삭제 여부
 
