@@ -19,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.TestPropertySource;
 
 import java.net.URL;
 import java.util.Optional;
@@ -434,4 +435,8 @@ class StudyServiceTest {
         then(studyQueryRepository).should(times(1)).findWithWaitUserById(any());
         then(studyApplyCreateMessageSender).should(times(1)).send(any());
     }
+
+//    @Test
+//    @DisplayName("회원의 스터디 대기 인원을 조회한다.")
+
 }
