@@ -9,6 +9,7 @@ import com.study.studyservice.exception.StudyException;
 import com.study.studyservice.kafka.sender.StudyDeleteMessageSender;
 import com.study.studyservice.kafka.sender.StudyApplyCreateMessageSender;
 import com.study.studyservice.model.study.response.StudyResponse;
+import com.study.studyservice.model.waituser.WaitUserResponse;
 import com.study.studyservice.repository.CategoryRepository;
 import com.study.studyservice.repository.StudyRepository;
 import com.study.studyservice.repository.query.StudyQueryRepository;
@@ -20,8 +21,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.TestPropertySource;
+import scala.Array;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static com.study.studyservice.fixture.CategoryFixture.*;
@@ -436,7 +440,23 @@ class StudyServiceTest {
         then(studyApplyCreateMessageSender).should(times(1)).send(any());
     }
 
-//    @Test
-//    @DisplayName("회원의 스터디 대기 인원을 조회한다.")
+    @Test
+    @DisplayName("회원의 스터디 대기 인원을 조회한다.")
+    void findWaitUserByStudyId(){
+        // given
+        given(studyQueryRepository.findWithWaitUserById(any()))
+                .willReturn(createTestOfflineStudy());
+
+        given(userServiceClient.findUserByIdIn(any()))
+                .willReturn(Arrays.asList(TEST_USER_RESPONSE1,TEST_USER_RESPONSE2));
+
+        // when
+        List<WaitUserResponse> result = studyService.findWaitUsersByStudyId(1L);
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).getUserId()).isEqualTo(TEST_USER_RESPONSE2.getId());
+        assertThat(result.get(1).getUserId()).isEqualTo(TEST_USER_RESPONSE1.getId());
+    }
 
 }

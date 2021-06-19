@@ -5,6 +5,8 @@ import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
+import com.study.studyservice.model.user.UserResponse;
+import com.study.studyservice.model.waituser.WaitUserResponse;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -89,6 +91,15 @@ public class StudyFixture {
             true,true,StudyStatus.CLOSE,TEST_IMAGE,TEST_LOCATION_RESPONSE,TEST_CATEGORY_RESPONSE1,TEST_CATEGORY_RESPONSE2,
             Arrays.asList("JPA","스프링"));
 
+    public static final UserResponse TEST_USER_RESPONSE1 = new UserResponse(2L,"황주환");
+    public static final UserResponse TEST_USER_RESPONSE2 = new UserResponse(3L,"황철원");
+
+    public static final WaitUserResponse TEST_WAIT_USER_RESPONSE1
+            = new WaitUserResponse(1L,3L,"황철원");
+
+    public static final WaitUserResponse TEST_WAIT_USER_RESPONSE2
+            = new WaitUserResponse(2L,2L,"황주환");
+
     public static Study createTestOnlineStudy(){
         Study study = new Study(1L,
                 "테스트 스터디", 5, 1, "테스트 스터디 입니다.",
@@ -110,8 +121,8 @@ public class StudyFixture {
         study.getStudyTags().add(new StudyTag(1L,study,TEST_TAG1));
         study.getStudyTags().add(new StudyTag(2L,study,TEST_TAG2));
         study.getStudyUsers().add(new StudyUser(1L,1L,Role.ADMIN,study));
-        study.getWaitUsers().add(new WaitUser(1L,2L,study));
-        study.getWaitUsers().add(new WaitUser(2L,3L,study));
+        study.getWaitUsers().add(new WaitUser(1L,3L,study));
+        study.getWaitUsers().add(new WaitUser(2L,2L,study));
         return study;
     }
 

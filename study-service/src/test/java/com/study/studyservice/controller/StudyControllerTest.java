@@ -9,6 +9,7 @@ import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
+import com.study.studyservice.model.waituser.WaitUserResponse;
 import com.study.studyservice.service.StudyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -346,6 +347,35 @@ class StudyControllerTest {
                 ));
 
         then(studyService).should(times(1)).createWaitUser(any(),any());
+    }
+
+    @Test
+    @DisplayName("스터디 참가 인원 조회 API 테스트")
+    void findWaitUser() throws Exception{
+        List<WaitUserResponse> waitUserResponseList = Arrays.asList(TEST_WAIT_USER_RESPONSE1, TEST_WAIT_USER_RESPONSE2);
+
+        given(studyService.findWaitUsersByStudyId(any()))
+                .willReturn(waitUserResponseList);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/studies/{studyId}/waitUsers", 1)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(waitUserResponseList)))
+                .andDo(document("study/waitUser/find",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("studyId").description("참여할 스터디 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("스터디 참가 대기 ID"),
+                                fieldWithPath("[].userId").type(JsonFieldType.NUMBER).description("스터디 참가 대기 유저 ID"),
+                                fieldWithPath("[].nickName").type(JsonFieldType.STRING).description("스터디 참가 대기 유저 닉네임")
+                        )
+                ));
+        then(studyService).should(times(1)).findWaitUsersByStudyId(any());
     }
 
 
