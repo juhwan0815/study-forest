@@ -9,13 +9,13 @@ import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
 import com.study.userservice.exception.UserException;
 import com.study.userservice.kafka.message.UserDeleteMessage;
-import com.study.userservice.kafka.message.UserUpdateProfileMessage;
 import com.study.userservice.kafka.sender.UserDeleteMessageSender;
-import com.study.userservice.kafka.sender.UserUpdateProfileMessageSender;
+import com.study.userservice.model.user.UserFindRequest;
 import com.study.userservice.model.user.UserLoginRequest;
 import com.study.userservice.model.user.UserUpdateProfileRequest;
 import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.repository.UserRepository;
+import com.study.userservice.repository.query.UserQueryRepository;
 import com.study.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +24,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -33,17 +36,26 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    private final UserQueryRepository userQueryRepository;
     private final UserRepository userRepository;
     private final AmazonS3Client amazonS3Client;
 
     private final UserDeleteMessageSender userDeleteMessageSender;
-    private final UserUpdateProfileMessageSender userUpdateProfileMessageSender;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
     @Value("${cloud.aws.s3.thumbnailBucket}")
     private String thumbnailBucket;
+
+    @PostConstruct
+    void init(){
+        IntStream.range(1,100)
+                .forEach(value -> {
+                    User testUser = User.createUser(Long.valueOf(value), "황철원" + value, "10~19", "male", UserRole.USER);
+                    userRepository.save(testUser);
+                });
+    }
 
     @Override
     @Transactional
@@ -76,23 +88,29 @@ public class UserServiceImpl implements UserService {
 
         findUser.changeNickName(request.getNickName());
 
-        if (request.isDeleteImage() && image.isEmpty()) {
-            if (findUser.getImage() != null) {
-                deleteImageFromS3(findUser.getImage().getImageStoreName());
-                findUser.changeImage(null);
-            }
-        }
-        if (!request.isDeleteImage() && !image.isEmpty()) {
-            if (findUser.getImage() != null) {
-                deleteImageFromS3(findUser.getImage().getImageStoreName());
-            }
-            validateImageType(image);
-            findUser.changeImage(uploadImageFromS3(image));
-        }
+        Image updateImage = updateImage(image, request.isDeleteImage(), findUser);
 
-        userUpdateProfileMessageSender.send(UserUpdateProfileMessage.from(findUser));
+        findUser.changeImage(updateImage);
 
         return UserResponse.from(findUser);
+    }
+
+    private Image updateImage(MultipartFile image,boolean deleteImage,User user) {
+        Image userImage = user.getImage();
+        if (deleteImage && image.isEmpty()) {
+            if (userImage != null) {
+                deleteImageFromS3(userImage.getImageStoreName());
+                userImage = null;
+            }
+        }
+        if (!deleteImage && !image.isEmpty()) {
+            if (userImage != null) {
+                deleteImageFromS3(userImage.getImageStoreName());
+            }
+            validateImageType(image);
+            userImage = uploadImageToS3(image);
+        }
+        return userImage;
     }
 
     @Override
@@ -113,7 +131,12 @@ public class UserServiceImpl implements UserService {
         userDeleteMessageSender.send(UserDeleteMessage.from(findUser));
     }
 
-    private Image uploadImageFromS3(MultipartFile image) {
+    @Override
+    public List<UserResponse> findByIdIn(UserFindRequest request) {
+        return userQueryRepository.findByIdIn(request.getUserIdList());
+    }
+
+    private Image uploadImageToS3(MultipartFile image) {
         String imageStoreName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
 
         ObjectMetadata objectMetadata = new ObjectMetadata();

@@ -1,6 +1,7 @@
 package com.study.userservice.controller;
 
 import com.study.userservice.config.LoginUser;
+import com.study.userservice.model.user.UserFindRequest;
 import com.study.userservice.model.user.UserLoginRequest;
 import com.study.userservice.model.user.UserUpdateProfileRequest;
 import com.study.userservice.model.user.UserResponse;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Slf4j
 @CrossOrigin(origins = "*",allowedHeaders = "*")
@@ -32,9 +34,14 @@ public class UserController {
         return ResponseEntity.ok(userService.findById(userId));
     }
 
-    @GetMapping("/users")
+    @GetMapping("/users/profile")
     public ResponseEntity<UserResponse> findUserByLoginId(@LoginUser Long userId){
         return ResponseEntity.ok(userService.findById(userId));
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<UserResponse>> findUserByIdIn(UserFindRequest request){
+        return ResponseEntity.ok(userService.findByIdIn(request));
     }
 
     @PatchMapping("/users/profile")

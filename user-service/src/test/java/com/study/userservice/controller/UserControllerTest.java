@@ -191,7 +191,7 @@ class UserControllerTest {
         given(userService.findById(any()))
                 .willReturn(TEST_USER_RESPONSE);
 
-        mockMvc.perform(get("/users")
+        mockMvc.perform(get("/users/profile")
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())

@@ -20,7 +20,6 @@ public class UserFixture {
     public static final Image TEST_Image
             = Image.createImage("썸네일 이미지","이미지","이미지 저장");
 
-
     public static final User TEST_USER =
             new User(1L,1L,1L,"황주환","10~19","male",0,
                     TEST_Image, UserRole.USER,null,null);

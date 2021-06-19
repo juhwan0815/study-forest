@@ -49,7 +49,6 @@ kafka:
   topic:
     user:
       delete: user-delete-topic
-      update: user-update-topic
 
 
 management:
