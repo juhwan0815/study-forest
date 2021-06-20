@@ -1,6 +1,7 @@
 package com.study.studyservice.service;
 
 import com.study.studyservice.domain.Tag;
+import com.study.studyservice.model.tag.TagFindRequest;
 import com.study.studyservice.model.tag.TagResponse;
 import com.study.studyservice.model.tag.TagSearchRequest;
 import org.springframework.data.domain.Page;
@@ -13,4 +14,6 @@ public interface TagService {
     List<Tag> FindAndCreate(List<String> requestTags);
 
     Page<TagResponse> findLikeName(Pageable pageable, TagSearchRequest request);
+
+    List<TagResponse> findByIdIn(TagFindRequest request);
 }

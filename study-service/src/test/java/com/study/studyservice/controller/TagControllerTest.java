@@ -26,6 +26,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.study.studyservice.fixture.TagFixture.*;
@@ -39,8 +40,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -73,7 +73,7 @@ class TagControllerTest {
 
     @Test
     @DisplayName("태그 검색 API 테스트")
-    void findByNameLIke() throws Exception{
+    void findByNameLIke() throws Exception {
         // given
         List<TagResponse> content = new ArrayList<>();
         content.add(TEST_TAG_RESPONSE1);
@@ -83,14 +83,14 @@ class TagControllerTest {
         Page<TagResponse> tagResponseList
                 = new PageImpl<>(content, pageable, content.size());
 
-        given(tagService.findLikeName(any(),any()))
+        given(tagService.findLikeName(any(), any()))
                 .willReturn(tagResponseList);
 
         mockMvc.perform(get("/tags")
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .param("page", "0")
                 .param("size", "20")
-                .param("name","스프링"))
+                .param("name", "스프링"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(tagResponseList)))
                 .andDo(document("tag/find",
@@ -124,7 +124,32 @@ class TagControllerTest {
                                 fieldWithPath("empty").type(JsonFieldType.BOOLEAN).description("값이 비었는지 여부")
                         )
                 ));
-        then(tagService).should(times(1)).findLikeName(any(),any());
+        then(tagService).should(times(1)).findLikeName(any(), any());
+    }
+
+    @Test
+    @DisplayName("태그 목록 조회 API 테스트")
+    void findByIdIn() throws Exception {
+        List<TagResponse> tagResponses = Arrays.asList(TEST_TAG_RESPONSE1, TEST_TAG_RESPONSE2);
+        given(tagService.findByIdIn(any()))
+                .willReturn(tagResponses);
+
+        mockMvc.perform(get("/tags/name")
+                .param("tagIdList","1","2")
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(tagResponses)))
+                .andDo(document("tag/findByIdIn",
+                        requestParameters(
+                                parameterWithName("tagIdList").description("태그 ID 리스트")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("태그 ID"),
+                                fieldWithPath("[].name").type(JsonFieldType.STRING).description("태그 이름")
+                        )
+                ));
+
+        then(tagService).should(times(1)).findByIdIn(any());
     }
 
 }

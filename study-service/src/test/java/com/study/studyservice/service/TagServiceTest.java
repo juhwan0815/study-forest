@@ -20,8 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.study.studyservice.fixture.TagFixture.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.contentOf;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -82,6 +81,21 @@ class TagServiceTest {
         assertThat(result.getContent().get(1).getName()).isEqualTo(TEST_TAG6.getName());
     }
 
+    @Test
+    @DisplayName("태그 ID 리스트로 태그를 조회한다.")
+    void findByIdIn(){
+        List<Long> tagIdList = Arrays.asList(1L, 2L);
 
+        given(tagRepository.findByIdIn(tagIdList))
+                .willReturn(TEST_TAG_LIST);
+
+        List<TagResponse> result = tagService.findByIdIn(TEST_TAG_FIND_REQUEST);
+
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).getId()).isEqualTo(1L);
+        assertThat(result.get(1).getId()).isEqualTo(2L);
+
+        then(tagRepository).should(times(1)).findByIdIn(any());
+    }
 
 }

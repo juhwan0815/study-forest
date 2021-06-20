@@ -1,6 +1,7 @@
 package com.study.studyservice.service.impl;
 
 import com.study.studyservice.domain.Tag;
+import com.study.studyservice.model.tag.TagFindRequest;
 import com.study.studyservice.model.tag.TagResponse;
 import com.study.studyservice.model.tag.TagSearchRequest;
 import com.study.studyservice.repository.TagRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -51,5 +53,12 @@ public class TagServiceImpl implements TagService {
     public Page<TagResponse> findLikeName(Pageable pageable, TagSearchRequest request) {
         Page<Tag> tags = tagRepository.findByNameContaining(pageable, request.getName());
         return tags.map(tag -> TagResponse.from(tag));
+    }
+
+    @Override
+    public List<TagResponse> findByIdIn(TagFindRequest request) {
+        return tagRepository.findByIdIn(request.getTagIdList()).stream()
+                .map(tag -> TagResponse.from(tag))
+                .collect(Collectors.toList());
     }
 }

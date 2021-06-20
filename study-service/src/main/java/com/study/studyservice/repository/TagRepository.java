@@ -13,4 +13,6 @@ public interface TagRepository extends JpaRepository<Tag,Long> {
     List<Tag> findByNameIn(List<String> tagNames);
 
     Page<Tag> findByNameContaining(Pageable pageable,String name);
+
+    List<Tag> findByIdIn(List<Long> tagIdList);
 }

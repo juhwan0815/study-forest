@@ -25,3 +25,13 @@ include::{snippets}/tag/find/request-parameters.adoc[]
 include::{snippets}/tag/find/http-response.adoc[]
 ====== Body
 include::{snippets}/tag/find/response-fields.adoc[]
+
+==== 태그 ID 리스트로 조회 API
+===== 요청
+include::{snippets}/tag/findByIdIn/http-request.adoc[]
+====== Param
+include::{snippets}/tag/findByIdIn/request-parameters.adoc[]
+===== 응답
+include::{snippets}/tag/findByIdIn/http-response.adoc[]
+====== Body
+include::{snippets}/tag/findByIdIn/response-fields.adoc[]

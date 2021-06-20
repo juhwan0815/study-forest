@@ -1,6 +1,7 @@
 package com.study.studyservice.fixture;
 
 import com.study.studyservice.domain.Tag;
+import com.study.studyservice.model.tag.TagFindRequest;
 import com.study.studyservice.model.tag.TagResponse;
 import com.study.studyservice.model.tag.TagSearchRequest;
 
@@ -11,6 +12,8 @@ import java.util.List;
 public class TagFixture {
 
     public static final TagSearchRequest TEST_TAG_SEARCH_REQUEST = new TagSearchRequest("프링");
+
+    public static final TagFindRequest TEST_TAG_FIND_REQUEST = new TagFindRequest(Arrays.asList(1L,2L));
 
     public static final Tag TEST_TAG1 = new Tag(1L,"JPA");
 
