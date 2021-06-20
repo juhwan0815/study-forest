@@ -1,15 +1,13 @@
 package com.study.userservice.repository.query;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.study.userservice.domain.QUser;
-import com.study.userservice.model.user.QUserResponse;
-import com.study.userservice.model.user.UserResponse;
+import com.study.userservice.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.study.userservice.domain.QUser.*;
+import static com.study.userservice.domain.QUser.user;
 
 @Repository
 @RequiredArgsConstructor
@@ -17,10 +15,9 @@ public class UserQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<UserResponse> findByIdIn(List<Long> userIdList){
+    public List<User> findByIdIn(List<Long> userIdList){
         return queryFactory
-                .select(new QUserResponse(user.id,user.nickName))
-                .from(user)
+                .selectFrom(user)
                 .where(user.id.in(userIdList))
                 .fetch();
     }

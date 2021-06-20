@@ -28,6 +28,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.study.userservice.UserFixture.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -72,7 +74,7 @@ class UserControllerTest {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .alwaysDo(print())
-                .addFilters(new CharacterEncodingFilter("utf-8",true))
+                .addFilters(new CharacterEncodingFilter("utf-8", true))
                 .apply(documentationConfiguration(restDocumentationContextProvider)
                         .operationPreprocessors()
                         .withRequestDefaults(prettyPrint())
@@ -116,7 +118,8 @@ class UserControllerTest {
                                 fieldWithPath("image.thumbnailImage").type(JsonFieldType.STRING).description("썸네일 이미지 URL"),
                                 fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수")
+                                fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
+                                fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID")
                         )));
 
         // then
@@ -177,7 +180,8 @@ class UserControllerTest {
                                 fieldWithPath("image.thumbnailImage").type(JsonFieldType.STRING).description("변경된 프로필 썸네일 이미지 URL"),
                                 fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수")
+                                fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
+                                fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID")
                         )));
 
         // then
@@ -209,7 +213,8 @@ class UserControllerTest {
                                 fieldWithPath("image.thumbnailImage").type(JsonFieldType.STRING).description("회원 프로필 썸네일 이미지 URL"),
                                 fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수")
+                                fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
+                                fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID")
                         )
                 ));
     }
@@ -237,7 +242,8 @@ class UserControllerTest {
                                 fieldWithPath("image.thumbnailImage").type(JsonFieldType.STRING).description("회원 프로필 썸네일 이미지 URL"),
                                 fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수")
+                                fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
+                                fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID")
                         )
                 ));
 
@@ -268,5 +274,64 @@ class UserControllerTest {
         then(userService).should(times(1)).delete(any());
     }
 
+    @Test
+    @DisplayName("회원 목록 조회 API 테스트")
+    void findUsers() throws Exception {
+        // given
+        List<UserResponse> userResponses = Arrays.asList(TEST_USER_RESPONSE, TEST_USER_RESPONSE2);
 
+        given(userService.findByIdIn(any()))
+                .willReturn(userResponses);
+
+        // when
+        mockMvc.perform(get("/users")
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .param("userIdList", "1", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(userResponses)))
+                .andDo(document("user/findByIdIn",
+                        requestParameters(
+                                parameterWithName("userIdList").description("회원 ID 배열")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("회원 ID"),
+                                fieldWithPath("[].kakaoId").type(JsonFieldType.NUMBER).description("카카오 ID"),
+                                fieldWithPath("[].nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                fieldWithPath("[].image").type(JsonFieldType.OBJECT).description("회원 이미지 정보"),
+                                fieldWithPath("[].image.profileImage").type(JsonFieldType.STRING).description("회원 프로필 이미지 URL"),
+                                fieldWithPath("[].image.thumbnailImage").type(JsonFieldType.STRING).description("회원 프로필 썸네일 이미지 URL"),
+                                fieldWithPath("[].gender").type(JsonFieldType.STRING).description("회원 성별"),
+                                fieldWithPath("[].ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
+                                fieldWithPath("[].numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
+                                fieldWithPath("[].locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID")
+                        )
+                ));
+        // then
+        then(userService).should(times(1)).findByIdIn(any());
+    }
+
+    @Test
+    @DisplayName("회원 지역 정보 변경 API")
+    void updateLocation() throws Exception {
+        // given
+        willDoNothing()
+                .given(userService)
+                .updateLocation(any(),any());
+
+        // when
+        mockMvc.perform(patch("/users/locations/{locationId}",1)
+        .header(HttpHeaders.AUTHORIZATION,TEST_AUTHORIZATION))
+                .andExpect(status().isOk())
+                .andDo(document("user/location/update",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access 토큰")
+                        ),
+                        pathParameters(
+                                parameterWithName("locationId").description("변경할 지역정보 ID")
+                        )
+                ));
+
+        // then
+        then(userService).should(times(1)).updateLocation(any(),any());
+    }
 }

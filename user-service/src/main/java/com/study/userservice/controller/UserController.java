@@ -57,6 +57,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @PatchMapping("/users/locations/{locationId}")
+    public ResponseEntity<Void> changeLocation(@LoginUser Long userId,@PathVariable Long locationId){
+        userService.updateLocation(userId,locationId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 
 
 

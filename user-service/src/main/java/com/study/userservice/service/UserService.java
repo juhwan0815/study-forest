@@ -19,4 +19,6 @@ public interface UserService {
     void delete(Long userId);
 
     List<UserResponse> findByIdIn(UserFindRequest request);
+
+    void updateLocation(Long userId, Long locationId);
 }

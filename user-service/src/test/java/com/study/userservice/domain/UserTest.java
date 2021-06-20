@@ -34,4 +34,16 @@ class UserTest {
         assertThat(user.getNickName()).isEqualTo("황철원");
     }
 
+    @Test
+    @DisplayName("회원의 지역을 변경한다.")
+    void changeLocation(){
+        // given
+        User user = User.createUser(1L,"황주환","10~19","male", UserRole.USER);
+
+        // when
+        user.changeLocation(1L);
+
+        // then
+        assertThat(user.getLocationId()).isEqualTo(1L);
+    }
 }

@@ -28,6 +28,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Slf4j
@@ -133,7 +134,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponse> findByIdIn(UserFindRequest request) {
-        return userQueryRepository.findByIdIn(request.getUserIdList());
+        return userQueryRepository.findByIdIn(request.getUserIdList()).stream()
+                .map(user -> UserResponse.from(user))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void updateLocation(Long userId, Long locationId) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(userId + "는 존재하지 않는 회원 ID입니다."));
+
+        findUser.changeLocation(locationId);
     }
 
     private Image uploadImageToS3(MultipartFile image) {

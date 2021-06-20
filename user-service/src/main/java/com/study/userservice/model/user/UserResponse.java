@@ -1,6 +1,5 @@
 package com.study.userservice.model.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.querydsl.core.annotations.QueryProjection;
 import com.study.userservice.domain.Image;
@@ -28,11 +27,7 @@ public class UserResponse {
 
     private Integer numberOfStudyApply; // 스터디 신청 개수
 
-    @QueryProjection
-    public UserResponse(Long id,String nickName){
-        this.id = id;
-        this.nickName = nickName;
-    }
+    private Long locationId; // 지역 정보 ID
 
     public static UserResponse from(User user){
         UserResponse userResponse = new UserResponse();
@@ -43,6 +38,7 @@ public class UserResponse {
         userResponse.gender = user.getGender();
         userResponse.ageRange = user.getAgeRange();
         userResponse.numberOfStudyApply = user.getNumberOfStudyApply();
+        userResponse.locationId = user.getLocationId();
         return userResponse;
     }
 

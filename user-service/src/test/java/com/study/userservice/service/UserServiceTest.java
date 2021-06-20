@@ -5,6 +5,7 @@ import com.study.userservice.domain.User;
 import com.study.userservice.kafka.sender.UserDeleteMessageSender;
 import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.repository.UserRepository;
+import com.study.userservice.repository.query.UserQueryRepository;
 import com.study.userservice.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,8 +13,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import scala.Array;
 
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static com.study.userservice.UserFixture.*;
@@ -32,6 +36,9 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserQueryRepository userQueryRepository;
 
     @Mock
     private AmazonS3Client amazonS3Client;
@@ -59,6 +66,7 @@ class UserServiceTest {
         assertThat(userResponse.getNickName()).isEqualTo(TEST_USER_LOGIN_REQUEST.getNickName());
         assertThat(userResponse.getImage().getProfileImage()).isEqualTo(TEST_USER_LOGIN_REQUEST.getProfileImage());
         assertThat(userResponse.getImage().getThumbnailImage()).isEqualTo(TEST_USER_LOGIN_REQUEST.getThumbnailImage());
+        assertThat(userResponse.getLocationId()).isNull();
         assertThat(userResponse.getGender()).isEqualTo(TEST_USER_LOGIN_REQUEST.getGender());
         assertThat(userResponse.getAgeRange()).isEqualTo(TEST_USER_LOGIN_REQUEST.getAgeRange());
         assertThat(userResponse.getNumberOfStudyApply()).isEqualTo(0);
@@ -189,6 +197,7 @@ class UserServiceTest {
         assertThat(result.getGender()).isEqualTo(TEST_USER.getGender());
         assertThat(result.getAgeRange()).isEqualTo(TEST_USER.getAgeRange());
         assertThat(result.getImage()).isEqualTo(TEST_USER.getImage());
+        assertThat(result.getLocationId()).isNull();
         assertThat(result.getNumberOfStudyApply()).isEqualTo(TEST_USER.getNumberOfStudyApply());
     }
 
@@ -216,5 +225,37 @@ class UserServiceTest {
         then(userDeleteMessageSender).should(times(1)).send(any());
     }
 
+    @Test
+    @DisplayName("회원 ID 리스트로 회원 목록을 조회한다.")
+    void findByIdIn(){
+        // given
+        List<User> userList = Arrays.asList(TEST_USER, TEST_USER2);
+        given(userQueryRepository.findByIdIn(any()))
+                .willReturn(userList);
+
+        // when
+        List<UserResponse> result = userService.findByIdIn(TEST_USER_FIND_REQUEST);
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).getId()).isEqualTo(TEST_USER.getId());
+        assertThat(result.get(1).getId()).isEqualTo(TEST_USER2.getId());
+        then(userQueryRepository).should(times(1)).findByIdIn(any());
+    }
+
+    @Test
+    @DisplayName("회원의 지역 정보를 변경한다.")
+    void changeLocation(){
+        // given
+        User user = createTestUser();
+        given(userRepository.findById(any()))
+                .willReturn(Optional.of(user));
+
+        // when
+        userService.updateLocation(1L,2L);
+
+        // then
+        assertThat(user.getLocationId()).isEqualTo(2L);
+    }
 
 }
