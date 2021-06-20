@@ -1,6 +1,7 @@
 package com.study.userservice.controller;
 
 import com.study.userservice.config.LoginUser;
+import com.study.userservice.model.interestTag.InterestTagResponse;
 import com.study.userservice.model.user.UserFindRequest;
 import com.study.userservice.model.user.UserLoginRequest;
 import com.study.userservice.model.user.UserResponse;
@@ -74,6 +75,10 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @GetMapping("/users/tags")
+    public ResponseEntity<List<InterestTagResponse>> findInterestTagsByUserId(@LoginUser Long userId){
+        return ResponseEntity.ok(userService.findInterestTagByUserId(userId));
+    }
 
 
 

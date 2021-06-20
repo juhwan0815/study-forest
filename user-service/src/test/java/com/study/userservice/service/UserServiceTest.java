@@ -1,9 +1,11 @@
 package com.study.userservice.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.study.userservice.client.StudyServiceClient;
 import com.study.userservice.domain.User;
 import com.study.userservice.exception.UserException;
 import com.study.userservice.kafka.sender.UserDeleteMessageSender;
+import com.study.userservice.model.interestTag.InterestTagResponse;
 import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.repository.UserRepository;
 import com.study.userservice.repository.query.UserQueryRepository;
@@ -44,6 +46,9 @@ class UserServiceTest {
 
     @Mock
     private AmazonS3Client amazonS3Client;
+
+    @Mock
+    private StudyServiceClient studyServiceClient;
 
     @Mock
     private UserDeleteMessageSender userDeleteMessageSender;
@@ -318,5 +323,28 @@ class UserServiceTest {
 
         // when
         assertThrows(UserException.class,()->userService.deleteInterestTag(1L,1L));
+    }
+
+    @Test
+    @DisplayName("회원의 관심 태그 목록을 조회한다.")
+    void findInterestTagsByUserId(){
+        // given
+        User user = createTestUser2();
+        given(userQueryRepository.findWithInterestTagById(any()))
+                .willReturn(user);
+
+        given(studyServiceClient.findTagsByIdIn(any()))
+                .willReturn(Arrays.asList(TEST_TAG_RESPONSE1,TEST_TAG_RESPONSE2));
+
+        // when
+        List<InterestTagResponse> result = userService.findInterestTagByUserId(1L);
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).getTagId()).isEqualTo(TEST_TAG_RESPONSE1.getId());
+        assertThat(result.get(1).getTagId()).isEqualTo(TEST_TAG_RESPONSE2.getId());
+
+        then(userQueryRepository).should(times(1)).findWithInterestTagById(any());
+        then(studyServiceClient).should(times(1)).findTagsByIdIn(any());
     }
 }

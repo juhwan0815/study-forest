@@ -4,12 +4,15 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.study.userservice.client.StudyServiceClient;
 import com.study.userservice.domain.Image;
 import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
 import com.study.userservice.exception.UserException;
 import com.study.userservice.kafka.message.UserDeleteMessage;
 import com.study.userservice.kafka.sender.UserDeleteMessageSender;
+import com.study.userservice.model.interestTag.InterestTagResponse;
+import com.study.userservice.model.tag.TagResponse;
 import com.study.userservice.model.user.UserFindRequest;
 import com.study.userservice.model.user.UserLoginRequest;
 import com.study.userservice.model.user.UserUpdateProfileRequest;
@@ -25,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,6 +44,7 @@ public class UserServiceImpl implements UserService {
     private final UserQueryRepository userQueryRepository;
     private final UserRepository userRepository;
     private final AmazonS3Client amazonS3Client;
+    private final StudyServiceClient studyServiceClient;
 
     private final UserDeleteMessageSender userDeleteMessageSender;
 
@@ -164,6 +169,30 @@ public class UserServiceImpl implements UserService {
         User findUser = userQueryRepository.findWithInterestTagById(userId);
 
         findUser.deleteInterestTag(tagId);
+    }
+
+    @Override
+    public List<InterestTagResponse> findInterestTagByUserId(Long userId) {
+        User findUser = userQueryRepository.findWithInterestTagById(userId);
+
+        List<Long> tagIdList = findUser.getInterestTags().stream()
+                .map(interestTag -> interestTag.getTagId())
+                .collect(Collectors.toList());
+
+        List<TagResponse> tags = studyServiceClient.findTagsByIdIn(tagIdList);
+
+        List<InterestTagResponse> interestTagResponses = new ArrayList<>();
+
+        findUser.getInterestTags().stream()
+                .forEach(interestTag -> {
+                    for (TagResponse tag : tags) {
+                        if(interestTag.getTagId().equals(tag.getId())){
+                            interestTagResponses.add(InterestTagResponse.from(interestTag,tag));
+                        }
+                    }
+                });
+
+        return interestTagResponses;
     }
 
     private Image uploadImageToS3(MultipartFile image) {

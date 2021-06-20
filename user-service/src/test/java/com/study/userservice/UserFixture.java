@@ -1,8 +1,11 @@
 package com.study.userservice;
 
 import com.study.userservice.domain.Image;
+import com.study.userservice.domain.InterestTag;
 import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
+import com.study.userservice.model.interestTag.InterestTagResponse;
+import com.study.userservice.model.tag.TagResponse;
 import com.study.userservice.model.user.UserFindRequest;
 import com.study.userservice.model.user.UserLoginRequest;
 import com.study.userservice.model.user.UserUpdateProfileRequest;
@@ -57,9 +60,23 @@ public class UserFixture {
 
     public static final UserFindRequest TEST_USER_FIND_REQUEST = new UserFindRequest(Arrays.asList(1L,2L));
 
+    public static final TagResponse TEST_TAG_RESPONSE1 = new TagResponse(1L,"스프링");
+    public static final TagResponse TEST_TAG_RESPONSE2 = new TagResponse(2L,"스프링");
+
+    public static final InterestTagResponse TEST_INTEREST_TAG_RESPONSE1 = new InterestTagResponse(1L,1L,"스프링");
+    public static final InterestTagResponse TEST_INTEREST_TAG_RESPONSE2 = new InterestTagResponse(1L,1L,"스프링");
+
     public static User createTestUser(){
         return new User(1L,1L,1L,"황주환","10~19","male",2,
                 TEST_Image, UserRole.USER,new ArrayList<>(),new ArrayList<>());
+    }
+
+    public static User createTestUser2(){
+        User user = new User(1L, 1L, 1L, "황주환", "10~19", "male", 2,
+                TEST_Image, UserRole.USER, new ArrayList<>(), new ArrayList<>());
+        user.getInterestTags().add(new InterestTag(1L,1L,user));
+        user.getInterestTags().add(new InterestTag(2L,2L,user));
+        return user;
     }
 
 

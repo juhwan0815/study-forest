@@ -1,5 +1,6 @@
 package com.study.userservice.service;
 
+import com.study.userservice.model.interestTag.InterestTagResponse;
 import com.study.userservice.model.user.UserFindRequest;
 import com.study.userservice.model.user.UserLoginRequest;
 import com.study.userservice.model.user.UserUpdateProfileRequest;
@@ -26,4 +27,5 @@ public interface UserService {
 
     void deleteInterestTag(Long userId, Long tagId);
 
+    List<InterestTagResponse> findInterestTagByUserId(Long userId);
 }

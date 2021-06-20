@@ -2,6 +2,7 @@ package com.study.userservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.userservice.config.LoginUserArgumentResolver;
+import com.study.userservice.model.interestTag.InterestTagResponse;
 import com.study.userservice.model.user.UserLoginRequest;
 import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.service.UserService;
@@ -393,4 +394,35 @@ class UserControllerTest {
         // then
         then(userService).should(times(1)).deleteInterestTag(any(),any());
     }
+
+    @Test
+    @DisplayName("회원 관심 주제 목록 조회 API 테스트")
+    void findInterestTagsByUserId() throws Exception{
+        // given
+        List<InterestTagResponse> interestTagResponses = Arrays.asList(TEST_INTEREST_TAG_RESPONSE1, TEST_INTEREST_TAG_RESPONSE2);
+        given(userService.findInterestTagByUserId(any()))
+                .willReturn(interestTagResponses);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/users/tags")
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(interestTagResponses)))
+                .andDo(document("user/tag/find",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("관심 태그 ID"),
+                                fieldWithPath("[].tagId").type(JsonFieldType.NUMBER).description("태그 ID"),
+                                fieldWithPath("[].name").type(JsonFieldType.STRING).description("태그 이름")
+                        )
+                ));
+
+        // then
+        then(userService).should(times(1)).findInterestTagByUserId(any());
+
+    }
+
+
 }
