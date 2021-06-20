@@ -2,6 +2,7 @@ package com.study.userservice.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.study.userservice.domain.User;
+import com.study.userservice.exception.UserException;
 import com.study.userservice.kafka.sender.UserDeleteMessageSender;
 import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.repository.UserRepository;
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 import static com.study.userservice.UserFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.*;
@@ -256,6 +258,36 @@ class UserServiceTest {
 
         // then
         assertThat(result.getLocationId()).isEqualTo(2L);
+    }
+
+    @Test
+    @DisplayName("회원의 관심 주제를 추가한다.")
+    void addInterestTag(){
+        // given
+        User user = createTestUser();
+        given(userQueryRepository.findWithInterestTagById(any()))
+                .willReturn(user);
+
+        // when
+        userService.addInterestTag(1L,1L);
+
+        // then
+        assertThat(user.getInterestTags().size()).isEqualTo(1);
+        assertThat(user.getInterestTags().get(0).getTagId()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("예외 테스트 : 이미 존재하는 관심주제를 중복으로 추가하면 예외가 발생한다.")
+    void addDuplicatedInterestTag(){
+        // given
+        User user = createTestUser();
+        user.addInterestTag(1L);
+
+        given(userQueryRepository.findWithInterestTagById(any()))
+                .willReturn(user);
+
+        // when
+        assertThrows(UserException.class, ()-> userService.addInterestTag(1L,1L));
     }
 
 }

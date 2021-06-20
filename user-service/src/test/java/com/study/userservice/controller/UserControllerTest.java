@@ -314,12 +314,12 @@ class UserControllerTest {
     @DisplayName("회원 지역 정보 변경 API")
     void updateLocation() throws Exception {
         // given
-        given(userService.updateLocation(any(),any()))
+        given(userService.updateLocation(any(), any()))
                 .willReturn(TEST_USER_RESPONSE2);
 
         // when
-        mockMvc.perform(patch("/users/locations/{locationId}",2)
-        .header(HttpHeaders.AUTHORIZATION,TEST_AUTHORIZATION))
+        mockMvc.perform(patch("/users/locations/{locationId}", 2)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
                 .andDo(document("user/location/update",
                         requestHeaders(
@@ -343,6 +343,30 @@ class UserControllerTest {
                 ));
 
         // then
-        then(userService).should(times(1)).updateLocation(any(),any());
+        then(userService).should(times(1)).updateLocation(any(), any());
+    }
+
+    @Test
+    @DisplayName("회원 관심 주제 추가 API")
+    void addInterestTag() throws Exception {
+        // given
+        willDoNothing()
+                .given(userService)
+                .addInterestTag(1L, 2L);
+
+        mockMvc.perform(post("/users/tags/{tagId}", 2)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
+                .andExpect(status().isOk())
+                .andDo(document("user/tag/create",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access 토큰")
+                        ),
+                        pathParameters(
+                                parameterWithName("tagId").description("추가할 태그 ID")
+                        )
+                ));
+
+        // then
+        then(userService).should(times(1)).addInterestTag(any(),any());
     }
 }

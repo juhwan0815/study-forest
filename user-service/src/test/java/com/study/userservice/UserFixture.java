@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class UserFixture {
@@ -58,7 +59,7 @@ public class UserFixture {
 
     public static User createTestUser(){
         return new User(1L,1L,1L,"황주환","10~19","male",2,
-                TEST_Image, UserRole.USER,null,null);
+                TEST_Image, UserRole.USER,new ArrayList<>(),new ArrayList<>());
     }
 
 

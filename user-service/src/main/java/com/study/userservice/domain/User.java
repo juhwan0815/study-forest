@@ -1,5 +1,6 @@
 package com.study.userservice.domain;
 
+import com.study.userservice.exception.UserException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -68,8 +69,18 @@ public class User extends BaseEntity{
         this.locationId = locationId;
     }
 
-    public void addInterestTag(Long tagId,String tagName){
-        InterestTag interestTag = InterestTag.createInterestTag(tagId, tagName, this);
+    public void checkExistTag(Long tagId) {
+        boolean checkTagResult = interestTags.stream()
+                .anyMatch(interestTag -> interestTag.getTagId().equals(tagId));
+
+
+        if(checkTagResult){
+            throw new UserException("이미 관심 주제로 추가한 태그 입니다.");
+        }
+    }
+
+    public void addInterestTag(Long tagId){
+        InterestTag interestTag = InterestTag.createInterestTag(tagId, this);
         interestTags.add(interestTag);
     }
 
@@ -120,4 +131,5 @@ public class User extends BaseEntity{
             }
         }
     }
+
 }

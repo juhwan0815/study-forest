@@ -1,12 +1,17 @@
 package com.study.userservice.repository.query;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.study.userservice.domain.QInterestTag;
+import com.study.userservice.domain.QUser;
 import com.study.userservice.domain.User;
+import com.study.userservice.exception.UserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.study.userservice.domain.QInterestTag.*;
+import static com.study.userservice.domain.QUser.*;
 import static com.study.userservice.domain.QUser.user;
 
 @Repository
@@ -20,6 +25,20 @@ public class UserQueryRepository {
                 .selectFrom(user)
                 .where(user.id.in(userIdList))
                 .fetch();
+    }
+
+    public User findWithInterestTagById(Long userId){
+        User findUser = queryFactory
+                .selectFrom(user)
+                .leftJoin(user.interestTags, interestTag).fetchJoin()
+                .where(user.id.eq(userId))
+                .fetchOne();
+
+        if(findUser == null){
+            throw new UserException(userId + "는 존재하지 않는 회원 ID 입니다.");
+        }
+
+        return findUser;
     }
 
 }

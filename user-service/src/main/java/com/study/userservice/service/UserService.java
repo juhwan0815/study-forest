@@ -21,4 +21,6 @@ public interface UserService {
     List<UserResponse> findByIdIn(UserFindRequest request);
 
     UserResponse updateLocation(Long userId, Long locationId);
+
+    void addInterestTag(Long userId, Long tagId);
 }

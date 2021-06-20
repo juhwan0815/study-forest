@@ -149,6 +149,16 @@ public class UserServiceImpl implements UserService {
         return UserResponse.from(findUser);
     }
 
+    // 1
+    @Override
+    @Transactional
+    public void addInterestTag(Long userId, Long tagId) {
+        User findUser = userQueryRepository.findWithInterestTagById(userId);
+
+        findUser.checkExistTag(tagId);
+        findUser.addInterestTag(tagId);
+    }
+
     private Image uploadImageToS3(MultipartFile image) {
         String imageStoreName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
 
