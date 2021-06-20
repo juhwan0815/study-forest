@@ -5,7 +5,7 @@
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.6.1">
-<title>스터디 서비스 API</title>
+<title>스터디 서비스 - 스터디 API</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
@@ -428,7 +428,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="location toc2 toc-left">
 <div id="header">
-<h1>스터디 서비스 API</h1>
+<h1>스터디 서비스 - 스터디 API</h1>
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel3">
@@ -495,6 +495,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_스터디_탈퇴_api">11. 스터디 탈퇴 API</a>
 <ul class="sectlevel4">
 <li><a href="#_요청_11">요청</a></li>
+<li><a href="#_응답_11">응답</a></li>
 </ul>
 </li>
 </ul>
@@ -2015,13 +2016,73 @@ Vary: Access-Control-Request-Headers</code></pre>
 <h4 id="_스터디_탈퇴_api"><a class="anchor" href="#_스터디_탈퇴_api"></a><a class="link" href="#_스터디_탈퇴_api">11. 스터디 탈퇴 API</a></h4>
 <div class="sect4">
 <h5 id="_요청_11"><a class="anchor" href="#_요청_11"></a><a class="link" href="#_요청_11">요청</a></h5>
-
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /studies/2/users HTTP/1.1
+Authorization: Bearer 액세스토큰
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_header_10"><a class="anchor" href="#_header_10"></a><a class="link" href="#_header_10">Header</a></h6>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Access Token</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="_path_9"><a class="anchor" href="#_path_9"></a><a class="link" href="#_path_9">Path</a></h6>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 9. /studies/{studyId}/users</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>studyId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 ID</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_응답_11"><a class="anchor" href="#_응답_11"></a><a class="link" href="#_응답_11">응답</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Vary: Origin
+Vary: Access-Control-Request-Method
+Vary: Access-Control-Request-Headers</code></pre>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-06-20 15:29:21 KST
+Last updated 2021-06-20 17:45:58 KST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">

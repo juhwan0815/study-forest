@@ -1,0 +1,27 @@
+:basedir: {docdir}/../../../
+:snippets: {basedir}/build/generated-snippets
+
+= 스터디 서비스 - 태그 API
+:doctype: location
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectnums:
+:sectlinks:
+:sectanchors:
+
+스터디 서비스 요청 URL
+
+Gateway-service 주소 : 포트 + /study-service
+
+[[api]]
+==== 태그 검색 API
+===== 요청
+include::{snippets}/tag/find/http-request.adoc[]
+====== Param
+include::{snippets}/tag/find/request-parameters.adoc[]
+===== 응답
+include::{snippets}/tag/find/http-response.adoc[]
+====== Body
+include::{snippets}/tag/find/response-fields.adoc[]

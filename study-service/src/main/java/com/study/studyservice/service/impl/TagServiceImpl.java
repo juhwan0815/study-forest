@@ -1,10 +1,14 @@
 package com.study.studyservice.service.impl;
 
 import com.study.studyservice.domain.Tag;
+import com.study.studyservice.model.tag.TagResponse;
+import com.study.studyservice.model.tag.TagSearchRequest;
 import com.study.studyservice.repository.TagRepository;
 import com.study.studyservice.service.TagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,5 +45,11 @@ public class TagServiceImpl implements TagService {
         });
 
         return findTags;
+    }
+
+    @Override
+    public Page<TagResponse> findLikeName(Pageable pageable, TagSearchRequest request) {
+        Page<Tag> tags = tagRepository.findByNameContaining(pageable, request.getName());
+        return tags.map(tag -> TagResponse.from(tag));
     }
 }
