@@ -120,3 +120,23 @@ include::{snippets}/study/studyUser/find/path-parameters.adoc[]
 include::{snippets}/study/studyUser/find/http-response.adoc[]
 ====== Body
 include::{snippets}/study/studyUser/find/response-fields.adoc[]
+
+==== 스터디 참가 인원 삭제 API
+===== 요청
+include::{snippets}/study/studyUser/delete/http-request.adoc[]
+====== Header
+include::{snippets}/study/studyUser/delete/request-headers.adoc[]
+====== Path
+include::{snippets}/study/studyUser/delete/path-parameters.adoc[]
+===== 응답
+include::{snippets}/study/studyUser/delete/http-response.adoc[]
+
+==== 스터디 탈퇴 API
+===== 요청
+include::{snippets}/study/studyUser/deleteSelf/http-request.adoc[]
+====== Header
+include::{snippets}/study/studyUser/deleteSelf/request-headers.adoc[]
+====== Path
+include::{snippets}/study/studyUser/deleteSelf/path-parameters.adoc[]
+===== 응답
+include::{snippets}/study/studyUser/deleteSelf/http-response.adoc[]

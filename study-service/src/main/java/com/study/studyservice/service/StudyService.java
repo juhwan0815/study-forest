@@ -29,4 +29,8 @@ public interface StudyService {
 
     List<StudyUserResponse> findStudyUsersByStudyId(Long studyId);
 
+    void deleteStudyUser(Long loginUserId, Long studyId, Long userId);
+
+    void deleteStudyUserSelf(Long userId, Long studyId);
+
 }

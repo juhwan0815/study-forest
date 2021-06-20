@@ -33,6 +33,7 @@ import java.util.Optional;
 
 import static com.study.studyservice.fixture.CategoryFixture.*;
 import static com.study.studyservice.fixture.StudyFixture.*;
+import static com.study.studyservice.fixture.StudyFixture.createTestCloseStudy;
 import static com.study.studyservice.fixture.TagFixture.*;
 import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -582,5 +583,91 @@ class StudyServiceTest {
         // then
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get(0).getUserId()).isEqualTo(TEST_USER_RESPONSE3.getId());
+    }
+
+    @Test
+    @DisplayName("스터디 참가 인원을 삭제한다.")
+    void deleteStudyUser(){
+        // given
+        Study study = createTestCloseStudy();
+        given(studyQueryRepository.findWithStudyUsersById(any()))
+                .willReturn(study);
+
+        // when
+        studyService.deleteStudyUser(1L,1L,4L);
+
+        // then
+        assertThat(study.getStudyUsers().size()).isEqualTo(1);
+        assertThat(study.getCurrentNumberOfPeople()).isEqualTo(1);
+        then(studyQueryRepository).should(times(1)).findWithStudyUsersById(any());
+    }
+
+    @Test
+    @DisplayName("예외 테스트 : 스터디 관리자가 아닌 유저가 스터디 회원을 삭제할 경우 예외가 발생한다.")
+    void deleteStudyUserWhenNotAdmin(){
+        // given
+        given(studyQueryRepository.findWithStudyUsersById(any()))
+                .willReturn(createTestCloseStudy());
+
+        // when
+        assertThrows(StudyException.class,()->studyService.deleteStudyUser(2L,1L,4L));
+    }
+
+    @Test
+    @DisplayName("예외 테스트 : 스터디 참여 인원에 삭제할 회원이 없을 경우 예외가 발생한다.")
+    void deleteStudyUserWhenNotExistStudyUser(){
+        given(studyQueryRepository.findWithStudyUsersById(any()))
+                .willReturn(createTestCloseStudy());
+
+        // when
+        assertThrows(StudyException.class,()->studyService.deleteStudyUser(1L,1L,5L));
+    }
+
+    @Test
+    @DisplayName("예외 테스트 : 스터디 관리자 회원을 스터디 참여 인원에서 삭제할 경우 예외가 발생한다.")
+    void deleteStudyAdminUser(){
+        given(studyQueryRepository.findWithStudyUsersById(any()))
+                .willReturn(createTestCloseStudy());
+
+        // when
+        assertThrows(StudyException.class,()->studyService.deleteStudyUser(1L,1L,1L));
+    }
+
+    @Test
+    @DisplayName("스터디 참가 인원이 스터디에서 탈퇴한다.")
+    void deleteStudyUserSelf(){
+        // given
+        Study study = createTestCloseStudy();
+        given(studyQueryRepository.findWithStudyUsersById(any()))
+                .willReturn(study);
+
+        // when
+        studyService.deleteStudyUserSelf(4L,1L);
+
+        // then
+        assertThat(study.getStudyUsers().size()).isEqualTo(1);
+        assertThat(study.getCurrentNumberOfPeople()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("예외 테스트 : 스터디 관리자가 스터디를 탈퇴할 경우 예외가 발생한다.")
+    void deleteStudyAdminUserSelf(){
+        // given
+        given(studyQueryRepository.findWithStudyUsersById(any()))
+                .willReturn(createTestCloseStudy());
+
+        // when
+        assertThrows(StudyException.class, ()->studyService.deleteStudyUserSelf(1L,1L));
+    }
+
+    @Test
+    @DisplayName("예외 테스트 : 스터디 참가 인원이 스터디 현재 인원에 존재하지 않을 경우 예외가 발생한다.")
+    void deleteStudyUserWhenNotExist(){
+        // given
+        given(studyQueryRepository.findWithStudyUsersById(any()))
+                .willReturn(createTestCloseStudy());
+
+        // when
+        assertThrows(StudyException.class, ()->studyService.deleteStudyUserSelf(2L,1L));
     }
 }

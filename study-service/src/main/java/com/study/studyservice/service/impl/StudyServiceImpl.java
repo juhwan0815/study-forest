@@ -279,6 +279,23 @@ public class StudyServiceImpl implements StudyService {
         return studyUserResponses;
     }
 
+    @Override
+    @Transactional
+    public void deleteStudyUser(Long loginUserId, Long studyId, Long userId) {
+        Study findStudy = studyQueryRepository.findWithStudyUsersById(studyId);
+
+        findStudy.checkStudyAdmin(loginUserId);
+        findStudy.deleteStudyUser(userId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteStudyUserSelf(Long userId, Long studyId) {
+        Study findStudy = studyQueryRepository.findWithStudyUsersById(studyId);
+
+        findStudy.deleteStudyUser(userId);
+    }
+
     private LocationResponse getLocation(boolean offline, String locationCode) {
         LocationResponse location = null;
         if (offline) {

@@ -10,7 +10,6 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 @Entity
 @Getter
@@ -183,7 +182,20 @@ public class Study extends BaseEntity {
         WaitUser findWaitUser = waitUsers.stream()
                 .filter(waitUser -> waitUser.getUserId().equals(userId))
                 .findFirst().orElseThrow(()-> new StudyException(userId + "는 스터디 참가 대기 인원에 존재하지 않는 회원 ID 입니다."));
+
         waitUsers.remove(findWaitUser);
     }
 
+    public void deleteStudyUser(Long userId) {
+        StudyUser findStudyUser = studyUsers.stream()
+                .filter(studyUser -> studyUser.getUserId().equals(userId))
+                .findFirst().orElseThrow(() -> new StudyException(userId + "는 스터디 참가 인원에 존재하지 않는 회원 ID 입니다."));
+
+        if (findStudyUser.getRole().equals(Role.ADMIN)){
+            throw new StudyException("스터디 관리자는 스터디를 탈퇴할 수 없습니다.");
+        }
+
+        studyUsers.remove(findStudyUser);
+        this.currentNumberOfPeople -= 1;
+    }
 }

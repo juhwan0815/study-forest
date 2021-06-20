@@ -31,7 +31,7 @@ class StudyTest {
     }
 
     @Test
-    @DisplayName("스터디 참가자수와 스터디의 정원이 같으면 스터디의 상태가 CLOSE로 변경된다.")
+    @DisplayName("스터디 참가자수와 스터디의 정원이 같으면 스터디의 상태가 CLOSE 로 변경된다.")
     void addStudyUserStatusClose(){
         // given
         Study study = Study.createStudy("테스트 스터디", 2, "테스트 스터디입니다.",
@@ -152,7 +152,7 @@ class StudyTest {
     @Test
     @DisplayName("스터디의 태그를 수정한다.")
     void updateStudyTags(){
-        // given
+        // givene
         Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
                 true, true, null);
 
@@ -225,4 +225,70 @@ class StudyTest {
         // when
         assertThrows(StudyException.class,()->study.checkExistWaitUserAndStudyUser(1L));
     }
+
+    @Test
+    @DisplayName("스터디 대기 인원을 삭제한다.")
+    void deleteWaitUser(){
+        // given
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
+        study.addWaitUser(1L);
+
+        // when
+        study.deleteWaitUser(1L);
+
+        // then
+        assertThat(study.getWaitUsers().size()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("예외테스트 : 스터디 참가 대기 인원에 삭제할 스터디 참가 대기 인원이 없을 경우 예외가 발생한다.")
+    void deleteWaitUserWhenNotExitWaitUser(){
+        // given
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
+
+        // when
+        assertThrows(StudyException.class,()->study.deleteWaitUser(1L));
+    }
+
+    @Test
+    @DisplayName("스터디 참가 인원을 삭제한다.")
+    void deleteStudyUser(){
+        // given
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
+        study.addStudyUser(1L,Role.USER);
+
+        // when
+        study.deleteStudyUser(1L);
+
+        // then
+        assertThat(study.getStudyUsers().size()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("예외테스트 : 스터디 관리자를 스터디 참가 인원에서 삭제할 경우 예외가 발생한다.")
+    void deleteStudyUserAdmin(){
+        // given
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
+        study.addStudyUser(1L,Role.ADMIN);
+
+        // when
+        assertThrows(StudyException.class,()->study.deleteStudyUser(1L));
+    }
+
+    @Test
+    @DisplayName("예외테스트 : 스터디 참가 인원에 삭제할 스터디 참가 인원이 없을 경우 예외가 발생한다.")
+    void deleteStudyUserWhenNotExistStudyUser(){
+        // given
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
+
+        // when
+        assertThrows(StudyException.class,()->study.deleteStudyUser(1L));
+    }
+
+
 }

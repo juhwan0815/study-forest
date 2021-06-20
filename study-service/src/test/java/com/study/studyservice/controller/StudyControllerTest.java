@@ -461,5 +461,60 @@ class StudyControllerTest {
         then(studyService).should(times(1)).findStudyUsersByStudyId(any());
     }
 
+    @Test
+    @DisplayName("스터디 참가 회원 삭제 API 테스트")
+    void deleteStudyUser() throws Exception{
+        willDoNothing()
+                .given(studyService)
+                .deleteStudyUser(any(),any(),any());
+
+        given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(1L);
+
+        mockMvc.perform(RestDocumentationRequestBuilders
+                .delete("/studies/{studyId}/users/{userId}", 1,2)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
+                .andExpect(status().isOk())
+                .andDo(document("study/studyUser/delete",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("studyId").description("스터디 ID"),
+                                parameterWithName("userId").description("스터디 참가 회원 목록의 회원 ID")
+                        )
+                ));
+
+        then(studyService).should(times(1)).deleteStudyUser(any(),any(),any());
+    }
+
+    @Test
+    @DisplayName("스터디 탈퇴 API 테스트")
+    void deleteStudyUserSelf() throws Exception{
+        willDoNothing()
+                .given(studyService)
+                .deleteStudyUserSelf(any(),any());
+
+        given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(1L);
+
+        mockMvc.perform(RestDocumentationRequestBuilders
+                .delete("/studies/{studyId}/users", 2)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
+                .andExpect(status().isOk())
+                .andDo(document("study/studyUser/deleteSelf",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("studyId").description("스터디 ID")
+                        )
+                ));
+
+        then(studyService).should(times(1)).deleteStudyUserSelf(any(),any());
+    }
+
+
+
 
 }

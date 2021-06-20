@@ -1,7 +1,6 @@
 package com.study.studyservice.controller;
 
 import com.study.studyservice.config.LoginUser;
-import com.study.studyservice.domain.WaitUser;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
@@ -83,5 +82,19 @@ public class StudyController {
     public ResponseEntity<List<StudyUserResponse>> findStudyUsersByStudyId(@PathVariable Long studyId){
         return ResponseEntity.ok(studyService.findStudyUsersByStudyId(studyId));
     }
+
+    @DeleteMapping("/studies/{studyId}/users/{userId}")
+    public ResponseEntity<Void> deleteStudyUser(@LoginUser Long loginUserId,
+                                                @PathVariable Long studyId, @PathVariable Long userId){
+        studyService.deleteStudyUser(loginUserId,studyId,userId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/studies/{studyId}/users")
+    public ResponseEntity<Void> deleteStudyUserSelf(@LoginUser Long userId,@PathVariable Long studyId){
+        studyService.deleteStudyUserSelf(userId,studyId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 
 }

@@ -137,16 +137,18 @@ public class StudyFixture {
 
     public static Study createTestCloseStudy(){
         Study study = new Study(1L,
-                "테스트 스터디", 5, 1, "테스트 스터디 입니다.",
+                "테스트 스터디", 5, 2, "테스트 스터디 입니다.",
                 true, true, StudyStatus.CLOSE, TEST_IMAGE, 1L, TEST_CATEGORY2,
                 new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
         study.getStudyTags().add(new StudyTag(1L,study,TEST_TAG1));
         study.getStudyTags().add(new StudyTag(2L,study,TEST_TAG2));
         study.getStudyUsers().add(new StudyUser(1L,1L,Role.ADMIN,study));
+        study.getStudyUsers().add(new StudyUser(1L,4L,Role.USER,study));
         study.getWaitUsers().add(new WaitUser(1L,3L,study));
         study.getWaitUsers().add(new WaitUser(2L,2L,study));
         return study;
     }
+
 
 
 
