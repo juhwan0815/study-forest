@@ -49,6 +49,10 @@ kafka:
   topic:
     user:
       delete: user-delete-topic
+    studyApply:
+      create: study-apply-create-topic
+      success: study-apply-success-topic
+      fail: study-apply-fail-topic
 
 
 management:

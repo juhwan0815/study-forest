@@ -160,7 +160,6 @@ class UserServiceTest {
         given(userRepository.findById(anyLong()))
                 .willReturn(Optional.of(user));
 
-
         // when
         UserResponse userResponse = userService.updateProfile(1L,TEST_EMPTY_IMAGE_FILE,
                 TEST_USER_PROFILE_UPDATE_REQUEST1);
