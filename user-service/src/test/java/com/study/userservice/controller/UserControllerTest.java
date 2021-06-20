@@ -314,12 +314,11 @@ class UserControllerTest {
     @DisplayName("회원 지역 정보 변경 API")
     void updateLocation() throws Exception {
         // given
-        willDoNothing()
-                .given(userService)
-                .updateLocation(any(),any());
+        given(userService.updateLocation(any(),any()))
+                .willReturn(TEST_USER_RESPONSE2);
 
         // when
-        mockMvc.perform(patch("/users/locations/{locationId}",1)
+        mockMvc.perform(patch("/users/locations/{locationId}",2)
         .header(HttpHeaders.AUTHORIZATION,TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
                 .andDo(document("user/location/update",
@@ -328,6 +327,18 @@ class UserControllerTest {
                         ),
                         pathParameters(
                                 parameterWithName("locationId").description("변경할 지역정보 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("회원 ID"),
+                                fieldWithPath("kakaoId").type(JsonFieldType.NUMBER).description("카카오 ID"),
+                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                fieldWithPath("image").type(JsonFieldType.OBJECT).description("회원 이미지 정보"),
+                                fieldWithPath("image.profileImage").type(JsonFieldType.STRING).description("회원 프로필 이미지 URL"),
+                                fieldWithPath("image.thumbnailImage").type(JsonFieldType.STRING).description("회원 프로필 썸네일 이미지 URL"),
+                                fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
+                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
+                                fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
+                                fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID")
                         )
                 ));
 

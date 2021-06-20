@@ -20,5 +20,5 @@ public interface UserService {
 
     List<UserResponse> findByIdIn(UserFindRequest request);
 
-    void updateLocation(Long userId, Long locationId);
+    UserResponse updateLocation(Long userId, Long locationId);
 }

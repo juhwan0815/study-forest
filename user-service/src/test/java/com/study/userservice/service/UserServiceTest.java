@@ -252,10 +252,10 @@ class UserServiceTest {
                 .willReturn(Optional.of(user));
 
         // when
-        userService.updateLocation(1L,2L);
+        UserResponse result = userService.updateLocation(1L, 2L);
 
         // then
-        assertThat(user.getLocationId()).isEqualTo(2L);
+        assertThat(result.getLocationId()).isEqualTo(2L);
     }
 
 }

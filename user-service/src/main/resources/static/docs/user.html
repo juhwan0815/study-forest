@@ -1321,7 +1321,7 @@ Content-Length: 506
 <h5 id="_요청_7"><a class="anchor" href="#_요청_7"></a><a class="link" href="#_요청_7">요청</a></h5>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PATCH /users/locations/1 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PATCH /users/locations/2 HTTP/1.1
 Authorization: Bearer 액세스토큰
 Host: localhost:8080</code></pre>
 </div>
@@ -1377,7 +1377,23 @@ Host: localhost:8080</code></pre>
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Vary: Origin
 Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers</code></pre>
+Vary: Access-Control-Request-Headers
+Content-Type: application/json;charset=utf-8
+Content-Length: 250
+
+{
+  "id" : 2,
+  "kakaoId" : 2,
+  "nickName" : "황철원",
+  "image" : {
+    "thumbnailImage" : "썸네일 이미지",
+    "profileImage" : "이미지"
+  },
+  "gender" : "male",
+  "ageRange" : "10~19",
+  "numberOfStudyApply" : 3,
+  "locationId" : 2
+}</code></pre>
 </div>
 </div>
 </div>

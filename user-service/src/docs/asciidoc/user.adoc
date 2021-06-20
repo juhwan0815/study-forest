@@ -91,3 +91,5 @@ include::{snippets}/user/location/update/request-headers.adoc[]
 include::{snippets}/user/location/update/path-parameters.adoc[]
 ===== 응답
 include::{snippets}/user/location/update/http-response.adoc[]
+====== Body
+include::{snippets}/user/location/update/response-fields.adoc[]
