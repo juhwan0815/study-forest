@@ -50,7 +50,7 @@ class UserTest {
     }
 
     @Test
-    @DisplayName("예외 테스트 : 이미 관심주제에 존재하는 태그를 추가할 경우 예외가 발생한다.")
+    @DisplayName("예외 테스트 : 이미 관심태그에 존재하는 태그를 추가할 경우 예외가 발생한다.")
     void checkExistTag(){
         // given
         User user = User.createUser(1L,"황주환","10~19","male", UserRole.USER);
@@ -61,7 +61,7 @@ class UserTest {
     }
 
     @Test
-    @DisplayName("관심 주제에 태그를 추가한다.")
+    @DisplayName("관심 태그에 태그를 추가한다.")
     void addInterestTag(){
         // given
         User user = User.createUser(1L,"황주환","10~19","male", UserRole.USER);
@@ -72,5 +72,29 @@ class UserTest {
         // then
         assertThat(user.getInterestTags().size()).isEqualTo(1);
         assertThat(user.getInterestTags().get(0).getTagId()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("관심 태그를 삭제한다.")
+    void deleteInterestTag(){
+        // given
+        User user = User.createUser(1L,"황주환","10~19","male", UserRole.USER);
+        user.addInterestTag(1L);
+
+        // when
+        user.deleteInterestTag(1L);
+
+        // then
+        assertThat(user.getInterestTags().size()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("예외 테스트 : 관심 태그 목록에 존재하지 않는 태그를 삭제할 경우 예외가 발생한다.")
+    void deleteInterestTagWhenNotExist(){
+        // given
+        User user = User.createUser(1L,"황주환","10~19","male", UserRole.USER);
+
+        // when
+        assertThrows(UserException.class,()->user.deleteInterestTag(1L));
     }
 }

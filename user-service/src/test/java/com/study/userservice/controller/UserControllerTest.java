@@ -352,7 +352,7 @@ class UserControllerTest {
         // given
         willDoNothing()
                 .given(userService)
-                .addInterestTag(1L, 2L);
+                .addInterestTag(any(), any());
 
         mockMvc.perform(post("/users/tags/{tagId}", 2)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
@@ -368,5 +368,29 @@ class UserControllerTest {
 
         // then
         then(userService).should(times(1)).addInterestTag(any(),any());
+    }
+
+    @Test
+    @DisplayName("회원 관심 주제 삭제 API 테스트")
+    void deleteInterestTag() throws Exception {
+        // given
+        willDoNothing()
+                .given(userService)
+                .deleteInterestTag(any(), any());
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/users/tags/{tagId}", 2)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
+                .andExpect(status().isOk())
+                .andDo(document("user/tag/delete",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access 토큰")
+                        ),
+                        pathParameters(
+                                parameterWithName("tagId").description("삭제할 태그 ID")
+                        )
+                ));
+
+        // then
+        then(userService).should(times(1)).deleteInterestTag(any(),any());
     }
 }

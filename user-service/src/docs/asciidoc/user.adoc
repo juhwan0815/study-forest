@@ -103,3 +103,13 @@ include::{snippets}/user/tag/create/request-headers.adoc[]
 include::{snippets}/user/tag/create/path-parameters.adoc[]
 ===== 응답
 include::{snippets}/user/tag/create/http-response.adoc[]
+
+==== 회원 관심 태그 삭제 API
+===== 요청
+include::{snippets}/user/tag/delete/http-request.adoc[]
+====== Header
+include::{snippets}/user/tag/delete/request-headers.adoc[]
+====== Path
+include::{snippets}/user/tag/delete/path-parameters.adoc[]
+===== 응답
+include::{snippets}/user/tag/delete/http-response.adoc[]

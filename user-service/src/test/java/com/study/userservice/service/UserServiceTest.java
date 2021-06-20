@@ -261,7 +261,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("회원의 관심 주제를 추가한다.")
+    @DisplayName("회원의 관심 태그를 추가한다.")
     void addInterestTag(){
         // given
         User user = createTestUser();
@@ -277,7 +277,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("예외 테스트 : 이미 존재하는 관심주제를 중복으로 추가하면 예외가 발생한다.")
+    @DisplayName("예외 테스트 : 이미 존재하는 관심태그를 중복으로 추가하면 예외가 발생한다.")
     void addDuplicatedInterestTag(){
         // given
         User user = createTestUser();
@@ -290,4 +290,33 @@ class UserServiceTest {
         assertThrows(UserException.class, ()-> userService.addInterestTag(1L,1L));
     }
 
+    @Test
+    @DisplayName("회원의 관심태그를 삭제한다.")
+    void deleteInterestTag(){
+        // given
+        User user = createTestUser();
+        user.addInterestTag(1L);
+
+        given(userQueryRepository.findWithInterestTagById(any()))
+                .willReturn(user);
+
+        // when
+        userService.deleteInterestTag(1L,1L);
+
+        // then
+        assertThat(user.getInterestTags().size()).isEqualTo(0);
+        then(userQueryRepository).should(times(1)).findWithInterestTagById(any());
+    }
+
+    @Test
+    @DisplayName("예외테스트 : 회원의 관심 태그 목록에 존재하지 않는 태그를 삭제할 경우 예외가 발생한다.")
+    void deleteInterestTagWhenNotExist(){
+        // given
+        User user = createTestUser();
+        given(userQueryRepository.findWithInterestTagById(any()))
+                .willReturn(user);
+
+        // when
+        assertThrows(UserException.class,()->userService.deleteInterestTag(1L,1L));
+    }
 }

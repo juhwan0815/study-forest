@@ -84,14 +84,13 @@ public class User extends BaseEntity{
         interestTags.add(interestTag);
     }
 
-    public void deleteInterestTag(Long interestTagId){
-        Optional<InterestTag> filterResult = interestTags.stream()
-                .filter(interestTag -> interestTag.getId().equals(interestTagId))
-                .findFirst();
+    // 1
+    public void deleteInterestTag(Long tagId){
+        InterestTag findInterestTag = interestTags.stream()
+                .filter(interestTag -> interestTag.getTagId().equals(tagId))
+                .findFirst().orElseThrow(() -> new UserException("존재하지 않는 관심 태그입니다."));
 
-        InterestTag interestTag = filterResult.get();
-
-        interestTags.remove(interestTag);
+        interestTags.remove(findInterestTag);
     }
 
     public void addStudyApply(Long studyId,String studyName) {

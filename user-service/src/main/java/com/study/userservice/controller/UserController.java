@@ -68,6 +68,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @DeleteMapping("/users/tags/{tagId}")
+    public ResponseEntity<Void> deleteInterestTag(@LoginUser Long userId,@PathVariable Long tagId){
+        userService.deleteInterestTag(userId,tagId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 
 
 

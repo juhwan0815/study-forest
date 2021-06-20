@@ -149,7 +149,6 @@ public class UserServiceImpl implements UserService {
         return UserResponse.from(findUser);
     }
 
-    // 1
     @Override
     @Transactional
     public void addInterestTag(Long userId, Long tagId) {
@@ -157,6 +156,14 @@ public class UserServiceImpl implements UserService {
 
         findUser.checkExistTag(tagId);
         findUser.addInterestTag(tagId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteInterestTag(Long userId, Long tagId) {
+        User findUser = userQueryRepository.findWithInterestTagById(userId);
+
+        findUser.deleteInterestTag(tagId);
     }
 
     private Image uploadImageToS3(MultipartFile image) {

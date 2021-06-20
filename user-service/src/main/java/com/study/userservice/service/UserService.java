@@ -23,4 +23,7 @@ public interface UserService {
     UserResponse updateLocation(Long userId, Long locationId);
 
     void addInterestTag(Long userId, Long tagId);
+
+    void deleteInterestTag(Long userId, Long tagId);
+
 }
