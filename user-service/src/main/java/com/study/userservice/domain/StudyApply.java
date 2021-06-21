@@ -20,8 +20,6 @@ public class StudyApply extends BaseEntity{
 
     private Long studyId;
 
-    private String studyName;
-
     @Enumerated(EnumType.STRING)
     private StudyApplyStatus status;
 
@@ -29,10 +27,9 @@ public class StudyApply extends BaseEntity{
     @JoinColumn(name = "user_id")
     private User user;
 
-    public static StudyApply createStudyApply(Long studyId, String studyName,User user){
+    public static StudyApply createStudyApply(Long studyId,User user){
         StudyApply studyApply = new StudyApply();
         studyApply.studyId = studyId;
-        studyApply.studyName = studyName;
         studyApply.user = user;
         studyApply.status = StudyApplyStatus.WAIT;
         return studyApply;

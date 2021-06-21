@@ -2,6 +2,7 @@ package com.study.userservice.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.study.userservice.client.StudyServiceClient;
+import com.study.userservice.domain.StudyApplyStatus;
 import com.study.userservice.domain.User;
 import com.study.userservice.exception.UserException;
 import com.study.userservice.kafka.sender.UserDeleteMessageSender;
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import scala.Array;
+
 
 import java.net.URL;
 import java.util.Arrays;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.study.userservice.UserFixture.*;
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -347,4 +349,62 @@ class UserServiceTest {
         then(userQueryRepository).should(times(1)).findWithInterestTagById(any());
         then(studyServiceClient).should(times(1)).findTagsByIdIn(any());
     }
+
+    @Test
+    @DisplayName("회원의 스터디 참가 신청 이력을 추가한다.")
+    void createStudyApply(){
+        // given
+        User user = createTestUser();
+        given(userRepository.findById(any()))
+                .willReturn(Optional.of(user));
+
+        // when
+        userService.createStudyApply(TEST_STUDY_APPLY_CREATE_MESSAGE);
+
+        // then
+        assertThat(user.getNumberOfStudyApply()).isEqualTo(1);
+        assertThat(user.getStudyApplies().size()).isEqualTo(1);
+        assertThat(user.getStudyApplies().get(0).getStudyId()).isEqualTo(TEST_STUDY_APPLY_CREATE_MESSAGE.getStudyId());
+        assertThat(user.getStudyApplies().get(0).getStatus()).isEqualTo(StudyApplyStatus.WAIT);
+
+        then(userRepository).should(times(1)).findById(any());
+    }
+
+    @Test
+    @DisplayName("회원의 스터디 참가 신청 이력을 실패로 변경한다.")
+    void failStudyApply(){
+        // given
+        User user = createTestUser2();
+        given(userQueryRepository.findWithStudyApplyById(any()))
+                .willReturn(user);
+
+        // when
+        userService.FailStudyApply(TEST_STUDY_APPLY_FAIL_MESSAGE);
+
+        // then
+        assertThat(user.getStudyApplies().size()).isEqualTo(2);
+        assertThat(user.getNumberOfStudyApply()).isEqualTo(2);
+        assertThat(user.getStudyApplies().get(0).getStatus()).isEqualTo(StudyApplyStatus.FAIL);
+        then(userQueryRepository).should(times(1)).findWithStudyApplyById(any());
+    }
+
+    @Test
+    @DisplayName("회원의 스터디 참가 신청 이력을 실패로 변경한다.")
+    void SuccessStudyApply(){
+        // given
+        User user = createTestUser2();
+        given(userQueryRepository.findWithStudyApplyById(any()))
+                .willReturn(user);
+
+        // when
+        userService.SuccessStudyApply(TEST_STUDY_APPLY_SUCCESS_MESSAGE);
+
+        // then
+        assertThat(user.getStudyApplies().size()).isEqualTo(2);
+        assertThat(user.getNumberOfStudyApply()).isEqualTo(2);
+        assertThat(user.getStudyApplies().get(0).getStatus()).isEqualTo(StudyApplyStatus.SUCCESS);
+        then(userQueryRepository).should(times(1)).findWithStudyApplyById(any());
+    }
+
+
 }

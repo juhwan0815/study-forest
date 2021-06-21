@@ -54,9 +54,53 @@ class UserQueryRepositoryTest {
         em.clear();
 
         // when
-        List<User> result = userQueryRepository.findByIdIn(Arrays.asList(1L, 2L));
+        List<User> result = userQueryRepository.findByIdIn(Arrays.asList(user1.getId(), user2.getId()));
 
         // then
         assertThat(result.size()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("회원과 관심 태그를 같이 조회한다.")
+    void findWithInterestTagsById(){
+        // given
+        User user = User.createUser(1L, "황주환", "10~19", "male", UserRole.USER);
+        user.addInterestTag(1L);
+        user.addInterestTag(2L);
+
+        userRepository.save(user);
+
+        em.flush();
+        em.clear();
+
+        // when
+        User result = userQueryRepository.findWithInterestTagById(user.getId());
+
+        // then
+        assertThat(result.getInterestTags().size()).isEqualTo(2);
+        assertThat(result.getInterestTags().get(0).getTagId()).isEqualTo(1L);
+        assertThat(result.getInterestTags().get(1).getTagId()).isEqualTo(2L);
+    }
+
+    @Test
+    @DisplayName("회원과 스터디 참가 신청 이력을 같이 조회한다.")
+    void findWithStudyAppliesById(){
+        // given
+        User user = User.createUser(1L, "황주환", "10~19", "male", UserRole.USER);
+        user.addStudyApply(1L);
+        user.addStudyApply(2L);
+
+        userRepository.save(user);
+
+        em.flush();
+        em.clear();
+
+        // when
+        User result = userQueryRepository.findWithStudyApplyById(user.getId());
+
+        // then
+        assertThat(result.getStudyApplies().size()).isEqualTo(2);
+        assertThat(result.getStudyApplies().get(0).getStudyId()).isEqualTo(2L);
+        assertThat(result.getStudyApplies().get(1).getStudyId()).isEqualTo(1L);
     }
 }

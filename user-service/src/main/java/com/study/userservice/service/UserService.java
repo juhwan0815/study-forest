@@ -1,5 +1,8 @@
 package com.study.userservice.service;
 
+import com.study.userservice.kafka.message.StudyApplyCreateMessage;
+import com.study.userservice.kafka.message.StudyApplyFailMessage;
+import com.study.userservice.kafka.message.StudyApplySuccessMessage;
 import com.study.userservice.model.interestTag.InterestTagResponse;
 import com.study.userservice.model.user.UserFindRequest;
 import com.study.userservice.model.user.UserLoginRequest;
@@ -28,4 +31,10 @@ public interface UserService {
     void deleteInterestTag(Long userId, Long tagId);
 
     List<InterestTagResponse> findInterestTagByUserId(Long userId);
+
+    void createStudyApply(StudyApplyCreateMessage studyApplyCreateMessage);
+
+    void SuccessStudyApply(StudyApplySuccessMessage studyApplySuccessMessage);
+
+    void FailStudyApply(StudyApplyFailMessage studyApplyFailMessage);
 }

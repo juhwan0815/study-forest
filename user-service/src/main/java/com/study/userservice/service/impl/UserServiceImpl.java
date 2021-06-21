@@ -9,14 +9,17 @@ import com.study.userservice.domain.Image;
 import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
 import com.study.userservice.exception.UserException;
+import com.study.userservice.kafka.message.StudyApplyCreateMessage;
+import com.study.userservice.kafka.message.StudyApplyFailMessage;
+import com.study.userservice.kafka.message.StudyApplySuccessMessage;
 import com.study.userservice.kafka.message.UserDeleteMessage;
 import com.study.userservice.kafka.sender.UserDeleteMessageSender;
 import com.study.userservice.model.interestTag.InterestTagResponse;
 import com.study.userservice.model.tag.TagResponse;
 import com.study.userservice.model.user.UserFindRequest;
 import com.study.userservice.model.user.UserLoginRequest;
-import com.study.userservice.model.user.UserUpdateProfileRequest;
 import com.study.userservice.model.user.UserResponse;
+import com.study.userservice.model.user.UserUpdateProfileRequest;
 import com.study.userservice.repository.UserRepository;
 import com.study.userservice.repository.query.UserQueryRepository;
 import com.study.userservice.service.UserService;
@@ -194,6 +197,34 @@ public class UserServiceImpl implements UserService {
 
         return interestTagResponses;
     }
+
+    @Override
+    @Transactional
+    public void createStudyApply(StudyApplyCreateMessage studyApplyCreateMessage) {
+        User findUser = userRepository.findById(studyApplyCreateMessage.getUserId())
+                .orElseThrow(()-> new UserException(studyApplyCreateMessage.getUserId() + "는 존재하지 않는 회원 ID입니다."));
+
+        findUser.addStudyApply(studyApplyCreateMessage.getStudyId());
+    }
+
+    @Override
+    @Transactional
+    public void SuccessStudyApply(StudyApplySuccessMessage studyApplySuccessMessage) {
+        User findUser = userQueryRepository
+                .findWithStudyApplyById(studyApplySuccessMessage.getUserId());
+
+        findUser.successStudyApply(studyApplySuccessMessage.getStudyId());
+    }
+
+    @Override
+    @Transactional
+    public void FailStudyApply(StudyApplyFailMessage studyApplyFailMessage) {
+        User findUser = userQueryRepository
+                .findWithStudyApplyById(studyApplyFailMessage.getUserId());
+
+        findUser.failStudyApply(studyApplyFailMessage.getStudyId());
+    }
+
 
     private Image uploadImageToS3(MultipartFile image) {
         String imageStoreName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();

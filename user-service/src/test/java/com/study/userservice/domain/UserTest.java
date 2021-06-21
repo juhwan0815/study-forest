@@ -4,6 +4,7 @@ import com.study.userservice.exception.UserException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -97,4 +98,51 @@ class UserTest {
         // when
         assertThrows(UserException.class,()->user.deleteInterestTag(1L));
     }
+
+    @Test
+    @DisplayName("스터디 참가 신청 이력을 추가한다.")
+    void addStudyApply(){
+        // given
+        User user = User.createUser(1L,"황주환","10~19","male", UserRole.USER);
+
+        // when
+        user.addStudyApply(1L);
+
+        // then
+        assertThat(user.getStudyApplies().size()).isEqualTo(1);
+        assertThat(user.getStudyApplies().get(0).getStudyId()).isEqualTo(1L);
+        assertThat(user.getStudyApplies().get(0).getStatus()).isEqualTo(StudyApplyStatus.WAIT);
+        assertThat(user.getNumberOfStudyApply()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("스터디 참가 신청 이력을 실패로 변경한다.")
+    void failStudyApply(){
+        // given
+        User user = User.createUser(1L,"황주환","10~19","male", UserRole.USER);
+        user.addStudyApply(1L);
+
+        // when
+        user.failStudyApply(1L);
+
+        // then
+        assertThat(user.getStudyApplies().size()).isEqualTo(1);
+        assertThat(user.getStudyApplies().get(0).getStatus()).isEqualTo(StudyApplyStatus.FAIL);
+    }
+
+    @Test
+    @DisplayName("스터디 참가 신청 이력을 성공으로 변경한다.")
+    void SuccessStudyApply(){
+        // given
+        User user = User.createUser(1L,"황주환","10~19","male", UserRole.USER);
+        user.addStudyApply(1L);
+
+        // when
+        user.successStudyApply(1L);
+
+        // then
+        assertThat(user.getStudyApplies().size()).isEqualTo(1);
+        assertThat(user.getStudyApplies().get(0).getStatus()).isEqualTo(StudyApplyStatus.SUCCESS);
+    }
+
 }

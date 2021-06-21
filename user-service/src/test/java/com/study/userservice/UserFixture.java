@@ -1,9 +1,9 @@
 package com.study.userservice;
 
-import com.study.userservice.domain.Image;
-import com.study.userservice.domain.InterestTag;
-import com.study.userservice.domain.User;
-import com.study.userservice.domain.UserRole;
+import com.study.userservice.domain.*;
+import com.study.userservice.kafka.message.StudyApplyCreateMessage;
+import com.study.userservice.kafka.message.StudyApplyFailMessage;
+import com.study.userservice.kafka.message.StudyApplySuccessMessage;
 import com.study.userservice.model.interestTag.InterestTagResponse;
 import com.study.userservice.model.tag.TagResponse;
 import com.study.userservice.model.user.UserFindRequest;
@@ -66,8 +66,18 @@ public class UserFixture {
     public static final InterestTagResponse TEST_INTEREST_TAG_RESPONSE1 = new InterestTagResponse(1L,1L,"스프링");
     public static final InterestTagResponse TEST_INTEREST_TAG_RESPONSE2 = new InterestTagResponse(1L,1L,"스프링");
 
+    public static final StudyApplyCreateMessage TEST_STUDY_APPLY_CREATE_MESSAGE =
+            new StudyApplyCreateMessage(1L,1L);
+
+    public static final StudyApplySuccessMessage TEST_STUDY_APPLY_SUCCESS_MESSAGE =
+            new StudyApplySuccessMessage(1L,1L);
+
+    public static final StudyApplyFailMessage TEST_STUDY_APPLY_FAIL_MESSAGE =
+            new StudyApplyFailMessage(1L,1L);
+
+
     public static User createTestUser(){
-        return new User(1L,1L,1L,"황주환","10~19","male",2,
+        return new User(1L,1L,1L,"황주환","10~19","male",0,
                 TEST_Image, UserRole.USER,new ArrayList<>(),new ArrayList<>());
     }
 
@@ -76,6 +86,9 @@ public class UserFixture {
                 TEST_Image, UserRole.USER, new ArrayList<>(), new ArrayList<>());
         user.getInterestTags().add(new InterestTag(1L,1L,user));
         user.getInterestTags().add(new InterestTag(2L,2L,user));
+        user.getStudyApplies().add(new StudyApply(2L,1L,StudyApplyStatus.WAIT,user));
+        user.getStudyApplies().add(new StudyApply(1L,1L,StudyApplyStatus.FAIL,user));
+
         return user;
     }
 

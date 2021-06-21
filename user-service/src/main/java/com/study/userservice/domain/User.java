@@ -84,7 +84,6 @@ public class User extends BaseEntity{
         interestTags.add(interestTag);
     }
 
-    // 1
     public void deleteInterestTag(Long tagId){
         InterestTag findInterestTag = interestTags.stream()
                 .filter(interestTag -> interestTag.getTagId().equals(tagId))
@@ -93,30 +92,26 @@ public class User extends BaseEntity{
         interestTags.remove(findInterestTag);
     }
 
-    public void addStudyApply(Long studyId,String studyName) {
-        StudyApply studyApply = StudyApply.createStudyApply(studyId,studyName, this);
+    public void addStudyApply(Long studyId) {
+        StudyApply studyApply = StudyApply.createStudyApply(studyId, this);
         studyApplies.add(studyApply);
+        this.numberOfStudyApply += 1;
     }
 
     public void failStudyApply(Long studyId) {
-        List<StudyApply> matchStudyApplies = studyApplies.stream()
-                .filter(studyJoin -> studyJoin.getStudyId().equals(studyId))
-                .sorted(Comparator.comparing(StudyApply::getId).reversed())
-                .collect(Collectors.toList());
+        StudyApply matchStudyApply = studyApplies.stream()
+                .filter(studyApply -> studyApply.getStudyId().equals(studyId))
+                .findFirst().get();
 
-        StudyApply studyApply = matchStudyApplies.get(0);
-
-        studyApply.fail();
+        matchStudyApply.fail();
     }
 
     public void successStudyApply(Long studyId) {
-        List<StudyApply> matchStudyApplies = studyApplies.stream()
-                .filter(studyJoin -> studyJoin.getStudyId().equals(studyId))
-                .sorted(Comparator.comparing(StudyApply::getId).reversed())
-                .collect(Collectors.toList());
+        StudyApply matchStudyApply = studyApplies.stream()
+                .filter(studyApply -> studyApply.getStudyId().equals(studyId))
+                .findFirst().get();
 
-        StudyApply studyApply = matchStudyApplies.get(0);
-        studyApply.success();
+        matchStudyApply.success();
     }
 
     public void deleteStudyApply(){
