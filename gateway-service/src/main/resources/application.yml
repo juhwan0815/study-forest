@@ -69,7 +69,27 @@ spring:
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
-            - Path=/user-service/users
+            - Path=/user-service/users/profile
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*),/$\{segment}
+            - AuthorizationHeaderFilter
+        # 회원 서비스 - 로그인 회원 관심 태그 조회 API
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/users/tags
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*),/$\{segment}
+            - AuthorizationHeaderFilter
+        # 회원 서비스 - 로그인 회원 스터디 신청 내역 조회 API
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/users/studyApply
             - Method=GET
           filters:
             - RemoveRequestHeader=Cookie
@@ -104,6 +124,7 @@ spring:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*),/$\{segment}
         # 지역정보 서비스 - 지역정보 등록 - 어드민 권한 필요
+
         # 지역정보 서비스 - 검색 API
         - id: location-service
           uri: lb://LOCATION-SERVICE
