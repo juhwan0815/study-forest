@@ -8,6 +8,7 @@ import com.study.userservice.model.user.UserLoginRequest;
 import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.model.user.UserUpdateProfileRequest;
 import com.study.userservice.service.UserService;
+import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
