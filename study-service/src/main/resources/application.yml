@@ -5,6 +5,13 @@ spring:
   application:
     name: study-service
 
+  zipkin:
+    base-url: http://127.0.0.1:9411
+    enabled: true
+  sleuth:
+    sampler:
+      probability: 1.0
+
   servlet:
     multipart:
       enabled: true
@@ -58,7 +65,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: refresh, health, beans, busrefresh
+        include: refresh, health, beans, busrefresh, info, metrics, prometheus
 
 logging:
   level:
