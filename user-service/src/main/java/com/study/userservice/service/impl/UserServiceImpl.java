@@ -15,6 +15,8 @@ import com.study.userservice.kafka.message.StudyApplySuccessMessage;
 import com.study.userservice.kafka.message.UserDeleteMessage;
 import com.study.userservice.kafka.sender.UserDeleteMessageSender;
 import com.study.userservice.model.interestTag.InterestTagResponse;
+import com.study.userservice.model.study.StudyResponse;
+import com.study.userservice.model.studyapply.StudyApplyResponse;
 import com.study.userservice.model.tag.TagResponse;
 import com.study.userservice.model.user.UserFindRequest;
 import com.study.userservice.model.user.UserLoginRequest;
@@ -58,8 +60,8 @@ public class UserServiceImpl implements UserService {
     private String thumbnailBucket;
 
     @PostConstruct
-    void init(){
-        IntStream.range(1,100)
+    void init() {
+        IntStream.range(1, 100)
                 .forEach(value -> {
                     User testUser = User.createUser(Long.valueOf(value), "황철원" + value, "10~19", "male", UserRole.USER);
                     userRepository.save(testUser);
@@ -104,7 +106,7 @@ public class UserServiceImpl implements UserService {
         return UserResponse.from(findUser);
     }
 
-    private Image updateImage(MultipartFile image,boolean deleteImage,User user) {
+    private Image updateImage(MultipartFile image, boolean deleteImage, User user) {
         Image userImage = user.getImage();
         if (deleteImage && image.isEmpty()) {
             if (userImage != null) {
@@ -189,8 +191,8 @@ public class UserServiceImpl implements UserService {
         findUser.getInterestTags().stream()
                 .forEach(interestTag -> {
                     for (TagResponse tag : tags) {
-                        if(interestTag.getTagId().equals(tag.getId())){
-                            interestTagResponses.add(InterestTagResponse.from(interestTag,tag));
+                        if (interestTag.getTagId().equals(tag.getId())) {
+                            interestTagResponses.add(InterestTagResponse.from(interestTag, tag));
                         }
                     }
                 });
@@ -202,7 +204,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void createStudyApply(StudyApplyCreateMessage studyApplyCreateMessage) {
         User findUser = userRepository.findById(studyApplyCreateMessage.getUserId())
-                .orElseThrow(()-> new UserException(studyApplyCreateMessage.getUserId() + "는 존재하지 않는 회원 ID입니다."));
+                .orElseThrow(() -> new UserException(studyApplyCreateMessage.getUserId() + "는 존재하지 않는 회원 ID입니다."));
 
         findUser.addStudyApply(studyApplyCreateMessage.getStudyId());
     }
@@ -223,6 +225,33 @@ public class UserServiceImpl implements UserService {
                 .findWithStudyApplyById(studyApplyFailMessage.getUserId());
 
         findUser.failStudyApply(studyApplyFailMessage.getStudyId());
+    }
+
+    @Override
+    @Transactional
+    public List<StudyApplyResponse> findStudyAppliesByUserId(Long userId) {
+        User findUser = userQueryRepository.findWithStudyApplyById(userId);
+
+        List<Long> studyIdList = findUser.getStudyApplies().stream()
+                .map(studyApply -> studyApply.getStudyId())
+                .collect(Collectors.toList());
+
+        List<StudyResponse> studyList = studyServiceClient.findStudiesByIdIn(studyIdList);
+
+        List<StudyApplyResponse> studyApplyResponses = new ArrayList<>();
+        findUser.getStudyApplies().stream()
+                .forEach(studyApply -> {
+                    for (StudyResponse study : studyList) {
+                        if (studyApply.getStudyId().equals(study.getId())){
+                            studyApplyResponses.add(StudyApplyResponse.from(studyApply,study));
+                            break;
+                        }
+                    }
+                });
+
+        findUser.deleteStudyApply();
+
+        return studyApplyResponses;
     }
 
 

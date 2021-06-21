@@ -7,6 +7,8 @@ import com.study.userservice.domain.User;
 import com.study.userservice.exception.UserException;
 import com.study.userservice.kafka.sender.UserDeleteMessageSender;
 import com.study.userservice.model.interestTag.InterestTagResponse;
+import com.study.userservice.model.study.StudyResponse;
+import com.study.userservice.model.studyapply.StudyApplyResponse;
 import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.repository.UserRepository;
 import com.study.userservice.repository.query.UserQueryRepository;
@@ -404,6 +406,27 @@ class UserServiceTest {
         assertThat(user.getNumberOfStudyApply()).isEqualTo(2);
         assertThat(user.getStudyApplies().get(0).getStatus()).isEqualTo(StudyApplyStatus.SUCCESS);
         then(userQueryRepository).should(times(1)).findWithStudyApplyById(any());
+    }
+
+    @Test
+    @DisplayName("회원의 스터디 참가 신청 이력을 조회한다.")
+    void findStudyAppliesByUserId(){
+        // given
+        User user = createTestUser2();
+        given(userQueryRepository.findWithStudyApplyById(any()))
+                .willReturn(user);
+
+        given(studyServiceClient.findStudiesByIdIn(any()))
+                .willReturn(Arrays.asList(TEST_STUDY_RESPONSE1));
+
+        // when
+        List<StudyApplyResponse> result = userService.findStudyAppliesByUserId(1L);
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(user.getStudyApplies().size()).isEqualTo(1);
+        then(userQueryRepository).should(times(1)).findWithStudyApplyById(any());
+        then(studyServiceClient).should(times(1)).findStudiesByIdIn(any());
     }
 
 

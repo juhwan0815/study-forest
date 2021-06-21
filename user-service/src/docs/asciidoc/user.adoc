@@ -123,3 +123,13 @@ include::{snippets}/user/tag/find/request-headers.adoc[]
 include::{snippets}/user/tag/find/http-response.adoc[]
 ====== Body
 include::{snippets}/user/tag/find/response-fields.adoc[]
+
+==== 회원 스터디 신청 내역 조회 API
+===== 요청
+include::{snippets}/user/studyApply/find/http-request.adoc[]
+====== Header
+include::{snippets}/user/studyApply/find/request-headers.adoc[]
+===== 응답
+include::{snippets}/user/studyApply/find/http-response.adoc[]
+====== Body
+include::{snippets}/user/studyApply/find/response-fields.adoc[]

@@ -5,6 +5,8 @@ import com.study.userservice.kafka.message.StudyApplyCreateMessage;
 import com.study.userservice.kafka.message.StudyApplyFailMessage;
 import com.study.userservice.kafka.message.StudyApplySuccessMessage;
 import com.study.userservice.model.interestTag.InterestTagResponse;
+import com.study.userservice.model.study.StudyResponse;
+import com.study.userservice.model.studyapply.StudyApplyResponse;
 import com.study.userservice.model.tag.TagResponse;
 import com.study.userservice.model.user.UserFindRequest;
 import com.study.userservice.model.user.UserLoginRequest;
@@ -75,6 +77,15 @@ public class UserFixture {
     public static final StudyApplyFailMessage TEST_STUDY_APPLY_FAIL_MESSAGE =
             new StudyApplyFailMessage(1L,1L);
 
+    public static final StudyResponse TEST_STUDY_RESPONSE1 = new StudyResponse(1L,"테스트 스터디1");
+    public static final StudyResponse TEST_STUDY_RESPONSE2 = new StudyResponse(2L,"테스트 스터디2");
+
+    public static final StudyApplyResponse TEST_STUDY_APPLY_RESPONSE1
+            = new StudyApplyResponse(1L,1L,"테스트 스터디1",StudyApplyStatus.FAIL);
+    public static final StudyApplyResponse TEST_STUDY_APPLY_RESPONSE2
+            = new StudyApplyResponse(2L,1L,"테스트 스터디1",StudyApplyStatus.SUCCESS);
+    public static final StudyApplyResponse TEST_STUDY_APPLY_RESPONSE3
+            = new StudyApplyResponse(3L,2L,"테스트 스터디2",StudyApplyStatus.WAIT);
 
     public static User createTestUser(){
         return new User(1L,1L,1L,"황주환","10~19","male",0,

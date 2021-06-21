@@ -145,4 +145,23 @@ class UserTest {
         assertThat(user.getStudyApplies().get(0).getStatus()).isEqualTo(StudyApplyStatus.SUCCESS);
     }
 
+    @Test
+    @DisplayName("스터디 참가 신청 이력을 삭제한다.")
+    void deleteStudyApply(){
+        // given
+        User user = User.createUser(1L,"황주환","10~19","male", UserRole.USER);
+        user.addStudyApply(1L);
+        user.addStudyApply(2L);
+        user.addStudyApply(3L);
+        user.failStudyApply(1L);
+        user.successStudyApply(3L);
+
+        // when
+        user.deleteStudyApply();
+
+        // then
+        assertThat(user.getStudyApplies().size()).isEqualTo(1);
+        assertThat(user.getStudyApplies().get(0).getStudyId()).isEqualTo(2L);
+    }
+
 }

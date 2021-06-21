@@ -24,14 +24,14 @@ public class UserQueryRepository {
 
     public List<User> findByIdIn(List<Long> userIdList){
         return queryFactory
-                .selectFrom(user)
+                .selectFrom(user).distinct()
                 .where(user.id.in(userIdList))
                 .fetch();
     }
 
     public User findWithInterestTagById(Long userId){
         User findUser = queryFactory
-                .selectFrom(user)
+                .selectFrom(user).distinct()
                 .leftJoin(user.interestTags, interestTag).fetchJoin()
                 .where(user.id.eq(userId))
                 .fetchOne();
@@ -45,7 +45,7 @@ public class UserQueryRepository {
 
     public User findWithStudyApplyById(Long userId){
         User findUser = queryFactory
-                .selectFrom(user)
+                .selectFrom(user).distinct()
                 .leftJoin(user.studyApplies, studyApply).fetchJoin()
                 .where(user.id.eq(userId))
                 .orderBy(studyApply.id.desc())

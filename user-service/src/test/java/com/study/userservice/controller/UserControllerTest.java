@@ -3,6 +3,7 @@ package com.study.userservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.userservice.config.LoginUserArgumentResolver;
 import com.study.userservice.model.interestTag.InterestTagResponse;
+import com.study.userservice.model.studyapply.StudyApplyResponse;
 import com.study.userservice.model.user.UserLoginRequest;
 import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.service.UserService;
@@ -421,7 +422,36 @@ class UserControllerTest {
 
         // then
         then(userService).should(times(1)).findInterestTagByUserId(any());
+    }
 
+    @Test
+    @DisplayName("회원의 스터디 신청 이력 조회 API 테스트")
+    void findStudyAppliesByUserId() throws Exception{
+        // given
+        List<StudyApplyResponse> studyApplyResponses
+                = Arrays.asList(TEST_STUDY_APPLY_RESPONSE1, TEST_STUDY_APPLY_RESPONSE2, TEST_STUDY_APPLY_RESPONSE3);
+        given(userService.findStudyAppliesByUserId(any()))
+                .willReturn(studyApplyResponses);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/users/studyApply")
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(studyApplyResponses)))
+                .andDo(document("user/studyApply/find",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("스터디 신청 내역 ID"),
+                                fieldWithPath("[].studyId").type(JsonFieldType.NUMBER).description("스터디 ID"),
+                                fieldWithPath("[].studyName").type(JsonFieldType.STRING).description("스터디 이름"),
+                                fieldWithPath("[].status").type(JsonFieldType.STRING).description("스터디 신청 내역 상태")
+                        )
+                ));
+
+        // then
+        then(userService).should(times(1)).findStudyAppliesByUserId(any());
     }
 
 
