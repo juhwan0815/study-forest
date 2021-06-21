@@ -670,4 +670,22 @@ class StudyServiceTest {
         // when
         assertThrows(StudyException.class, ()->studyService.deleteStudyUserSelf(2L,1L));
     }
+
+    @Test
+    @DisplayName("스터디 ID 리스트로 스터디 목록을 조회한다.")
+    void findByIdIn(){
+        // given
+        given(studyQueryRepository.findByIdIn(any()))
+                .willReturn(Arrays.asList(TEST_STUDY1,TEST_STUDY2));
+
+        // when
+        List<StudyResponse> result = studyService.findByIdIn(TEST_STUDY_FIND_REQUEST);
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).getId()).isEqualTo(1L);
+        assertThat(result.get(0).getName()).isEqualTo(TEST_STUDY1.getName());
+        assertThat(result.get(1).getId()).isEqualTo(2L);
+        assertThat(result.get(1).getName()).isEqualTo(TEST_STUDY2.getName());
+    }
 }

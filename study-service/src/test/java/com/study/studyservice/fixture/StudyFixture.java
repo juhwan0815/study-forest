@@ -3,6 +3,7 @@ package com.study.studyservice.fixture;
 import com.study.studyservice.domain.*;
 import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
+import com.study.studyservice.model.study.request.StudyFindRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
 import com.study.studyservice.model.studyuser.StudyUserResponse;
@@ -43,6 +44,13 @@ public class StudyFixture {
             "테스트 스터디", 5, 1, "테스트 스터디 입니다.",
             true, true, StudyStatus.OPEN, TEST_IMAGE, 1L, TEST_CATEGORY2,
             new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+
+    public static final Study TEST_STUDY2 = new Study(2L,
+            "테스트 스터디2", 5, 1, "테스트 스터디2 입니다.",
+            true, true, StudyStatus.OPEN, TEST_IMAGE, 1L, TEST_CATEGORY2,
+            new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+
+    public static final StudyFindRequest TEST_STUDY_FIND_REQUEST = new StudyFindRequest(Arrays.asList(1L,2L));
 
 
     public static final StudyTag TEST_STUDY_TAG1 = new StudyTag(1L,TEST_STUDY1,TEST_TAG1);
@@ -92,6 +100,12 @@ public class StudyFixture {
     public static final StudyResponse TEST_STUDY_RESPONSE2 = new StudyResponse(1L,"테스트 스터디",5,1,"테스트 스터디 입니다.",
             true,true,StudyStatus.CLOSE,TEST_IMAGE,TEST_LOCATION_RESPONSE,TEST_CATEGORY_RESPONSE1,TEST_CATEGORY_RESPONSE2,
             Arrays.asList("JPA","스프링"));
+
+    public static final StudyResponse TEST_STUDY_RESPONSE3 = new StudyResponse(3L,"테스트 스터디3",5,1,"테스트 스터디3 입니다.",
+            true,true,StudyStatus.CLOSE,TEST_IMAGE, null,null,null,null);
+
+    public static final StudyResponse TEST_STUDY_RESPONSE4 = new StudyResponse(4L,"테스트 스터디4",5,1,"테스트 스터디4 입니다.",
+            true,true,StudyStatus.CLOSE,TEST_IMAGE,null,null,null,null);
 
     public static final UserResponse TEST_USER_RESPONSE1 = new UserResponse(2L,"황주환");
     public static final UserResponse TEST_USER_RESPONSE2 = new UserResponse(3L,"황철원");

@@ -19,6 +19,7 @@ import com.study.studyservice.kafka.sender.StudyApplySuccessMessageSender;
 import com.study.studyservice.kafka.sender.StudyDeleteMessageSender;
 import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
+import com.study.studyservice.model.study.request.StudyFindRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
 import com.study.studyservice.model.studyuser.StudyUserResponse;
@@ -294,6 +295,13 @@ public class StudyServiceImpl implements StudyService {
         Study findStudy = studyQueryRepository.findWithStudyUsersById(studyId);
 
         findStudy.deleteStudyUser(userId);
+    }
+
+    @Override
+    public List<StudyResponse> findByIdIn(StudyFindRequest request) {
+        return studyQueryRepository.findByIdIn(request.getStudyIdList()).stream()
+                .map(study -> StudyResponse.from(study))
+                .collect(Collectors.toList());
     }
 
     private LocationResponse getLocation(boolean offline, String locationCode) {

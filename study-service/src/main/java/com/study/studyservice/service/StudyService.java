@@ -1,6 +1,7 @@
 package com.study.studyservice.service;
 
 import com.study.studyservice.model.study.request.StudyCreateRequest;
+import com.study.studyservice.model.study.request.StudyFindRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
 import com.study.studyservice.model.studyuser.StudyUserResponse;
@@ -33,4 +34,5 @@ public interface StudyService {
 
     void deleteStudyUserSelf(Long userId, Long studyId);
 
+    List<StudyResponse> findByIdIn(StudyFindRequest request);
 }

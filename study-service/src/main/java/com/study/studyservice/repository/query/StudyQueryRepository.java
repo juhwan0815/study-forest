@@ -8,6 +8,8 @@ import com.study.studyservice.exception.StudyException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 import static com.study.studyservice.domain.QCategory.category;
 import static com.study.studyservice.domain.QStudy.*;
 import static com.study.studyservice.domain.QStudy.study;
@@ -81,5 +83,12 @@ public class StudyQueryRepository {
         }
 
         return findStudy;
+    }
+
+    public List<Study> findByIdIn(List<Long> studyIdList){
+       return queryFactory
+                .selectFrom(study).distinct()
+                .where(study.id.in(studyIdList))
+                .fetch();
     }
 }

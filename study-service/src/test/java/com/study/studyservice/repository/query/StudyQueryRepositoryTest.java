@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -157,4 +158,22 @@ class StudyQueryRepositoryTest {
         assertThat(result.getWaitUsers().get(1).getUserId()).isEqualTo(2L);
     }
 
+    @Test
+    @DisplayName("스터디 ID로 스터디 목록을 조회한다.")
+    void findByIdIn(){
+        Study study1 = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
+        Study study2 = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
+
+        studyRepository.save(study1);
+        studyRepository.save(study2);
+
+        em.flush();
+        em.clear();
+
+        List<Study> result = studyQueryRepository.findByIdIn(Arrays.asList(study1.getId(), study2.getId()));
+
+        assertThat(result.size()).isEqualTo(2);
+    }
 }

@@ -347,12 +347,12 @@ class StudyControllerTest {
                         )
                 ));
 
-        then(studyService).should(times(1)).createWaitUser(any(),any());
+        then(studyService).should(times(1)).createWaitUser(any(), any());
     }
 
     @Test
     @DisplayName("스터디 참가 대기 인원 조회 API 테스트")
-    void findWaitUser() throws Exception{
+    void findWaitUser() throws Exception {
         List<WaitUserResponse> waitUserResponseList = Arrays.asList(TEST_WAIT_USER_RESPONSE1, TEST_WAIT_USER_RESPONSE2);
 
         given(studyService.findWaitUsersByStudyId(any()))
@@ -381,15 +381,15 @@ class StudyControllerTest {
 
     @Test
     @DisplayName("스터디 참가 인원 추가 API 테스트")
-    void createStudyUser() throws Exception{
+    void createStudyUser() throws Exception {
         willDoNothing()
                 .given(studyService)
-                .createStudyUser(any(),any(),any());
+                .createStudyUser(any(), any(), any());
 
         given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
                 .willReturn(1L);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.post("/studies/{studyId}/users/{userId}", 1,2)
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/studies/{studyId}/users/{userId}", 1, 2)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
                 .andDo(document("study/studyUser/create",
@@ -402,21 +402,21 @@ class StudyControllerTest {
                         )
                 ));
 
-        then(studyService).should(times(1)).createStudyUser(any(),any(),any());
+        then(studyService).should(times(1)).createStudyUser(any(), any(), any());
     }
 
     @Test
     @DisplayName("스터디 참가 신청 거부 API 테스트")
-    void deleteWaitUser() throws Exception{
+    void deleteWaitUser() throws Exception {
         willDoNothing()
                 .given(studyService)
-                .deleteWaitUser(any(),any(),any());
+                .deleteWaitUser(any(), any(), any());
 
         given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
                 .willReturn(1L);
 
         mockMvc.perform(RestDocumentationRequestBuilders
-                .delete("/studies/{studyId}/waitUsers/{userId}", 1,2)
+                .delete("/studies/{studyId}/waitUsers/{userId}", 1, 2)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
                 .andDo(document("study/waitUser/delete",
@@ -429,12 +429,12 @@ class StudyControllerTest {
                         )
                 ));
 
-        then(studyService).should(times(1)).deleteWaitUser(any(),any(),any());
+        then(studyService).should(times(1)).deleteWaitUser(any(), any(), any());
     }
 
     @Test
     @DisplayName("스터디 참가 인원 조회 API 테스트")
-    void findStudyUsersByStudyId() throws Exception{
+    void findStudyUsersByStudyId() throws Exception {
         List<StudyUserResponse> studyUserResponseList = Arrays.asList(TEST_STUDY_USER_RESPONSE1, TEST_STUDY_USER_RESPONSE2);
         given(studyService.findStudyUsersByStudyId(any()))
                 .willReturn(studyUserResponseList);
@@ -463,16 +463,16 @@ class StudyControllerTest {
 
     @Test
     @DisplayName("스터디 참가 회원 삭제 API 테스트")
-    void deleteStudyUser() throws Exception{
+    void deleteStudyUser() throws Exception {
         willDoNothing()
                 .given(studyService)
-                .deleteStudyUser(any(),any(),any());
+                .deleteStudyUser(any(), any(), any());
 
         given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
                 .willReturn(1L);
 
         mockMvc.perform(RestDocumentationRequestBuilders
-                .delete("/studies/{studyId}/users/{userId}", 1,2)
+                .delete("/studies/{studyId}/users/{userId}", 1, 2)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
                 .andDo(document("study/studyUser/delete",
@@ -485,15 +485,15 @@ class StudyControllerTest {
                         )
                 ));
 
-        then(studyService).should(times(1)).deleteStudyUser(any(),any(),any());
+        then(studyService).should(times(1)).deleteStudyUser(any(), any(), any());
     }
 
     @Test
     @DisplayName("스터디 탈퇴 API 테스트")
-    void deleteStudyUserSelf() throws Exception{
+    void deleteStudyUserSelf() throws Exception {
         willDoNothing()
                 .given(studyService)
-                .deleteStudyUserSelf(any(),any());
+                .deleteStudyUserSelf(any(), any());
 
         given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
                 .willReturn(1L);
@@ -511,10 +511,43 @@ class StudyControllerTest {
                         )
                 ));
 
-        then(studyService).should(times(1)).deleteStudyUserSelf(any(),any());
+        then(studyService).should(times(1)).deleteStudyUserSelf(any(), any());
     }
 
+    @Test
+    @DisplayName("스터디 목록 조회 API 테스트")
+    void findByIdIn() throws Exception {
+        List<StudyResponse> studyResponses = Arrays.asList(TEST_STUDY_RESPONSE3, TEST_STUDY_RESPONSE4);
 
+        given(studyService.findByIdIn(any()))
+                .willReturn(studyResponses);
+
+        mockMvc.perform(get("/studies/name")
+                .accept(MediaType.APPLICATION_JSON)
+                .param("studyIdList", "1", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(studyResponses)))
+                .andDo(document("study/findName",
+                        requestParameters(
+                                parameterWithName("studyIdList").description("스터디 ID 리스트")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("스터디 ID"),
+                                fieldWithPath("[].name").type(JsonFieldType.STRING).description("스터디 이름"),
+                                fieldWithPath("[].numberOfPeople").type(JsonFieldType.NUMBER).description("스터디 인원"),
+                                fieldWithPath("[].currentNumberOfPeople").type(JsonFieldType.NUMBER).description("스터디 현재 인원"),
+                                fieldWithPath("[].content").type(JsonFieldType.STRING).description("스터디 내용"),
+                                fieldWithPath("[].online").type(JsonFieldType.BOOLEAN).description("스터디 온라인 여부"),
+                                fieldWithPath("[].offline").type(JsonFieldType.BOOLEAN).description("스터디 오프라인여부"),
+                                fieldWithPath("[].status").type(JsonFieldType.STRING).description("스터디 상태"),
+                                fieldWithPath("[].image").type(JsonFieldType.OBJECT).description("스터디 이미지"),
+                                fieldWithPath("[].image.studyImage").type(JsonFieldType.STRING).description("스터디 이미지 URL"),
+                                fieldWithPath("[].image.thumbnailImage").type(JsonFieldType.STRING).description("스터디 썸네일 이미지 URL")
+                        )
+                ));
+
+        then(studyService).should(times(1)).findByIdIn(any());
+    }
 
 
 }

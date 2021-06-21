@@ -1,5 +1,6 @@
 package com.study.studyservice.model.study.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.study.studyservice.domain.Image;
 import com.study.studyservice.domain.Study;
 import com.study.studyservice.domain.StudyStatus;
@@ -35,12 +36,16 @@ public class StudyResponse {
 
     private Image image; // 스터디 이미지
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private LocationResponse location; // 지역 정보
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private CategoryResponse parentCategory; // 부모 카테고리
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private CategoryResponse childCategory; // 자식 카테고리
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<String> studyTags; // 스터디 태그
 
     public static StudyResponse from(Study study,LocationResponse location) {
@@ -63,5 +68,18 @@ public class StudyResponse {
         return studyResponse;
     }
 
+    public static StudyResponse from(Study study){
+        StudyResponse studyResponse = new StudyResponse();
+        studyResponse.id = study.getId();
+        studyResponse.name = study.getName();
+        studyResponse.content = study.getContent();
+        studyResponse.numberOfPeople = study.getNumberOfPeople();
+        studyResponse.currentNumberOfPeople = study.getCurrentNumberOfPeople();
+        studyResponse.online = study.isOnline();
+        studyResponse.offline = study.isOffline();
+        studyResponse.status = study.getStatus();
+        studyResponse.image = study.getImage();
+        return studyResponse;
+    }
 
 }

@@ -2,6 +2,7 @@ package com.study.studyservice.controller;
 
 import com.study.studyservice.config.LoginUser;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
+import com.study.studyservice.model.study.request.StudyFindRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
 import com.study.studyservice.model.studyuser.StudyUserResponse;
@@ -96,5 +97,9 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @GetMapping("/studies/name")
+    public ResponseEntity<List<StudyResponse>> findByIdIn(StudyFindRequest request){
+        return ResponseEntity.ok(studyService.findByIdIn(request));
+    }
 
 }
