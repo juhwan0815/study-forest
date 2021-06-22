@@ -17,4 +17,5 @@ public class GatewayServiceApplication {
     public HttpTraceRepository httpTraceRepository(){
         return new InMemoryHttpTraceRepository();
     }
+
 }

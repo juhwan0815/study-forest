@@ -18,6 +18,12 @@ spring:
     password: guest
   cloud:
     gateway:
+      default-filters:
+        - name: GlobalFilter
+          args:
+            baseMessage: Spring Cloud Gateway Global Filter
+            preLogger: true
+            postLogger: true
       routes:
         # 인증 서비스 - 카카오 로그인 API
         - id: auth-service
