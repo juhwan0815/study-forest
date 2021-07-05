@@ -138,12 +138,12 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/location-service/(?<segment>.*),/$\{segment}
-        # 지역정보 서비스 - 검색 API
+        # 지역정보 서비스 - 검색, 추가 API
         - id: location-service
           uri: lb://LOCATION-SERVICE
           predicates:
             - Path=/location-service/locations/**
-            - Method=GET
+            - Method=GET,POST
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/location-service/(?<segment>.*),/$\{segment}
