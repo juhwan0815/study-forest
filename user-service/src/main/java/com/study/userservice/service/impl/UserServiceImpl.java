@@ -109,11 +109,9 @@ public class UserServiceImpl implements UserService {
         Image userImage = user.getImage();
 
         if (deleteImage && image != null) {
-            if (image.isEmpty()) {
-                if (userImage != null) {
-                    deleteImageFromS3(userImage.getImageStoreName());
-                    userImage = null;
-                }
+            if (userImage != null) {
+                deleteImageFromS3(userImage.getImageStoreName());
+                userImage = null;
             }
         }
         if (!deleteImage && image != null) {
