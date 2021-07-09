@@ -1,6 +1,8 @@
 server:
   port: 0
 
+
+
 spring:
   application:
     name: user-service
@@ -76,4 +78,8 @@ management:
 
 logging:
   level:
+    org:
+      apache:
+        coyote:
+          http11=debug:
     org.hibernate.SQL: debug
