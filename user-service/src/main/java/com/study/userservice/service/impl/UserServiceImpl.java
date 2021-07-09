@@ -90,7 +90,6 @@ public class UserServiceImpl implements UserService {
         return UserResponse.from(findUser.get());
     }
 
-
     @Override
     @Transactional
     public UserResponse updateProfile(Long userId, MultipartFile image, UserUpdateProfileRequest request) {
@@ -109,23 +108,22 @@ public class UserServiceImpl implements UserService {
     private Image updateImage(MultipartFile image, boolean deleteImage, User user) {
         Image userImage = user.getImage();
 
-        log.info("{}",deleteImage);
-        if(image == null){
-            log.info("이미지가 없습니다.");
-        }
-
-        if (deleteImage && image.isEmpty()) {
-            if (userImage != null) {
-                deleteImageFromS3(userImage.getImageStoreName());
-                userImage = null;
+        if (deleteImage && image != null) {
+            if (image.isEmpty()) {
+                if (userImage != null) {
+                    deleteImageFromS3(userImage.getImageStoreName());
+                    userImage = null;
+                }
             }
         }
-        if (!deleteImage && !image.isEmpty()) {
-            if (userImage != null) {
-                deleteImageFromS3(userImage.getImageStoreName());
+        if (!deleteImage && image != null) {
+            if (!image.isEmpty()) {
+                if (userImage != null) {
+                    deleteImageFromS3(userImage.getImageStoreName());
+                }
+                validateImageType(image);
+                userImage = uploadImageToS3(image);
             }
-            validateImageType(image);
-            userImage = uploadImageToS3(image);
         }
         return userImage;
     }
@@ -248,8 +246,8 @@ public class UserServiceImpl implements UserService {
         findUser.getStudyApplies().stream()
                 .forEach(studyApply -> {
                     for (StudyResponse study : studyList) {
-                        if (studyApply.getStudyId().equals(study.getId())){
-                            studyApplyResponses.add(StudyApplyResponse.from(studyApply,study));
+                        if (studyApply.getStudyId().equals(study.getId())) {
+                            studyApplyResponses.add(StudyApplyResponse.from(studyApply, study));
                             break;
                         }
                     }

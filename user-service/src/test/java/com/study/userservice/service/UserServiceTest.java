@@ -7,7 +7,6 @@ import com.study.userservice.domain.User;
 import com.study.userservice.exception.UserException;
 import com.study.userservice.kafka.sender.UserDeleteMessageSender;
 import com.study.userservice.model.interestTag.InterestTagResponse;
-import com.study.userservice.model.study.StudyResponse;
 import com.study.userservice.model.studyapply.StudyApplyResponse;
 import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.repository.UserRepository;
@@ -20,14 +19,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static com.study.userservice.UserFixture.*;
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
