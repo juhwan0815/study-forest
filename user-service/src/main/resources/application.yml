@@ -81,5 +81,5 @@ logging:
     org:
       apache:
         coyote:
-          http11=debug:
+          http11: debug
     org.hibernate.SQL: debug
