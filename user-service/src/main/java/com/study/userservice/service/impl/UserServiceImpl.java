@@ -108,7 +108,11 @@ public class UserServiceImpl implements UserService {
     private Image updateImage(MultipartFile image, boolean deleteImage, User user) {
         Image userImage = user.getImage();
 
+        log.info("deleteImage = {}",deleteImage);
+        log.info("image {}", image != null);
+
         if (deleteImage && image != null) {
+            log.info("11");
             if (userImage != null) {
                 deleteImageFromS3(userImage.getImageStoreName());
                 userImage = null;
