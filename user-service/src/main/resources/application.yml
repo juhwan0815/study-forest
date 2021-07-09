@@ -78,8 +78,4 @@ management:
 
 logging:
   level:
-    org:
-      apache:
-        coyote:
-          http11: debug
     org.hibernate.SQL: debug

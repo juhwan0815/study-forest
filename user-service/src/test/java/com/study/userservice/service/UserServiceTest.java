@@ -156,7 +156,7 @@ class UserServiceTest {
                 .deleteObject(any(),any());
 
         // when
-        UserResponse userResponse = userService.updateProfile(1L,TEST_EMPTY_IMAGE_FILE,
+        UserResponse userResponse = userService.updateProfile(1L,null,
                                                              TEST_USER_PROFILE_UPDATE_REQUEST2);
 
         // then
