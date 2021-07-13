@@ -1,12 +1,19 @@
 package com.study.studyservice.repository.query;
 
+import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.study.studyservice.domain.QStudy;
 import com.study.studyservice.domain.QWaitUser;
 import com.study.studyservice.domain.Study;
 import com.study.studyservice.exception.StudyException;
+import com.study.studyservice.model.study.request.StudySearchRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -90,5 +97,43 @@ public class StudyQueryRepository {
                 .selectFrom(study).distinct()
                 .where(study.id.in(studyIdList))
                 .fetch();
+    }
+
+    public Page<Study> findBySearchCondition(StudySearchRequest request, List<Long> locationIdList,
+                                             Pageable pageable){
+        QueryResults<Study> result = queryFactory
+                .selectFrom(study).distinct()
+                .where(nameLike(request.getSearchKeyword()),
+                        locationIn(locationIdList),
+                        categoryEq(request.getCategoryId()),
+                        online(request.getOnline()).or(offline(request.getOffline())))
+                .orderBy(study.createdAt.desc())
+                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset())
+                .fetchResults();
+
+        List<Study> content = result.getResults();
+        long total = result.getTotal();
+        return new PageImpl<>(content,pageable,total);
+    }
+
+    private BooleanExpression locationIn(List<Long> locationIdList){
+        return locationIdList != null ?  study.locationId.in(locationIdList) : null;
+    }
+
+    private BooleanExpression nameLike(String searchKeyword){
+        return StringUtils.hasText(searchKeyword) ? study.name.contains(searchKeyword) : null;
+    }
+
+    private BooleanExpression categoryEq(Long categoryId){
+        return categoryId != null ? study.category.id.eq(categoryId) : null;
+    }
+
+    private BooleanExpression online(Boolean online){
+        return online != null ? study.online.eq(online) : null;
+    }
+
+    private BooleanExpression offline(Boolean offline){
+        return offline != null ? study.offline.eq(offline) : null;
     }
 }

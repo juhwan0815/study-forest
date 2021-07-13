@@ -16,6 +16,19 @@
 Gateway-service 주소 : 포트 + /study-service
 
 [[api]]
+==== 스터디 검색 API
+===== 요청
+include::{snippets}/study/search/http-request.adoc[]
+====== Header
+include::{snippets}/study/search/request-headers.adoc[]
+====== Param
+include::{snippets}/study/search/request-parameters.adoc[]
+===== 응답
+include::{snippets}/study/search/http-response.adoc[]
+====== Body
+include::{snippets}/study/search/response-fields.adoc[]
+
+
 ==== 스터디 생성 API
 ===== 요청
 include::{snippets}/study/create/http-request.adoc[]

@@ -20,6 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -549,5 +553,79 @@ class StudyControllerTest {
         then(studyService).should(times(1)).findByIdIn(any());
     }
 
+    @Test
+    @DisplayName("스터디 검색 API 테스트")
+    void search() throws Exception {
+        List<StudyResponse> content = new ArrayList<>();
+        content.add(TEST_STUDY_RESPONSE5);
+        content.add(TEST_STUDY_RESPONSE6);
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<StudyResponse> result = new PageImpl<>(content,pageable,content.size());
+
+        given(studyService.find(any(),any(),any()))
+                .willReturn(result);
+
+        mockMvc.perform(get("/studies")
+                .header(HttpHeaders.AUTHORIZATION,TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON)
+                .param("page","0")
+                .param("size","20")
+                .param("offline","true")
+                .param("online","true")
+                .param("searchKeyword","스터디")
+                .param("categoryId","1"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(result)))
+                .andDo(document("study/search",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).optional().description("Access Token")
+                        ),
+                        requestParameters(
+                                parameterWithName("page").description("페이지 번호"),
+                                parameterWithName("size").description("페이지 사이즈"),
+                                parameterWithName("offline").description("오프라인 여부"),
+                                parameterWithName("online").description("온라인 여부"),
+                                parameterWithName("searchKeyword").description("스터디 검색 키워드"),
+                                parameterWithName("categoryId").description("카테고리 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("content").type(JsonFieldType.ARRAY).description("조회 결과 배열"),
+                                fieldWithPath("content.[].id").type(JsonFieldType.NUMBER).description("스터디 ID"),
+                                fieldWithPath("content.[].name").type(JsonFieldType.STRING).description("스터디 이름"),
+                                fieldWithPath("content.[].numberOfPeople").type(JsonFieldType.NUMBER).description("스터디 인원"),
+                                fieldWithPath("content.[].currentNumberOfPeople").type(JsonFieldType.NUMBER).description("스터디 현재 인원"),
+                                fieldWithPath("content.[].content").type(JsonFieldType.STRING).description("스터디 내용"),
+                                fieldWithPath("content.[].online").type(JsonFieldType.BOOLEAN).description("스터디 온라인 여부"),
+                                fieldWithPath("content.[].offline").type(JsonFieldType.BOOLEAN).description("스터디 오프라인여부"),
+                                fieldWithPath("content.[].status").type(JsonFieldType.STRING).description("스터디 상태"),
+                                fieldWithPath("content.[].image").type(JsonFieldType.OBJECT).description("스터디 이미지"),
+                                fieldWithPath("content.[].image.studyImage").type(JsonFieldType.STRING).description("스터디 이미지 URL"),
+                                fieldWithPath("content.[].image.thumbnailImage").type(JsonFieldType.STRING).description("스터디 썸네일 이미지 URL"),
+                                fieldWithPath("content.[].studyTags").type(JsonFieldType.ARRAY).description("스터디 태그"),
+                                fieldWithPath("pageable.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬 여부 "),
+                                fieldWithPath("pageable.sort.unsorted").type(JsonFieldType.BOOLEAN).description("비정렬 여부"),
+                                fieldWithPath("pageable.sort.empty").type(JsonFieldType.BOOLEAN).description("값이 비었는지 여부"),
+                                fieldWithPath("pageable.offset").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                                fieldWithPath("pageable.pageNumber").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                                fieldWithPath("pageable.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                                fieldWithPath("pageable.paged").type(JsonFieldType.BOOLEAN).description("페이징 여부"),
+                                fieldWithPath("pageable.unpaged").type(JsonFieldType.BOOLEAN).description("비페이징 여부"),
+                                fieldWithPath("last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
+                                fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("총 페이지 수"),
+                                fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("총 결과 수"),
+                                fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                                fieldWithPath("number").type(JsonFieldType.NUMBER).description("페이지 번호"),
+                                fieldWithPath("sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬여부"),
+                                fieldWithPath("sort.unsorted").type(JsonFieldType.BOOLEAN).description("비정렬여부"),
+                                fieldWithPath("sort.empty").type(JsonFieldType.BOOLEAN).description("값이 비었는지 여부"),
+                                fieldWithPath("numberOfElements").type(JsonFieldType.NUMBER).description("현재 페이지 크기"),
+                                fieldWithPath("first").type(JsonFieldType.BOOLEAN).description("처음 페이지 여부"),
+                                fieldWithPath("empty").type(JsonFieldType.BOOLEAN).description("값이 비었는지 여부")
+
+                        )
+                ));
+
+        then(studyService).should(times(1)).find(any(),any(),any());
+    }
 
 }

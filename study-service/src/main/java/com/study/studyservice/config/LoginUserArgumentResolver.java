@@ -29,12 +29,23 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) throws Exception {
+
         String bearerToken = webRequest.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if (bearerToken == null) {
+            return null;
+        }
+
         String jwt = bearerToken.substring(7);
 
-        String userId = Jwts.parser().setSigningKey(env.getProperty("token.secret"))
-                .parseClaimsJws(jwt)
-                .getBody().getSubject();
+        String userId = null;
+        try {
+            userId = Jwts.parser().setSigningKey(env.getProperty("token.secret"))
+                    .parseClaimsJws(jwt)
+                    .getBody().getSubject();
+        } catch (Exception e){
+            return null;
+        }
 
         return Long.valueOf(userId);
     }

@@ -23,10 +23,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.TestPropertySource;
 import scala.Array;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -688,4 +692,79 @@ class StudyServiceTest {
         assertThat(result.get(1).getId()).isEqualTo(2L);
         assertThat(result.get(1).getName()).isEqualTo(TEST_STUDY2.getName());
     }
+
+    @Test
+    @DisplayName("로그인 회원이 오프라인 스터디를 검색한다.")
+    void findByOfflineAndLoginUser(){
+        List<Study> studies = new ArrayList<>();
+        studies.add(TEST_STUDY1);
+        studies.add(TEST_STUDY2);
+
+        PageRequest pageable = PageRequest.of(0, 20);
+        Page<Study> pageStudies = new PageImpl<>(studies,pageable,studies.size());
+
+        // given
+        given(userServiceClient.findUserById(any()))
+                .willReturn(TEST_USER_RESPONSE1);
+
+        given(locationServiceClient.findLocationAroundById(any(),any()))
+                .willReturn(Arrays.asList(TEST_LOCATION_RESPONSE));
+
+        given(studyQueryRepository.findBySearchCondition(any(),any(),any()))
+                .willReturn(pageStudies);
+
+        // when
+        Page<StudyResponse> result = studyService.find(2L, TEST_STUDY_SEARCH_REQUEST1, pageable);
+
+        // then
+        assertThat(result.getContent().size()).isEqualTo(2);
+        then(userServiceClient).should(times(1)).findUserById(any());
+        then(locationServiceClient).should(times(1)).findLocationAroundById(any(),any());
+        then(studyQueryRepository).should(times(1)).findBySearchCondition(any(),any(),any());
+    }
+
+    @Test
+    @DisplayName("비로그인 회원이 오프라인 스터디를 검색한다.")
+    void findByOfflineAndOnlineUser(){
+        List<Study> studies = new ArrayList<>();
+        studies.add(TEST_STUDY1);
+        studies.add(TEST_STUDY2);
+
+        PageRequest pageable = PageRequest.of(0, 20);
+        Page<Study> pageStudies = new PageImpl<>(studies,pageable,studies.size());
+
+        // given
+        given(studyQueryRepository.findBySearchCondition(any(),any(),any()))
+                .willReturn(pageStudies);
+
+        // when
+        Page<StudyResponse> result = studyService.find(null, TEST_STUDY_SEARCH_REQUEST1, pageable);
+
+        // then
+        assertThat(result.getContent().size()).isEqualTo(2);
+        then(studyQueryRepository).should(times(1)).findBySearchCondition(any(),any(),any());
+    }
+
+    @Test
+    @DisplayName("온라인 스터디를 검색한다.")
+    void findByOnline(){
+        List<Study> studies = new ArrayList<>();
+        studies.add(TEST_STUDY1);
+        studies.add(TEST_STUDY2);
+
+        PageRequest pageable = PageRequest.of(0, 20);
+        Page<Study> pageStudies = new PageImpl<>(studies,pageable,studies.size());
+
+        // given
+        given(studyQueryRepository.findBySearchCondition(any(),any(),any()))
+                .willReturn(pageStudies);
+
+        // when
+        Page<StudyResponse> result = studyService.find(null, TEST_STUDY_SEARCH_REQUEST2, pageable);
+
+        // then
+        assertThat(result.getContent().size()).isEqualTo(2);
+        then(studyQueryRepository).should(times(1)).findBySearchCondition(any(),any(),any());
+    }
+
 }

@@ -3,6 +3,7 @@ package com.study.studyservice.controller;
 import com.study.studyservice.config.LoginUser;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
 import com.study.studyservice.model.study.request.StudyFindRequest;
+import com.study.studyservice.model.study.request.StudySearchRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
 import com.study.studyservice.model.studyuser.StudyUserResponse;
@@ -10,6 +11,9 @@ import com.study.studyservice.model.waituser.WaitUserResponse;
 import com.study.studyservice.service.StudyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +28,14 @@ import java.util.List;
 public class StudyController {
 
     private final StudyService studyService;
+
+    @GetMapping("/studies")
+    public ResponseEntity<Page<StudyResponse>> search(@LoginUser Long userId,
+                                                      @PageableDefault(size = 25,page = 0) Pageable pageable,
+                                                      StudySearchRequest request){
+        Page<StudyResponse> body = studyService.find(userId, request, pageable);
+        return ResponseEntity.ok(body);
+    }
 
     @PostMapping("/studies")
     public ResponseEntity<StudyResponse> create(@LoginUser Long userId,

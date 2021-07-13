@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @FeignClient(name = "location-service")
@@ -17,4 +18,7 @@ public interface LocationServiceClient {
 
     @GetMapping("/locations/{locationId}")
     LocationResponse findLocationById(@PathVariable Long locationId);
+
+    @GetMapping("/locations/{locationId}/around")
+    List<LocationResponse> findLocationAroundById(@PathVariable Long locationId,@RequestParam Integer searchDistance);
 }

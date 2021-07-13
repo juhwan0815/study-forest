@@ -82,4 +82,21 @@ public class StudyResponse {
         return studyResponse;
     }
 
+    public static StudyResponse searchFrom(Study study){
+        StudyResponse studyResponse = new StudyResponse();
+        studyResponse.id = study.getId();
+        studyResponse.name = study.getName();
+        studyResponse.content = study.getContent();
+        studyResponse.numberOfPeople = study.getNumberOfPeople();
+        studyResponse.currentNumberOfPeople = study.getCurrentNumberOfPeople();
+        studyResponse.online = study.isOnline();
+        studyResponse.offline = study.isOffline();
+        studyResponse.status = study.getStatus();
+        studyResponse.image = study.getImage();
+        studyResponse.studyTags = study.getStudyTags().stream()
+                .map(studyTag -> studyTag.getTag().getName())
+                .collect(Collectors.toList());
+        return studyResponse;
+    }
+
 }

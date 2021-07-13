@@ -28,5 +28,4 @@ public class Tag extends BaseEntity{
         tag.name = name;
         return tag;
     }
-
 }

@@ -20,6 +20,7 @@ import com.study.studyservice.kafka.sender.StudyDeleteMessageSender;
 import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
 import com.study.studyservice.model.study.request.StudyFindRequest;
+import com.study.studyservice.model.study.request.StudySearchRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
 import com.study.studyservice.model.studyuser.StudyUserResponse;
@@ -33,6 +34,8 @@ import com.study.studyservice.service.TagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -71,46 +74,49 @@ public class StudyServiceImpl implements StudyService {
     @Value("${cloud.aws.s3.thumbnailBucket}")
     private String thumbnailBucket;
 
+    @Transactional
     @PostConstruct
-    void init() {
-        IntStream.range(1, 5).forEach(
-                value -> {
-                    Category testParentCategory = Category.createCategory("개발" + value, null);
-                    categoryRepository.save(testParentCategory);
-                }
-        );
+    void init(){
+        Category parentCategory1 = categoryRepository.save(Category.createCategory("개발", null));
+        Category parentCategory2 = categoryRepository.save(Category.createCategory("영어", null));
+        Category parentCategory3 = categoryRepository.save(Category.createCategory("자격증", null));
 
-        IntStream.range(1, 10).forEach(
-                value -> {
-                    int revalue = value % 3 + 1;
-                    Category parentCategory = categoryRepository.findById(Long.valueOf(revalue)).get();
-                    Category testParentCategory = Category.createCategory("백엔드" + revalue, parentCategory);
-                    categoryRepository.save(testParentCategory);
-                }
-        );
+        Category childCategory1 = categoryRepository.save(Category.createCategory("프론트엔드", parentCategory1));
+        Category childCategory2 = categoryRepository.save(Category.createCategory("백엔드", parentCategory1));
+        Category childCategory3 = categoryRepository.save(Category.createCategory("DEVOPS", parentCategory1));
+        Category childCategory4 = categoryRepository.save(Category.createCategory("토익", parentCategory2));
+        Category childCategory5 = categoryRepository.save(Category.createCategory("토플", parentCategory2));
+        Category childCategory6 = categoryRepository.save(Category.createCategory("몰라", parentCategory2));
+        Category childCategory7 = categoryRepository.save(Category.createCategory("정처기", parentCategory2));
+        Category childCategory8 = categoryRepository.save(Category.createCategory("정통기", parentCategory2));
+        Category childCategory9 = categoryRepository.save(Category.createCategory("전기기사", parentCategory2));
 
-        IntStream.range(1, 10)
-                .forEach(value -> {
-                    Category category = categoryRepository.findById(9L).get();
-                    Study study = Study.createStudy("테스트 스터디" + value,
-                            5,
-                            "테스트 스터디" + value,
-                            true,
-                            true,
-                            category);
-                    study.addWaitUser(Long.valueOf(1 + 10 * value));
-                    study.addWaitUser(Long.valueOf(2 + 10 * value));
-                    study.addWaitUser(Long.valueOf(3 + 10 * value));
-                    study.addWaitUser(Long.valueOf(4 + 10 * value));
-                    study.addWaitUser(Long.valueOf(5 + 10 * value));
-                    study.addWaitUser(Long.valueOf(6 + 10 * value));
-                    study.addWaitUser(Long.valueOf(7 + 10 * value));
-                    study.addWaitUser(Long.valueOf(8 + 10 * value));
-                    study.addWaitUser(Long.valueOf(9 + 10 * value));
-                    Study savedStudy = studyRepository.save(study);
-                });
+        IntStream.range(0,100).forEach(value -> {
+            Study study = Study.createStudy("테스트 스터디" + value, value, "테스트 스터디" + value, true, true, childCategory1);
+            study.changeLocation(Long.valueOf(800 + value));
+
+            List<String> requestTags = new ArrayList<>();
+            requestTags.add("뿌직"+value);
+            requestTags.add("뿌직"+(value+1));
+            List<Tag> tags = tagService.FindAndCreate(requestTags);
+            study.addStudyTags(tags);
+
+            studyRepository.save(study);
+        });
+
+        IntStream.range(0,100).forEach(value -> {
+            Study study = Study.createStudy("테스트 스터디" + (value+100), (value+100), "테스트 스터디" + (value+100), true, true, childCategory1);
+            study.changeLocation(Long.valueOf(800 + value));
+
+            List<String> requestTags = new ArrayList<>();
+            requestTags.add("뿌직"+value);
+            requestTags.add("뿌직"+(value+1));
+            List<Tag> tags = tagService.FindAndCreate(requestTags);
+            study.addStudyTags(tags);
+
+            studyRepository.save(study);
+        });
     }
-
 
     @Override
     @Transactional
@@ -183,6 +189,31 @@ public class StudyServiceImpl implements StudyService {
 
         studyDeleteMessageSender.send(StudyDeleteMessage.from(findStudy));
     }
+
+    @Override
+    public Page<StudyResponse> find(Long userId, StudySearchRequest request, Pageable pageable) {
+
+        List<Long> locationIdList = null;
+
+        if(request.getOffline() == true && userId != null){
+            UserResponse user = userServiceClient.findUserById(userId);
+            Long locationId = user.getLocationId();
+
+            if (locationId != null) {
+                Integer searchDistance = user.getSearchDistance();
+                List<LocationResponse> locations = locationServiceClient.findLocationAroundById(locationId, searchDistance);
+
+                locationIdList = locations.stream()
+                        .map(locationResponse -> locationResponse.getId())
+                        .collect(Collectors.toList());
+            }
+        }
+
+        Page<Study> studySearchList = studyQueryRepository.findBySearchCondition(request, locationIdList, pageable);
+
+        return studySearchList.map(study -> StudyResponse.searchFrom(study));
+    }
+
 
     @Override
     public StudyResponse findById(Long studyId) {

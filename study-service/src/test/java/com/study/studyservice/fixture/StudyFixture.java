@@ -4,9 +4,11 @@ import com.study.studyservice.domain.*;
 import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
 import com.study.studyservice.model.study.request.StudyFindRequest;
+import com.study.studyservice.model.study.request.StudySearchRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
 import com.study.studyservice.model.studyuser.StudyUserResponse;
+import com.study.studyservice.model.user.UserImage;
 import com.study.studyservice.model.user.UserResponse;
 import com.study.studyservice.model.waituser.WaitUserResponse;
 import org.springframework.http.MediaType;
@@ -51,6 +53,9 @@ public class StudyFixture {
             new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
 
     public static final StudyFindRequest TEST_STUDY_FIND_REQUEST = new StudyFindRequest(Arrays.asList(1L,2L));
+
+    public static final StudySearchRequest TEST_STUDY_SEARCH_REQUEST1 = new StudySearchRequest(null,null,false,true);
+    public static final StudySearchRequest TEST_STUDY_SEARCH_REQUEST2 = new StudySearchRequest(null,null,true,false);
 
 
     public static final StudyTag TEST_STUDY_TAG1 = new StudyTag(1L,TEST_STUDY1,TEST_TAG1);
@@ -107,9 +112,18 @@ public class StudyFixture {
     public static final StudyResponse TEST_STUDY_RESPONSE4 = new StudyResponse(4L,"테스트 스터디4",5,1,"테스트 스터디4 입니다.",
             true,true,StudyStatus.CLOSE,TEST_IMAGE,null,null,null,null);
 
-    public static final UserResponse TEST_USER_RESPONSE1 = new UserResponse(2L,"황주환");
-    public static final UserResponse TEST_USER_RESPONSE2 = new UserResponse(3L,"황철원");
-    public static final UserResponse TEST_USER_RESPONSE3 = new UserResponse(1L,"한다빈");
+    public static final StudyResponse TEST_STUDY_RESPONSE5 = new StudyResponse(5L,"테스트 스터디5",5,1,"테스트 스터디 5입니다.",
+            true,true,StudyStatus.OPEN,TEST_IMAGE,null,null,null,Arrays.asList("스프링","MYSQL"));
+
+    public static final StudyResponse TEST_STUDY_RESPONSE6 = new StudyResponse(6L,"테스트 스터디6",5,1,"테스트 스터디 6입니다.",
+            true,true,StudyStatus.OPEN,TEST_IMAGE,null,null,null,Arrays.asList("뿌직1","뿌직2"));
+
+
+    public static final UserImage TEST_USER_IMAGE = new UserImage("테스트 썸네일 이미지","테스트 프로필 이미지");
+
+    public static final UserResponse TEST_USER_RESPONSE1 = new UserResponse(2L,"황주환",TEST_USER_IMAGE,"male","20~29",3,800L);
+    public static final UserResponse TEST_USER_RESPONSE2 = new UserResponse(3L,"황철원",TEST_USER_IMAGE,"male","20~29",3,800L);
+    public static final UserResponse TEST_USER_RESPONSE3 = new UserResponse(1L,"한다빈",TEST_USER_IMAGE,"female","20~29",3,800L);
 
     public static final WaitUserResponse TEST_WAIT_USER_RESPONSE1
             = new WaitUserResponse(1L,3L,"황철원");
