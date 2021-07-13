@@ -163,3 +163,13 @@ include::{snippets}/study/findName/request-parameters.adoc[]
 include::{snippets}/study/findName/http-response.adoc[]
 ====== Body
 include::{snippets}/study/findName/response-fields.adoc[]
+
+==== 회원의 스터디 조회 API
+===== 요청
+include::{snippets}/study/user/http-request.adoc[]
+====== Header
+include::{snippets}/study/user/request-headers.adoc[]
+===== 응답
+include::{snippets}/study/user/http-response.adoc[]
+====== Body
+include::{snippets}/study/user/response-fields.adoc[]

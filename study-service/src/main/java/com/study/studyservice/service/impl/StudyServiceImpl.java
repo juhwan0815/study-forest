@@ -335,6 +335,13 @@ public class StudyServiceImpl implements StudyService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<StudyResponse> findByUser(Long userId) {
+        return studyQueryRepository.findByUser(userId).stream()
+                .map(study -> StudyResponse.searchFrom(study))
+                .collect(Collectors.toList());
+    }
+
     private LocationResponse getLocation(boolean offline, String locationCode) {
         LocationResponse location = null;
         if (offline) {

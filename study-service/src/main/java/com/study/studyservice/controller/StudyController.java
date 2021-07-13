@@ -11,6 +11,7 @@ import com.study.studyservice.model.waituser.WaitUserResponse;
 import com.study.studyservice.service.StudyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.LazyToOne;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -113,4 +114,8 @@ public class StudyController {
         return ResponseEntity.ok(studyService.findByIdIn(request));
     }
 
+    @GetMapping("/users/studies")
+    public ResponseEntity<List<StudyResponse>> findByUser(@LoginUser Long userId){
+        return ResponseEntity.ok(studyService.findByUser(userId));
+    }
 }

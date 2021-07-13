@@ -638,4 +638,40 @@ class StudyControllerTest {
         then(studyService).should(times(1)).find(any(),any(),any());
     }
 
+    @Test
+    @DisplayName("회원이 가입한 스터디 조회 API 테스트")
+    void findByUser() throws Exception {
+        List<StudyResponse> studyResponses = Arrays.asList(TEST_STUDY_RESPONSE5, TEST_STUDY_RESPONSE6);
+
+        given(studyService.findByUser(any()))
+                .willReturn(studyResponses);
+
+        mockMvc.perform(get("/users/studies")
+                .header(HttpHeaders.AUTHORIZATION,TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(studyResponses)))
+                .andDo(document("study/user",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).optional().description("Access Token")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("스터디 ID"),
+                                fieldWithPath("[].name").type(JsonFieldType.STRING).description("스터디 이름"),
+                                fieldWithPath("[].numberOfPeople").type(JsonFieldType.NUMBER).description("스터디 인원"),
+                                fieldWithPath("[].currentNumberOfPeople").type(JsonFieldType.NUMBER).description("스터디 현재 인원"),
+                                fieldWithPath("[].content").type(JsonFieldType.STRING).description("스터디 내용"),
+                                fieldWithPath("[].online").type(JsonFieldType.BOOLEAN).description("스터디 온라인 여부"),
+                                fieldWithPath("[].offline").type(JsonFieldType.BOOLEAN).description("스터디 오프라인여부"),
+                                fieldWithPath("[].status").type(JsonFieldType.STRING).description("스터디 상태"),
+                                fieldWithPath("[].image").type(JsonFieldType.OBJECT).description("스터디 이미지"),
+                                fieldWithPath("[].image.studyImage").type(JsonFieldType.STRING).description("스터디 이미지 URL"),
+                                fieldWithPath("[].image.thumbnailImage").type(JsonFieldType.STRING).description("스터디 썸네일 이미지 URL"),
+                                fieldWithPath("[].studyTags").type(JsonFieldType.ARRAY).description("스터디 태그")
+                        )
+                ));
+
+        then(studyService).should(times(1)).findByUser(any());
+    }
+
 }

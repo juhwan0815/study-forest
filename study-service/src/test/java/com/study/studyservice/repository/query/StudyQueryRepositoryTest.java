@@ -50,6 +50,34 @@ class StudyQueryRepositoryTest {
     }
 
     @Test
+    @DisplayName("회원이 가입한 스터디를 조회한다.")
+    void findByUserId(){
+        // given
+        Study study = Study.createStudy("테스트 스터디", 5, "테스트 스터디입니다.",
+                true, true, null);
+        study.addStudyUser(1L, Role.ADMIN);
+        study.addStudyUser(2L, Role.USER);
+
+        List<Tag> tags = new ArrayList<>();
+        tags.add(Tag.createTag("스프링"));
+        tags.add(Tag.createTag("JPA"));
+        tagRepository.saveAll(tags);
+
+        study.addStudyTags(tags);
+
+        studyRepository.save(study);
+
+        em.flush();
+        em.clear();
+
+        // when
+        List<Study> result = studyQueryRepository.findByUser(1L);
+
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getStudyTags().size()).isEqualTo(2);
+    }
+
+    @Test
     @DisplayName("스터디와 스터디 태그를 같이 조회한다.")
     void findWithStudyTagById() {
         // given

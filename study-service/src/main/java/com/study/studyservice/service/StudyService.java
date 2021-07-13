@@ -40,4 +40,7 @@ public interface StudyService {
     void deleteStudyUserSelf(Long userId, Long studyId);
 
     List<StudyResponse> findByIdIn(StudyFindRequest request);
+
+    List<StudyResponse> findByUser(Long userId);
+
 }

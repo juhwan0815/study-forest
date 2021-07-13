@@ -31,21 +31,31 @@ public class StudyQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public Study findWithStudyTagsById(Long studyId){
+    public List<Study> findByUser(Long userId) {
+        return queryFactory
+                .selectFrom(study).distinct()
+                .leftJoin(study.studyUsers, studyUser)
+                .leftJoin(study.studyTags,studyTag).fetchJoin()
+                .leftJoin(studyTag.tag,tag).fetchJoin()
+                .where(studyUser.userId.eq(userId))
+                .fetch();
+    }
+
+    public Study findWithStudyTagsById(Long studyId) {
         Study findStudy = queryFactory
                 .selectFrom(study).distinct()
                 .leftJoin(study.studyTags, studyTag).fetchJoin()
                 .where(study.id.eq(studyId))
                 .fetchOne();
 
-        if(findStudy == null){
-           throw new StudyException(studyId + "는 존재하지 않는 스터디 ID입니다.");
+        if (findStudy == null) {
+            throw new StudyException(studyId + "는 존재하지 않는 스터디 ID입니다.");
         }
 
         return findStudy;
     }
 
-    public Study findWithStudyUsersById(Long studyId){
+    public Study findWithStudyUsersById(Long studyId) {
         Study findStudy = queryFactory
                 .selectFrom(study).distinct()
                 .leftJoin(study.studyUsers, studyUser).fetchJoin()
@@ -53,14 +63,14 @@ public class StudyQueryRepository {
                 .orderBy(studyUser.id.asc())
                 .fetchOne();
 
-        if(findStudy == null){
+        if (findStudy == null) {
             throw new StudyException(studyId + "는 존재하지 않는 스터디 ID입니다.");
         }
 
         return findStudy;
     }
 
-    public Study findWithCategoryAndStudyTagsAndTagById(Long studyId){
+    public Study findWithCategoryAndStudyTagsAndTagById(Long studyId) {
         Study findStudy = queryFactory
                 .selectFrom(study).distinct()
                 .leftJoin(study.category, category).fetchJoin()
@@ -70,14 +80,14 @@ public class StudyQueryRepository {
                 .where(study.id.eq(studyId))
                 .fetchOne();
 
-        if(findStudy == null){
+        if (findStudy == null) {
             throw new StudyException(studyId + "는 존재하지 않는 스터디 ID입니다.");
         }
 
         return findStudy;
     }
 
-    public Study findWithWaitUserById(Long studyId){
+    public Study findWithWaitUserById(Long studyId) {
         Study findStudy = queryFactory
                 .selectFrom(study).distinct()
                 .leftJoin(study.waitUsers, waitUser).fetchJoin()
@@ -85,22 +95,22 @@ public class StudyQueryRepository {
                 .orderBy(waitUser.id.asc())
                 .fetchOne();
 
-        if(findStudy == null){
+        if (findStudy == null) {
             throw new StudyException(studyId + "는 존재하지 않는 스터디 ID입니다.");
         }
 
         return findStudy;
     }
 
-    public List<Study> findByIdIn(List<Long> studyIdList){
-       return queryFactory
+    public List<Study> findByIdIn(List<Long> studyIdList) {
+        return queryFactory
                 .selectFrom(study).distinct()
                 .where(study.id.in(studyIdList))
                 .fetch();
     }
 
     public Page<Study> findBySearchCondition(StudySearchRequest request, List<Long> locationIdList,
-                                             Pageable pageable){
+                                             Pageable pageable) {
         QueryResults<Study> result = queryFactory
                 .selectFrom(study).distinct()
                 .where(nameLike(request.getSearchKeyword()),
@@ -114,26 +124,26 @@ public class StudyQueryRepository {
 
         List<Study> content = result.getResults();
         long total = result.getTotal();
-        return new PageImpl<>(content,pageable,total);
+        return new PageImpl<>(content, pageable, total);
     }
 
-    private BooleanExpression locationIn(List<Long> locationIdList){
-        return locationIdList != null ?  study.locationId.in(locationIdList) : null;
+    private BooleanExpression locationIn(List<Long> locationIdList) {
+        return locationIdList != null ? study.locationId.in(locationIdList) : null;
     }
 
-    private BooleanExpression nameLike(String searchKeyword){
+    private BooleanExpression nameLike(String searchKeyword) {
         return StringUtils.hasText(searchKeyword) ? study.name.contains(searchKeyword) : null;
     }
 
-    private BooleanExpression categoryEq(Long categoryId){
+    private BooleanExpression categoryEq(Long categoryId) {
         return categoryId != null ? study.category.id.eq(categoryId) : null;
     }
 
-    private BooleanExpression online(Boolean online){
+    private BooleanExpression online(Boolean online) {
         return online != null ? study.online.eq(online) : null;
     }
 
-    private BooleanExpression offline(Boolean offline){
+    private BooleanExpression offline(Boolean offline) {
         return offline != null ? study.offline.eq(offline) : null;
     }
 }

@@ -767,4 +767,19 @@ class StudyServiceTest {
         then(studyQueryRepository).should(times(1)).findBySearchCondition(any(),any(),any());
     }
 
+    @Test
+    @DisplayName("회원이 가입한 스터디를 조회한다.")
+    void findByUserId(){
+        // given
+        given(studyQueryRepository.findByUser(any()))
+                .willReturn(Arrays.asList(createTestOfflineStudy()));
+        // when
+        List<StudyResponse> result = studyService.findByUser(1L);
+
+        // then
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getStudyTags().size()).isEqualTo(2);
+        then(studyQueryRepository).should(times(1)).findByUser(any());
+    }
+
 }
