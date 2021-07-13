@@ -126,16 +126,16 @@ public class StudyFixture {
     public static final UserResponse TEST_USER_RESPONSE3 = new UserResponse(1L,"한다빈",TEST_USER_IMAGE,"female","20~29",3,800L);
 
     public static final WaitUserResponse TEST_WAIT_USER_RESPONSE1
-            = new WaitUserResponse(1L,3L,"황철원");
+            = new WaitUserResponse(1L,3L,"황철원",TEST_USER_IMAGE,"male","20~29");
 
     public static final WaitUserResponse TEST_WAIT_USER_RESPONSE2
-            = new WaitUserResponse(2L,2L,"황주환");
+            = new WaitUserResponse(2L,2L,"황주환",TEST_USER_IMAGE,"male","20~29");
 
     public static final StudyUserResponse TEST_STUDY_USER_RESPONSE1
-            = new StudyUserResponse(1L,1L,"한다빈",Role.ADMIN);
+            = new StudyUserResponse(1L,1L,"한다빈",TEST_USER_IMAGE,"female","20~29",Role.ADMIN);
 
     public static final StudyUserResponse TEST_STUDY_USER_RESPONSE2
-            = new StudyUserResponse(2L,2L,"황주환",Role.USER);
+            = new StudyUserResponse(2L,2L,"황주환",TEST_USER_IMAGE,"male","20~29",Role.USER);
 
     public static Study createTestOnlineStudy(){
         Study study = new Study(1L,

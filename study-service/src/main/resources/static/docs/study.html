@@ -639,8 +639,8 @@ Content-Length: 1275
   } ],
   "pageable" : {
     "sort" : {
-      "unsorted" : true,
       "sorted" : false,
+      "unsorted" : true,
       "empty" : true
     },
     "offset" : 0,
@@ -655,12 +655,12 @@ Content-Length: 1275
   "size" : 20,
   "number" : 0,
   "sort" : {
-    "unsorted" : true,
     "sorted" : false,
+    "unsorted" : true,
     "empty" : true
   },
-  "first" : true,
   "numberOfElements" : 2,
+  "first" : true,
   "empty" : false
 }</code></pre>
 </div>
@@ -1945,16 +1945,28 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Content-Length: 122
+Content-Length: 468
 
 [ {
   "id" : 1,
   "userId" : 3,
-  "nickName" : "황철원"
+  "nickName" : "황철원",
+  "image" : {
+    "thumbnailImage" : "테스트 썸네일 이미지",
+    "profileImage" : "테스트 프로필 이미지"
+  },
+  "gender" : "male",
+  "ageRange" : "20~29"
 }, {
   "id" : 2,
   "userId" : 2,
-  "nickName" : "황주환"
+  "nickName" : "황주환",
+  "image" : {
+    "thumbnailImage" : "테스트 썸네일 이미지",
+    "profileImage" : "테스트 프로필 이미지"
+  },
+  "gender" : "male",
+  "ageRange" : "20~29"
 } ]</code></pre>
 </div>
 </div>
@@ -1988,6 +2000,31 @@ Content-Length: 122
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].nickName</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">스터디 참가 대기 유저 닉네임</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].image</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 참가 대기 유저 이미지</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].image.thumbnailImage</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 참가 대기 유저 썸네일 이미지 URL</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].image.profileImage</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 참가 대기 유저 이미지 URL</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].gender</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 참가 대기 유저 성별</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].ageRange</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 참가 대기 유저 나이대</p></td>
 </tr>
 </tbody>
 </table>
@@ -2192,17 +2229,29 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Content-Length: 161
+Content-Length: 509
 
 [ {
   "id" : 1,
   "userId" : 1,
   "nickName" : "한다빈",
+  "image" : {
+    "thumbnailImage" : "테스트 썸네일 이미지",
+    "profileImage" : "테스트 프로필 이미지"
+  },
+  "gender" : "female",
+  "ageRange" : "20~29",
   "role" : "ADMIN"
 }, {
   "id" : 2,
   "userId" : 2,
   "nickName" : "황주환",
+  "image" : {
+    "thumbnailImage" : "테스트 썸네일 이미지",
+    "profileImage" : "테스트 프로필 이미지"
+  },
+  "gender" : "male",
+  "ageRange" : "20~29",
   "role" : "USER"
 } ]</code></pre>
 </div>
@@ -2237,6 +2286,31 @@ Content-Length: 161
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].nickName</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">스터디 참가 유저 닉네임</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].image</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 참가 유저 이미지</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].image.thumbnailImage</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 참가 유저 썸네일 이미지 URL</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].image.profileImage</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 참가  유저 이미지 URL</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].gender</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 참가 유저 성별</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].ageRange</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 참가 유저 나이대</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].role</code></p></td>

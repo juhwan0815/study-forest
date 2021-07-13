@@ -377,7 +377,12 @@ class StudyControllerTest {
                         responseFields(
                                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("스터디 참가 대기 ID"),
                                 fieldWithPath("[].userId").type(JsonFieldType.NUMBER).description("스터디 참가 대기 유저 ID"),
-                                fieldWithPath("[].nickName").type(JsonFieldType.STRING).description("스터디 참가 대기 유저 닉네임")
+                                fieldWithPath("[].nickName").type(JsonFieldType.STRING).description("스터디 참가 대기 유저 닉네임"),
+                                fieldWithPath("[].image").type(JsonFieldType.OBJECT).description("스터디 참가 대기 유저 이미지"),
+                                fieldWithPath("[].image.thumbnailImage").type(JsonFieldType.STRING).description("스터디 참가 대기 유저 썸네일 이미지 URL"),
+                                fieldWithPath("[].image.profileImage").type(JsonFieldType.STRING).description("스터디 참가 대기 유저 이미지 URL"),
+                                fieldWithPath("[].gender").type(JsonFieldType.STRING).description("스터디 참가 대기 유저 성별"),
+                                fieldWithPath("[].ageRange").type(JsonFieldType.STRING).description("스터디 참가 대기 유저 나이대")
                         )
                 ));
         then(studyService).should(times(1)).findWaitUsersByStudyId(any());
@@ -459,6 +464,11 @@ class StudyControllerTest {
                                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("스터디 참가 ID"),
                                 fieldWithPath("[].userId").type(JsonFieldType.NUMBER).description("스터디 참가 유저 ID"),
                                 fieldWithPath("[].nickName").type(JsonFieldType.STRING).description("스터디 참가 유저 닉네임"),
+                                fieldWithPath("[].image").type(JsonFieldType.OBJECT).description("스터디 참가 유저 이미지"),
+                                fieldWithPath("[].image.thumbnailImage").type(JsonFieldType.STRING).description("스터디 참가 유저 썸네일 이미지 URL"),
+                                fieldWithPath("[].image.profileImage").type(JsonFieldType.STRING).description("스터디 참가  유저 이미지 URL"),
+                                fieldWithPath("[].gender").type(JsonFieldType.STRING).description("스터디 참가 유저 성별"),
+                                fieldWithPath("[].ageRange").type(JsonFieldType.STRING).description("스터디 참가 유저 나이대"),
                                 fieldWithPath("[].role").type(JsonFieldType.STRING).description("스터디 참가 유저 권한")
                         )
                 ));
