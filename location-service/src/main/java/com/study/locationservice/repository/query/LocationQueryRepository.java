@@ -21,6 +21,24 @@ public class LocationQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
+    public List<Location> findAroundByLocation(Location findLocation, Integer searchDistance) {
+        List<Location> result = queryFactory
+                .selectFrom(location)
+                .where(betweenLen(findLocation.getLen(), searchDistance),
+                        betweenLet(findLocation.getLet(), searchDistance))
+                .fetch();
+
+        return result;
+    }
+
+    private BooleanExpression betweenLen(Double len, Integer searchDistance) {
+        return location.len.between(len - 0.009009 * searchDistance, len + 0.009009 * searchDistance);
+    }
+
+    private BooleanExpression betweenLet(Double let, Integer searchDistance) {
+        return location.let.between(let - 0.011353 * searchDistance, let + 0.011353 * searchDistance);
+    }
+
     public Page<Location> findBySearchCondition(Pageable pageable,
                                                 LocationSearchRequest locationSearchRequest) {
         QueryResults<Location> result = queryFactory
@@ -33,7 +51,7 @@ public class LocationQueryRepository {
 
         List<Location> content = result.getResults();
         long total = result.getTotal();
-        return new PageImpl<>(content,pageable,total);
+        return new PageImpl<>(content, pageable, total);
     }
 
     private BooleanExpression dongLike(String searchName) {
@@ -45,7 +63,8 @@ public class LocationQueryRepository {
     }
 
     private BooleanExpression riLike(String searchName) {
-        return searchName != null ?  location.ri.contains(searchName) : null;
+        return searchName != null ? location.ri.contains(searchName) : null;
     }
+
 
 }

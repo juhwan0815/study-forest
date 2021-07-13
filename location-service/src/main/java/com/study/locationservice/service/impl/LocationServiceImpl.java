@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -64,5 +65,17 @@ public class LocationServiceImpl implements LocationService {
                 .orElseThrow(() -> new LocationException(request.getCode() + "는 존재하지 않는 지역정보 코드입니다."));
 
         return LocationResponse.from(findLocation);
+    }
+
+    @Override
+    public List<LocationResponse> findAroundById(Long locationId, Integer searchDistance) {
+        Location findLocation = locationRepository.findById(locationId)
+                .orElseThrow(() -> new LocationException(locationId + "는 존재하지 않는 지역정보 ID입니다."));
+
+        List<Location> aroundLocations = locationQueryRepository.findAroundByLocation(findLocation, searchDistance);
+
+        return aroundLocations.stream()
+                .map(location-> LocationResponse.from(location))
+                .collect(Collectors.toList());
     }
 }

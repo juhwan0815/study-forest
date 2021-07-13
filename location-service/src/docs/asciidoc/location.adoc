@@ -66,3 +66,17 @@ include::{snippets}/location/findByCode/request-parameters.adoc[]
 include::{snippets}/location/findByCode/http-response.adoc[]
 ====== Body
 include::{snippets}/location/findByCode/response-fields.adoc[]
+
+==== 지역정보 주변동네 조회 API
+===== 요청
+include::{snippets}/location/findAroundById/http-request.adoc[]
+====== Header
+include::{snippets}/location/findAroundById/request-headers.adoc[]
+====== Path
+include::{snippets}/location/findAroundById/path-parameters.adoc[]
+====== Param
+include::{snippets}/location/findAroundById/request-parameters.adoc[]
+===== 응답
+include::{snippets}/location/findAroundById/http-response.adoc[]
+====== Body
+include::{snippets}/location/findAroundById/response-fields.adoc[]

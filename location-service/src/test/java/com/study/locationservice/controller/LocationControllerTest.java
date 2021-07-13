@@ -28,6 +28,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.study.locationservice.LocationFixture.*;
@@ -240,5 +241,45 @@ class LocationControllerTest {
                         )));
 
         then(locationService).should(times(1)).findByCode(any());
+    }
+
+    @Test
+    @DisplayName("지역정보 ID로 주변 지역 정보 검색 API 테스트")
+    void findAroundById() throws Exception {
+        List<LocationResponse> result = Arrays.asList(TEST_LOCATION_RESPONSE1, TEST_LOCATION_RESPONSE2);
+
+        given(locationService.findAroundById(any(), any()))
+                .willReturn(result);
+
+        mockMvc.perform(get("/locations/{locationId}/around", 1)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .param("searchDistance","3"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(result)))
+                .andDo(document("location/findAroundById",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("locationId").description("지역정보 ID")
+                        ),
+                        requestParameters(
+                                parameterWithName("searchDistance").description("검색 거리")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("지역정보 ID"),
+                                fieldWithPath("[].code").type(JsonFieldType.STRING).description("행정동/법정동 코드"),
+                                fieldWithPath("[].city").type(JsonFieldType.STRING).description("시/도"),
+                                fieldWithPath("[].gu").type(JsonFieldType.STRING).description("시/군/구"),
+                                fieldWithPath("[].dong").type(JsonFieldType.STRING).description("읍/면/동"),
+                                fieldWithPath("[].ri").type(JsonFieldType.STRING).description("리"),
+                                fieldWithPath("[].let").type(JsonFieldType.NUMBER).description("위도"),
+                                fieldWithPath("[].len").type(JsonFieldType.NUMBER).description("경도"),
+                                fieldWithPath("[].codeType").type(JsonFieldType.STRING).description("코드타입")
+                        )
+                ));
+
+        then(locationService).should(times(1)).findAroundById(any(),any());
     }
 }

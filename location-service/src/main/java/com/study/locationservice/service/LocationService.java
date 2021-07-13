@@ -18,4 +18,6 @@ public interface LocationService {
     Page<LocationResponse> findBySearchCondition(Pageable pageable, LocationSearchRequest request);
 
     LocationResponse findByCode(LocationCodeRequest request);
+
+    List<LocationResponse> findAroundById(Long locationId,Integer searchDistance);
 }

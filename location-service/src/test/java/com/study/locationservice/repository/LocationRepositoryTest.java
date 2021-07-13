@@ -16,6 +16,8 @@ import org.springframework.data.domain.PageRequest;
 
 import javax.persistence.EntityManager;
 
+import java.util.List;
+
 import static com.study.locationservice.LocationFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -102,5 +104,40 @@ class LocationRepositoryTest {
         assertThat(result.getContent().get(0).getDong()).isEqualTo(TEST_LOCATION_SEARCH_REQUEST.getSearchName());
     }
 
+    @Test
+    @DisplayName("주변 동네 검색 테스트")
+    void findAroundByLocation(){
+        // given
+        Location location1 = Location.createLocation("2823751000", "인천광역시", "부평구", "부평1동",null,37.494168, 126.720032, "H");
+        Location location2 = Location.createLocation("2823752000", "인천광역시", "부평구", "부평2동",null,37.486874, 126.71794, "H");
+        Location location3 = Location.createLocation("2823753000", "인천광역시", "부평구", "부평3동",null,37.486111, 126.708309, "H");
+        Location location4 = Location.createLocation("2823754000", "인천광역시", "부평구", "부평4동",null,37.500906, 126.724893, "H");
+        Location location5 = Location.createLocation("2823755000", "인천광역시", "부평구", "부평5동",null,37.493609, 126.728399, "H");
+        Location location6 = Location.createLocation("2823756000", "인천광역시", "부평구", "부평6동",null,37.486458, 126.724449, "H");
+        Location location7 = Location.createLocation("2823757000", "인천광역시", "부평구", "산곡1동",null,37.506944, 126.700236, "H");
+        Location location8 = Location.createLocation("2823758000", "인천광역시", "부평구", "산곡2동",null,37.505903, 126.708771, "H");
+        Location location9 = Location.createLocation("2823758100", "인천광역시", "부평구", "산곡3동",null,37.490794, 126.709709, "H");
+        Location location10 =Location.createLocation("2823758200", "인천광역시", "부평구", "산곡4동",null,37.501743, 126.711511, "H");
+
+        locationRepository.save(location1);
+        locationRepository.save(location2);
+        locationRepository.save(location3);
+        locationRepository.save(location4);
+        locationRepository.save(location5);
+        locationRepository.save(location6);
+        locationRepository.save(location7);
+        locationRepository.save(location8);
+        locationRepository.save(location9);
+        locationRepository.save(location10);
+
+        em.flush();
+        em.clear();
+
+        // when
+        List<Location> result = locationQueryRepository.findAroundByLocation(location10, 3);
+
+        // then
+        assertThat(result.size()).isEqualTo(10);
+    }
 
 }

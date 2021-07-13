@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -118,6 +119,25 @@ class LocationServiceTest {
         assertThat(result.getId()).isEqualTo(TEST_LOCATION.getId());
         assertThat(result.getCode()).isEqualTo(TEST_LOCATION.getCode());
         assertThat(result.getDong()).isEqualTo(TEST_LOCATION.getDong());
+    }
+
+    @Test
+    @DisplayName("지역정보 ID와 검색거리로 주변 지역정보를 조회한다.")
+    void findAroundByLocation(){
+        // given
+        given(locationRepository.findById(any()))
+                .willReturn(Optional.of(TEST_LOCATION));
+
+        given(locationQueryRepository.findAroundByLocation(any(),any()))
+                .willReturn(Arrays.asList(TEST_LOCATION,TEST_LOCATION2));
+
+        // when
+        List<LocationResponse> result = locationService.findAroundById(1L, 3);
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
+        then(locationRepository).should(times(1)).findById(any());
+        then(locationQueryRepository).should(times(1)).findAroundByLocation(any(),any());
     }
 
 

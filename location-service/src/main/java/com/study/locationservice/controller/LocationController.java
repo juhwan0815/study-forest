@@ -1,5 +1,6 @@
 package com.study.locationservice.controller;
 
+import com.study.locationservice.domain.Location;
 import com.study.locationservice.model.LocationCodeRequest;
 import com.study.locationservice.model.LocationCreateRequest;
 import com.study.locationservice.model.LocationResponse;
@@ -46,7 +47,11 @@ public class LocationController {
         return ResponseEntity.ok(locationService.findByCode(request));
     }
 
-
+    @GetMapping("/locations/{locationId}/around")
+    public ResponseEntity<List<LocationResponse>> around(@PathVariable Long locationId,
+                                                 @RequestParam Integer searchDistance){
+        return ResponseEntity.ok(locationService.findAroundById(locationId,searchDistance));
+    }
 
 
 
