@@ -121,7 +121,8 @@ class UserControllerTest {
                                 fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
-                                fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID")
+                                fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID"),
+                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리")
                         )));
 
         // then
@@ -183,7 +184,8 @@ class UserControllerTest {
                                 fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
-                                fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID")
+                                fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID"),
+                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리")
                         )));
 
         // then
@@ -216,7 +218,8 @@ class UserControllerTest {
                                 fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
-                                fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID")
+                                fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID"),
+                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리")
                         )
                 ));
     }
@@ -245,7 +248,8 @@ class UserControllerTest {
                                 fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
-                                fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID")
+                                fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID"),
+                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리")
                         )
                 ));
 
@@ -305,7 +309,8 @@ class UserControllerTest {
                                 fieldWithPath("[].gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("[].ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("[].numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
-                                fieldWithPath("[].locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID")
+                                fieldWithPath("[].locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID"),
+                                fieldWithPath("[].searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리")
                         )
                 ));
         // then
@@ -340,7 +345,8 @@ class UserControllerTest {
                                 fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
-                                fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID")
+                                fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID"),
+                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리")
                         )
                 ));
 
@@ -452,6 +458,43 @@ class UserControllerTest {
 
         // then
         then(userService).should(times(1)).findStudyAppliesByUserId(any());
+    }
+
+    @Test
+    @DisplayName("회원의 오프라인 검색거리 수정 API 테스트")
+    void updateSearchDistance() throws Exception{
+
+        given(userService.updateSearchDistance(any(),any()))
+                .willReturn(TEST_USER_RESPONSE);
+
+        mockMvc.perform(patch("/users/searchDistance/{searchDistance}",2)
+                .header(HttpHeaders.AUTHORIZATION,TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE)))
+                .andDo(document("user/searchDistance/update",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access 토큰")
+                        ),
+                        pathParameters(
+                                parameterWithName("searchDistance").description("변경할 오프라인 검색 거리")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("회원 ID"),
+                                fieldWithPath("kakaoId").type(JsonFieldType.NUMBER).description("카카오 ID"),
+                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                fieldWithPath("image").type(JsonFieldType.OBJECT).description("회원 이미지 정보"),
+                                fieldWithPath("image.profileImage").type(JsonFieldType.STRING).description("회원 프로필 이미지 URL"),
+                                fieldWithPath("image.thumbnailImage").type(JsonFieldType.STRING).description("회원 프로필 썸네일 이미지 URL"),
+                                fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
+                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
+                                fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
+                                fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID"),
+                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("변경된 회원 오프라인 검색 거리")
+                        )
+                ));
+
+        then(userService).should(times(1)).updateSearchDistance(any(),any());
     }
 
 

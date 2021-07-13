@@ -26,6 +26,8 @@ public class User extends BaseEntity{
 
     private Long locationId;
 
+    private Integer searchDistance;
+
     private String nickName; // 닉네임
 
     private String ageRange; // 나이대
@@ -54,6 +56,7 @@ public class User extends BaseEntity{
         user.gender = gender;
         user.role = role;
         user.numberOfStudyApply = 0;
+        user.searchDistance = 3;
         return user;
     }
 
@@ -72,7 +75,6 @@ public class User extends BaseEntity{
     public void checkExistTag(Long tagId) {
         boolean checkTagResult = interestTags.stream()
                 .anyMatch(interestTag -> interestTag.getTagId().equals(tagId));
-
 
         if(checkTagResult){
             throw new UserException("이미 관심 주제로 추가한 태그 입니다.");
@@ -126,4 +128,7 @@ public class User extends BaseEntity{
         }
     }
 
+    public void changeSearchDistance(Integer searchDistance) {
+        this.searchDistance = searchDistance;
+    }
 }

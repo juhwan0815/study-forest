@@ -8,7 +8,6 @@ import com.study.userservice.model.user.UserLoginRequest;
 import com.study.userservice.model.user.UserResponse;
 import com.study.userservice.model.user.UserUpdateProfileRequest;
 import com.study.userservice.service.UserService;
-import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -47,7 +46,7 @@ public class UserController {
     }
 
     @PatchMapping("/users/profile")
-    public ResponseEntity<UserResponse> changeProfile(@LoginUser Long userId,
+    public ResponseEntity<UserResponse> updateProfile(@LoginUser Long userId,
                                                       @RequestPart(required = false) MultipartFile image,
                                                       @RequestPart @Valid UserUpdateProfileRequest request){
         return ResponseEntity.ok(userService.updateProfile(userId,image,request));
@@ -60,8 +59,14 @@ public class UserController {
     }
 
     @PatchMapping("/users/locations/{locationId}")
-    public ResponseEntity<UserResponse> changeLocation(@LoginUser Long userId,@PathVariable Long locationId){
+    public ResponseEntity<UserResponse> updateLocation(@LoginUser Long userId,@PathVariable Long locationId){
         return ResponseEntity.ok(userService.updateLocation(userId,locationId));
+    }
+
+    @PatchMapping("/users/searchDistance/{searchDistance}")
+    public ResponseEntity<UserResponse> updateSearchDistance(@LoginUser Long userid,
+                                                             @PathVariable Integer searchDistance){
+        return ResponseEntity.ok(userService.updateSearchDistance(userid,searchDistance));
     }
 
     @PostMapping("/users/tags/{tagId}")

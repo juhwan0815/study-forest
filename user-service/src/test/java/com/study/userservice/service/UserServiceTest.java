@@ -77,6 +77,7 @@ class UserServiceTest {
         assertThat(userResponse.getLocationId()).isNull();
         assertThat(userResponse.getGender()).isEqualTo(TEST_USER_LOGIN_REQUEST.getGender());
         assertThat(userResponse.getAgeRange()).isEqualTo(TEST_USER_LOGIN_REQUEST.getAgeRange());
+        assertThat(userResponse.getSearchDistance()).isEqualTo(3);
         assertThat(userResponse.getNumberOfStudyApply()).isEqualTo(0);
 
         then(userRepository).should(times(1)).findByKakaoId(anyLong());
@@ -102,6 +103,7 @@ class UserServiceTest {
         assertThat(userResponse.getGender()).isEqualTo(TEST_USER_LOGIN_REQUEST.getGender());
         assertThat(userResponse.getAgeRange()).isEqualTo(TEST_USER_LOGIN_REQUEST.getAgeRange());
         assertThat(userResponse.getNumberOfStudyApply()).isEqualTo(0);
+        assertThat(userResponse.getSearchDistance()).isEqualTo(3);
 
         then(userRepository).should(times(1)).findByKakaoId(anyLong());
         then(userRepository).should(never()).save(any());
@@ -207,6 +209,9 @@ class UserServiceTest {
         assertThat(result.getImage()).isEqualTo(TEST_USER.getImage());
         assertThat(result.getLocationId()).isNull();
         assertThat(result.getNumberOfStudyApply()).isEqualTo(TEST_USER.getNumberOfStudyApply());
+        assertThat(result.getSearchDistance()).isEqualTo(3);
+
+        then(userRepository).should(times(1)).findById(any());
     }
 
     @Test
@@ -426,5 +431,21 @@ class UserServiceTest {
         then(studyServiceClient).should(times(1)).findStudiesByIdIn(any());
     }
 
+    @Test
+    @DisplayName("회원의 오프라인 검색 거리를 변경한다.")
+    void updateSearchDistance(){
+        // given
+        User user = createTestUser();
+
+        given(userRepository.findById(any()))
+                .willReturn(Optional.of(user));
+
+        // when
+        UserResponse result = userService.updateSearchDistance(1L, 3);
+
+        // then
+        assertThat(result.getSearchDistance()).isEqualTo(3);
+        then(userRepository).should(times(1)).findById(any());
+    }
 
 }

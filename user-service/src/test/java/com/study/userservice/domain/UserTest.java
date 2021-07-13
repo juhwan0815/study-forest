@@ -164,4 +164,16 @@ class UserTest {
         assertThat(user.getStudyApplies().get(0).getStudyId()).isEqualTo(2L);
     }
 
+    @Test
+    void changeSearchDistance(){
+        // given
+        User user = User.createUser(1L,"황주환","10~19","male", UserRole.USER);
+
+        // when
+        user.changeSearchDistance(6);
+
+        // then
+        assertThat(user.getSearchDistance()).isEqualTo(6);
+    }
+
 }

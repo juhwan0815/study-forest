@@ -29,6 +29,8 @@ public class UserResponse {
 
     private Long locationId; // 지역 정보 ID
 
+    private Integer searchDistance; // 검색 거리
+
     public static UserResponse from(User user){
         UserResponse userResponse = new UserResponse();
         userResponse.id = user.getId();
@@ -39,6 +41,7 @@ public class UserResponse {
         userResponse.ageRange = user.getAgeRange();
         userResponse.numberOfStudyApply = user.getNumberOfStudyApply();
         userResponse.locationId = user.getLocationId();
+        userResponse.searchDistance = user.getSearchDistance();
         return userResponse;
     }
 

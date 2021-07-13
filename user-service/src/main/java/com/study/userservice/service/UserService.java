@@ -27,6 +27,8 @@ public interface UserService {
 
     UserResponse updateLocation(Long userId, Long locationId);
 
+    UserResponse updateSearchDistance(Long userId, Integer searchDistance);
+
     void addInterestTag(Long userId, Long tagId);
 
     void deleteInterestTag(Long userId, Long tagId);

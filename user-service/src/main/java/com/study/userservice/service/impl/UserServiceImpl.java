@@ -163,6 +163,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public UserResponse updateSearchDistance(Long userId, Integer searchDistance) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(userId + "는 존재하지 않는 회원 ID입니다."));
+
+        findUser.changeSearchDistance(searchDistance);
+
+        return UserResponse.from(findUser);
+    }
+
+    @Override
+    @Transactional
     public void addInterestTag(Long userId, Long tagId) {
         User findUser = userQueryRepository.findWithInterestTagById(userId);
 

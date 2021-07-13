@@ -78,8 +78,6 @@ class UserQueryRepositoryTest {
 
         // then
         assertThat(result.getInterestTags().size()).isEqualTo(2);
-        assertThat(result.getInterestTags().get(0).getTagId()).isEqualTo(1L);
-        assertThat(result.getInterestTags().get(1).getTagId()).isEqualTo(2L);
     }
 
     @Test

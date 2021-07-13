@@ -29,11 +29,11 @@ public class UserFixture {
             = Image.createImage("썸네일 이미지","이미지","이미지 저장");
 
     public static final User TEST_USER =
-            new User(1L,1L,null,"황주환","10~19","male",0,
+            new User(1L,1L,null,3,"황주환","10~19","male",0,
                     TEST_Image, UserRole.USER,null,null);
 
     public static final User TEST_USER2 =
-            new User(2L,1L,2L,"황철원","10~19","male",0,
+            new User(2L,1L,2L,3,"황철원","10~19","male",0,
                     TEST_Image, UserRole.USER,null,null);
 
     public static final MockMultipartFile TEST_IMAGE_FILE = new MockMultipartFile(
@@ -55,10 +55,10 @@ public class UserFixture {
             = new UserUpdateProfileRequest(true,"황철원");
 
     public static final UserResponse TEST_USER_RESPONSE
-            = new UserResponse(1L,1L,"황주환",TEST_Image,"male","10~19",2,1L);
+            = new UserResponse(1L,1L,"황주환",TEST_Image,"male","10~19",2,1L,3);
 
     public static final UserResponse TEST_USER_RESPONSE2
-            = new UserResponse(2L,2L,"황철원",TEST_Image,"male","10~19",3,2L);
+            = new UserResponse(2L,2L,"황철원",TEST_Image,"male","10~19",3,2L,3);
 
     public static final UserFindRequest TEST_USER_FIND_REQUEST = new UserFindRequest(Arrays.asList(1L,2L));
 
@@ -88,12 +88,12 @@ public class UserFixture {
             = new StudyApplyResponse(3L,2L,"테스트 스터디2",StudyApplyStatus.WAIT);
 
     public static User createTestUser(){
-        return new User(1L,1L,1L,"황주환","10~19","male",0,
+        return new User(1L,1L,1L,3,"황주환","10~19","male",0,
                 TEST_Image, UserRole.USER,new ArrayList<>(),new ArrayList<>());
     }
 
     public static User createTestUser2(){
-        User user = new User(1L, 1L, 1L, "황주환", "10~19", "male", 2,
+        User user = new User(1L, 1L, 1L, 3,"황주환", "10~19", "male", 2,
                 TEST_Image, UserRole.USER, new ArrayList<>(), new ArrayList<>());
         user.getInterestTags().add(new InterestTag(1L,1L,user));
         user.getInterestTags().add(new InterestTag(2L,2L,user));
