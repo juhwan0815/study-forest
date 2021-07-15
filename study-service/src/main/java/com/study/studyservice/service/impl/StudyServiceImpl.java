@@ -388,7 +388,8 @@ public class StudyServiceImpl implements StudyService {
     }
 
     private Image uploadImageToS3(MultipartFile image) {
-        String imageStoreName = UUID.randomUUID().toString();
+        String ext = extractExt(image.getContentType());
+        String imageStoreName = UUID.randomUUID().toString() + "." + ext;
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(image.getSize());
@@ -410,6 +411,11 @@ public class StudyServiceImpl implements StudyService {
         }
 
         return uploadResult;
+    }
+
+    private String extractExt(String contentType) {
+        int pos = contentType.lastIndexOf("/");
+        return contentType.substring(pos + 1);
     }
 
     private void deleteImageFromS3(String imageStoreName) {
