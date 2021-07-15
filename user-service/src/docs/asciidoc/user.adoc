@@ -104,7 +104,7 @@ include::{snippets}/user/searchDistance/update/path-parameters.adoc[]
 ===== 응답
 include::{snippets}/user/searchDistance/update/http-response.adoc[]
 ====== Body
-include::{snippets}/user/searchDistance/update/response-fields.adoc[]
+include::{snippets}/user/searchDistance/update/response-fields.adoc[]s
 
 
 ==== 회원 관심 태그 추가 API

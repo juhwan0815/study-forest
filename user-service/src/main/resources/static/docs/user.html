@@ -475,30 +475,34 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_응답_7">응답</a></li>
 </ul>
 </li>
-<li><a href="#_회원_오프라인_검색_거리_수정_api">8. 회원 오프라인 검색 거리 수정 API</a></li>
-<li><a href="#_요청_8">9. 요청</a></li>
-<li><a href="#_회원_관심_태그_추가_api">10. 회원 관심 태그 추가 API</a>
+<li><a href="#_회원_오프라인_검색_거리_수정_api">8. 회원 오프라인 검색 거리 수정 API</a>
 <ul class="sectlevel4">
-<li><a href="#_요청_9">요청</a></li>
+<li><a href="#_요청_8">요청</a></li>
 <li><a href="#_응답_8">응답</a></li>
 </ul>
 </li>
-<li><a href="#_회원_관심_태그_삭제_api">11. 회원 관심 태그 삭제 API</a>
+<li><a href="#_회원_관심_태그_추가_api">9. 회원 관심 태그 추가 API</a>
 <ul class="sectlevel4">
-<li><a href="#_요청_10">요청</a></li>
+<li><a href="#_요청_9">요청</a></li>
 <li><a href="#_응답_9">응답</a></li>
 </ul>
 </li>
-<li><a href="#_회원_관심_태그_조회_api">12. 회원 관심 태그 조회 API</a>
+<li><a href="#_회원_관심_태그_삭제_api">10. 회원 관심 태그 삭제 API</a>
 <ul class="sectlevel4">
-<li><a href="#_요청_11">요청</a></li>
+<li><a href="#_요청_10">요청</a></li>
 <li><a href="#_응답_10">응답</a></li>
 </ul>
 </li>
-<li><a href="#_회원_스터디_신청_내역_조회_api">13. 회원 스터디 신청 내역 조회 API</a>
+<li><a href="#_회원_관심_태그_조회_api">11. 회원 관심 태그 조회 API</a>
+<ul class="sectlevel4">
+<li><a href="#_요청_11">요청</a></li>
+<li><a href="#_응답_11">응답</a></li>
+</ul>
+</li>
+<li><a href="#_회원_스터디_신청_내역_조회_api">12. 회원 스터디 신청 내역 조회 API</a>
 <ul class="sectlevel4">
 <li><a href="#_요청_12">요청</a></li>
-<li><a href="#_응답_11">응답</a></li>
+<li><a href="#_응답_12">응답</a></li>
 </ul>
 </li>
 </ul>
@@ -629,7 +633,7 @@ Content-Length: 274
   "ageRange" : "10~19",
   "numberOfStudyApply" : 2,
   "locationId" : 1,
-  "searchDistance" : 2
+  "searchDistance" : 3
 }</code></pre>
 </div>
 </div>
@@ -818,7 +822,7 @@ Content-Length: 274
   "ageRange" : "10~19",
   "numberOfStudyApply" : 3,
   "locationId" : 2,
-  "searchDistance" : 2
+  "searchDistance" : 3
 }</code></pre>
 </div>
 </div>
@@ -994,7 +998,7 @@ Content-Length: 274
   "ageRange" : "10~19",
   "numberOfStudyApply" : 2,
   "locationId" : 1,
-  "searchDistance" : 2
+  "searchDistance" : 3
 }</code></pre>
 </div>
 </div>
@@ -1128,7 +1132,7 @@ Content-Length: 274
   "ageRange" : "10~19",
   "numberOfStudyApply" : 2,
   "locationId" : 1,
-  "searchDistance" : 2
+  "searchDistance" : 3
 }</code></pre>
 </div>
 </div>
@@ -1261,7 +1265,7 @@ Content-Length: 554
   "ageRange" : "10~19",
   "numberOfStudyApply" : 2,
   "locationId" : 1,
-  "searchDistance" : 2
+  "searchDistance" : 3
 }, {
   "id" : 2,
   "kakaoId" : 2,
@@ -1274,7 +1278,7 @@ Content-Length: 554
   "ageRange" : "10~19",
   "numberOfStudyApply" : 3,
   "locationId" : 2,
-  "searchDistance" : 2
+  "searchDistance" : 3
 } ]</code></pre>
 </div>
 </div>
@@ -1429,7 +1433,7 @@ Content-Length: 274
   "ageRange" : "10~19",
   "numberOfStudyApply" : 3,
   "locationId" : 2,
-  "searchDistance" : 2
+  "searchDistance" : 3
 }</code></pre>
 </div>
 </div>
@@ -1511,22 +1515,13 @@ Content-Length: 274
 </div>
 <div class="sect3">
 <h4 id="_회원_오프라인_검색_거리_수정_api"><a class="anchor" href="#_회원_오프라인_검색_거리_수정_api"></a><a class="link" href="#_회원_오프라인_검색_거리_수정_api">8. 회원 오프라인 검색 거리 수정 API</a></h4>
-
-</div>
-<div class="sect3">
-<h4 id="_요청_8"><a class="anchor" href="#_요청_8"></a><a class="link" href="#_요청_8">9. 요청</a></h4>
-<div class="paragraph">
-<p>include::/Users/juhwan/project/capstonedesign/user-service/src/docs/asciidoc/../../..//build/generated-snippets/user</p>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_회원_관심_태그_추가_api"><a class="anchor" href="#_회원_관심_태그_추가_api"></a><a class="link" href="#_회원_관심_태그_추가_api">10. 회원 관심 태그 추가 API</a></h4>
 <div class="sect4">
-<h5 id="_요청_9"><a class="anchor" href="#_요청_9"></a><a class="link" href="#_요청_9">요청</a></h5>
+<h5 id="_요청_8"><a class="anchor" href="#_요청_8"></a><a class="link" href="#_요청_8">요청</a></h5>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /users/tags/2 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PATCH /users/searchDistance/2 HTTP/1.1
 Authorization: Bearer 액세스토큰
+Accept: application/json
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1554,7 +1549,7 @@ Host: localhost:8080</code></pre>
 <div class="sect5">
 <h6 id="_path_3"><a class="anchor" href="#_path_3"></a><a class="link" href="#_path_3">Path</a></h6>
 <table class="tableblock frame-all grid-all spread">
-<caption class="title">Table 3. /users/tags/{tagId}</caption>
+<caption class="title">Table 3. /users/searchDistance/{searchDistance}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -1567,8 +1562,8 @@ Host: localhost:8080</code></pre>
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tagId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">추가할 태그 ID</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>searchDistance</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">변경할 오프라인 검색 거리</p></td>
 </tr>
 </tbody>
 </table>
@@ -1578,18 +1573,41 @@ Host: localhost:8080</code></pre>
 <h5 id="_응답_8"><a class="anchor" href="#_응답_8"></a><a class="link" href="#_응답_8">응답</a></h5>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+Content-Length: 274
+
+{
+  "id" : 1,
+  "kakaoId" : 1,
+  "nickName" : "황주환",
+  "image" : {
+    "thumbnailImage" : "썸네일 이미지",
+    "profileImage" : "이미지"
+  },
+  "gender" : "male",
+  "ageRange" : "10~19",
+  "numberOfStudyApply" : 2,
+  "locationId" : 1,
+  "searchDistance" : 3
+}</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_body_8"><a class="anchor" href="#_body_8"></a><a class="link" href="#_body_8">Body</a></h6>
+<div class="paragraph">
+<p>include::/Users/juhwan/project/capstonedesign/user-service/src/docs/asciidoc/../../..//build/generated-snippets/user/searchDistance/update/response-fields.adoc[]s</p>
 </div>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_회원_관심_태그_삭제_api"><a class="anchor" href="#_회원_관심_태그_삭제_api"></a><a class="link" href="#_회원_관심_태그_삭제_api">11. 회원 관심 태그 삭제 API</a></h4>
+<h4 id="_회원_관심_태그_추가_api"><a class="anchor" href="#_회원_관심_태그_추가_api"></a><a class="link" href="#_회원_관심_태그_추가_api">9. 회원 관심 태그 추가 API</a></h4>
 <div class="sect4">
-<h5 id="_요청_10"><a class="anchor" href="#_요청_10"></a><a class="link" href="#_요청_10">요청</a></h5>
+<h5 id="_요청_9"><a class="anchor" href="#_요청_9"></a><a class="link" href="#_요청_9">요청</a></h5>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /users/tags/2 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /users/tags/2 HTTP/1.1
 Authorization: Bearer 액세스토큰
 Host: localhost:8080</code></pre>
 </div>
@@ -1632,7 +1650,7 @@ Host: localhost:8080</code></pre>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>tagId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">삭제할 태그 ID</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">추가할 태그 ID</p></td>
 </tr>
 </tbody>
 </table>
@@ -1648,14 +1666,13 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_회원_관심_태그_조회_api"><a class="anchor" href="#_회원_관심_태그_조회_api"></a><a class="link" href="#_회원_관심_태그_조회_api">12. 회원 관심 태그 조회 API</a></h4>
+<h4 id="_회원_관심_태그_삭제_api"><a class="anchor" href="#_회원_관심_태그_삭제_api"></a><a class="link" href="#_회원_관심_태그_삭제_api">10. 회원 관심 태그 삭제 API</a></h4>
 <div class="sect4">
-<h5 id="_요청_11"><a class="anchor" href="#_요청_11"></a><a class="link" href="#_요청_11">요청</a></h5>
+<h5 id="_요청_10"><a class="anchor" href="#_요청_10"></a><a class="link" href="#_요청_10">요청</a></h5>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /users/tags HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">DELETE /users/tags/2 HTTP/1.1
 Authorization: Bearer 액세스토큰
-Accept: application/json
 Host: localhost:8080</code></pre>
 </div>
 </div>
@@ -1680,9 +1697,74 @@ Host: localhost:8080</code></pre>
 </tbody>
 </table>
 </div>
+<div class="sect5">
+<h6 id="_path_5"><a class="anchor" href="#_path_5"></a><a class="link" href="#_path_5">Path</a></h6>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 5. /users/tags/{tagId}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tagId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">삭제할 태그 ID</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="sect4">
 <h5 id="_응답_10"><a class="anchor" href="#_응답_10"></a><a class="link" href="#_응답_10">응답</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_회원_관심_태그_조회_api"><a class="anchor" href="#_회원_관심_태그_조회_api"></a><a class="link" href="#_회원_관심_태그_조회_api">11. 회원 관심 태그 조회 API</a></h4>
+<div class="sect4">
+<h5 id="_요청_11"><a class="anchor" href="#_요청_11"></a><a class="link" href="#_요청_11">요청</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /users/tags HTTP/1.1
+Authorization: Bearer 액세스토큰
+Accept: application/json
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_header_9"><a class="anchor" href="#_header_9"></a><a class="link" href="#_header_9">Header</a></h6>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Access 토큰</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_응답_11"><a class="anchor" href="#_응답_11"></a><a class="link" href="#_응답_11">응답</a></h5>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
@@ -1701,7 +1783,7 @@ Content-Length: 112
 </div>
 </div>
 <div class="sect5">
-<h6 id="_body_8"><a class="anchor" href="#_body_8"></a><a class="link" href="#_body_8">Body</a></h6>
+<h6 id="_body_9"><a class="anchor" href="#_body_9"></a><a class="link" href="#_body_9">Body</a></h6>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -1737,7 +1819,7 @@ Content-Length: 112
 </div>
 </div>
 <div class="sect3">
-<h4 id="_회원_스터디_신청_내역_조회_api"><a class="anchor" href="#_회원_스터디_신청_내역_조회_api"></a><a class="link" href="#_회원_스터디_신청_내역_조회_api">13. 회원 스터디 신청 내역 조회 API</a></h4>
+<h4 id="_회원_스터디_신청_내역_조회_api"><a class="anchor" href="#_회원_스터디_신청_내역_조회_api"></a><a class="link" href="#_회원_스터디_신청_내역_조회_api">12. 회원 스터디 신청 내역 조회 API</a></h4>
 <div class="sect4">
 <h5 id="_요청_12"><a class="anchor" href="#_요청_12"></a><a class="link" href="#_요청_12">요청</a></h5>
 <div class="listingblock">
@@ -1749,7 +1831,7 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect5">
-<h6 id="_header_9"><a class="anchor" href="#_header_9"></a><a class="link" href="#_header_9">Header</a></h6>
+<h6 id="_header_10"><a class="anchor" href="#_header_10"></a><a class="link" href="#_header_10">Header</a></h6>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 50%;">
@@ -1771,7 +1853,7 @@ Host: localhost:8080</code></pre>
 </div>
 </div>
 <div class="sect4">
-<h5 id="_응답_11"><a class="anchor" href="#_응답_11"></a><a class="link" href="#_응답_11">응답</a></h5>
+<h5 id="_응답_12"><a class="anchor" href="#_응답_12"></a><a class="link" href="#_응답_12">응답</a></h5>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
@@ -1797,7 +1879,7 @@ Content-Length: 287
 </div>
 </div>
 <div class="sect5">
-<h6 id="_body_9"><a class="anchor" href="#_body_9"></a><a class="link" href="#_body_9">Body</a></h6>
+<h6 id="_body_10"><a class="anchor" href="#_body_10"></a><a class="link" href="#_body_10">Body</a></h6>
 <table class="tableblock frame-all grid-all spread">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -1840,7 +1922,7 @@ Content-Length: 287
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-07-12 21:38:06 KST
+Last updated 2021-07-13 22:06:33 KST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
