@@ -28,6 +28,7 @@ import com.study.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -269,7 +270,8 @@ public class UserServiceImpl implements UserService {
 
 
     private Image uploadImageToS3(MultipartFile image) {
-        String imageStoreName = UUID.randomUUID().toString();
+        String ext = extractExt(image.getContentType());
+        String imageStoreName = UUID.randomUUID().toString() + "." + ext;
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(image.getSize());
@@ -291,6 +293,11 @@ public class UserServiceImpl implements UserService {
         }
 
         return uploadResult;
+    }
+
+    private String extractExt(String contentType) {
+        int pos = contentType.lastIndexOf("/");
+        return contentType.substring(pos + 1);
     }
 
     private void deleteImageFromS3(String imageStoreName) {
