@@ -388,7 +388,7 @@ public class StudyServiceImpl implements StudyService {
     }
 
     private Image uploadImageToS3(MultipartFile image) {
-        String imageStoreName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
+        String imageStoreName = UUID.randomUUID().toString();
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(image.getSize());
