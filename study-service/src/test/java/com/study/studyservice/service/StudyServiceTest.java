@@ -111,7 +111,7 @@ class StudyServiceTest {
                 .willReturn(createTestOnlineStudy());
 
         // when
-        StudyResponse result = studyService.create(1L,TEST_IMAGE_EMPTY_FILE,TEST_STUDY_CREATE_REQUEST3);
+        StudyResponse result = studyService.create(1L,null,TEST_STUDY_CREATE_REQUEST3);
 
         // then
         assertThat(result.getName()).isEqualTo(TEST_STUDY_CREATE_REQUEST3.getName());
@@ -251,7 +251,7 @@ class StudyServiceTest {
                 given(amazonS3Client)
                 .deleteObject(any(),any());
 
-        StudyResponse result = studyService.update(1L, 1L, TEST_IMAGE_EMPTY_FILE, TEST_STUDY_UPDATE_REQUEST2);
+        StudyResponse result = studyService.update(1L, 1L, null, TEST_STUDY_UPDATE_REQUEST2);
 
         assertThat(result.getName()).isEqualTo(TEST_STUDY_UPDATE_REQUEST2.getName());
         assertThat(result.getContent()).isEqualTo(TEST_STUDY_UPDATE_REQUEST2.getContent());

@@ -76,7 +76,7 @@ public class StudyServiceImpl implements StudyService {
 
     @Transactional
     @PostConstruct
-    void init(){
+    void init() {
         Category parentCategory1 = categoryRepository.save(Category.createCategory("개발", null));
         Category parentCategory2 = categoryRepository.save(Category.createCategory("영어", null));
         Category parentCategory3 = categoryRepository.save(Category.createCategory("자격증", null));
@@ -91,26 +91,26 @@ public class StudyServiceImpl implements StudyService {
         Category childCategory8 = categoryRepository.save(Category.createCategory("정통기", parentCategory2));
         Category childCategory9 = categoryRepository.save(Category.createCategory("전기기사", parentCategory2));
 
-        IntStream.range(0,100).forEach(value -> {
+        IntStream.range(0, 100).forEach(value -> {
             Study study = Study.createStudy("테스트 스터디" + value, value, "테스트 스터디" + value, true, true, childCategory1);
             study.changeLocation(Long.valueOf(800 + value));
 
             List<String> requestTags = new ArrayList<>();
-            requestTags.add("뿌직"+value);
-            requestTags.add("뿌직"+(value+1));
+            requestTags.add("뿌직" + value);
+            requestTags.add("뿌직" + (value + 1));
             List<Tag> tags = tagService.FindAndCreate(requestTags);
             study.addStudyTags(tags);
 
             studyRepository.save(study);
         });
 
-        IntStream.range(0,100).forEach(value -> {
-            Study study = Study.createStudy("테스트 스터디" + (value+100), (value+100), "테스트 스터디" + (value+100), true, true, childCategory1);
+        IntStream.range(0, 100).forEach(value -> {
+            Study study = Study.createStudy("테스트 스터디" + (value + 100), (value + 100), "테스트 스터디" + (value + 100), true, true, childCategory1);
             study.changeLocation(Long.valueOf(800 + value));
 
             List<String> requestTags = new ArrayList<>();
-            requestTags.add("뿌직"+value);
-            requestTags.add("뿌직"+(value+1));
+            requestTags.add("뿌직" + value);
+            requestTags.add("뿌직" + (value + 1));
             List<Tag> tags = tagService.FindAndCreate(requestTags);
             study.addStudyTags(tags);
 
@@ -195,7 +195,7 @@ public class StudyServiceImpl implements StudyService {
 
         List<Long> locationIdList = null;
 
-        if(request.getOffline() == true && userId != null){
+        if (request.getOffline() == true && userId != null) {
             UserResponse user = userServiceClient.findUserById(userId);
             Long locationId = user.getLocationId();
 
@@ -272,9 +272,9 @@ public class StudyServiceImpl implements StudyService {
         findStudy.checkStudyAdmin(loginUserId);
 
         findStudy.deleteWaitUser(userId);
-        findStudy.addStudyUser(userId,Role.USER);
+        findStudy.addStudyUser(userId, Role.USER);
 
-        studyApplySuccessMessageSender.send(StudyApplySuccessMessage.from(userId,studyId));
+        studyApplySuccessMessageSender.send(StudyApplySuccessMessage.from(userId, studyId));
     }
 
     @Override
@@ -285,7 +285,7 @@ public class StudyServiceImpl implements StudyService {
 
         findStudy.deleteWaitUser(userId);
 
-       studyApplyFailMessageSender.send(StudyApplyFailMessage.from(userId,studyId));
+        studyApplyFailMessageSender.send(StudyApplyFailMessage.from(userId, studyId));
     }
 
     @Override
@@ -358,27 +358,31 @@ public class StudyServiceImpl implements StudyService {
 
     private Image updateImage(MultipartFile image, boolean deleteImage, Study study) {
         Image studyImage = study.getImage();
-        if (deleteImage && image.isEmpty()) {
+        if (deleteImage && image == null) {
             if (studyImage != null) {
                 deleteImageFromS3(studyImage.getImageStoreName());
                 studyImage = null;
             }
         }
-        if (!deleteImage && !image.isEmpty()) {
-            if (studyImage != null) {
-                deleteImageFromS3(studyImage.getImageStoreName());
+        if (!deleteImage && image != null) {
+            if(!image.isEmpty()) {
+                if (studyImage != null) {
+                    deleteImageFromS3(studyImage.getImageStoreName());
+                }
+                validateImageType(image);
+                studyImage = uploadImageToS3(image);
             }
-            validateImageType(image);
-            studyImage = uploadImageToS3(image);
         }
         return studyImage;
     }
 
     private Image uploadImage(MultipartFile image) {
         Image uploadResult = null;
-        if (!image.isEmpty()) {
-            validateImageType(image);
-            uploadResult = uploadImageToS3(image);
+        if (image != null) {
+            if (!image.isEmpty()) {
+                validateImageType(image);
+                uploadResult = uploadImageToS3(image);
+            }
         }
         return uploadResult;
     }
