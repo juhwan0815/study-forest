@@ -216,7 +216,7 @@ public class StudyServiceImpl implements StudyService {
 
 
     @Override
-    public StudyResponse findById(Long studyId) {
+    public StudyResponse findById(Long userId,Long studyId) {
         Study findStudy = studyQueryRepository.findWithCategoryAndStudyTagsAndTagById(studyId);
 
         LocationResponse location;
@@ -227,7 +227,7 @@ public class StudyServiceImpl implements StudyService {
             location = new LocationResponse();
         }
 
-        return StudyResponse.from(findStudy, location);
+        return StudyResponse.from(findStudy, location,userId);
     }
 
     @Override

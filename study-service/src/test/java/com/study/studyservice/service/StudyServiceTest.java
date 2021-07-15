@@ -363,6 +363,106 @@ class StudyServiceTest {
     }
 
     @Test
+    @DisplayName("스터디 참가신청을 한 로그인 유저가 스터디를 상세조회한다.")
+    void findByIdWhenLoginUserIsWaitUser(){
+        // given
+        given(studyQueryRepository.findWithCategoryAndStudyTagsAndTagById(any()))
+                .willReturn(createTestOnlineStudy());
+
+        // when
+        StudyResponse result = studyService.findById(2L,1L);
+
+        // then
+        assertThat(result.getName()).isEqualTo("테스트 스터디");
+        assertThat(result.getContent()).isEqualTo("테스트 스터디 입니다.");
+        assertThat(result.getStudyTags().size()).isEqualTo(2);
+        assertThat(result.getStudyTags()).contains("스프링","JPA");
+        assertThat(result.getLocation().getId()).isNull();
+        assertThat(result.getImage()).isNull();
+        assertThat(result.getChildCategory().getName()).isEqualTo("프론트엔드");
+        assertThat(result.getParentCategory().getName()).isEqualTo("개발");
+        assertThat(result.getApply()).isEqualTo(true);
+
+        then(studyQueryRepository).should(times(1))
+                .findWithCategoryAndStudyTagsAndTagById(any());
+    }
+
+    @Test
+    @DisplayName("스터디에 가입한 한 로그인 유저가 스터디를 상세조회한다.")
+    void findByIdWhenLoginUserIsStudyUser(){
+        // given
+        given(studyQueryRepository.findWithCategoryAndStudyTagsAndTagById(any()))
+                .willReturn(createTestOnlineStudy());
+
+        // when
+        StudyResponse result = studyService.findById(1L,1L);
+
+        // then
+        assertThat(result.getName()).isEqualTo("테스트 스터디");
+        assertThat(result.getContent()).isEqualTo("테스트 스터디 입니다.");
+        assertThat(result.getStudyTags().size()).isEqualTo(2);
+        assertThat(result.getStudyTags()).contains("스프링","JPA");
+        assertThat(result.getLocation().getId()).isNull();
+        assertThat(result.getImage()).isNull();
+        assertThat(result.getChildCategory().getName()).isEqualTo("프론트엔드");
+        assertThat(result.getParentCategory().getName()).isEqualTo("개발");
+        assertThat(result.getApply()).isEqualTo(null);
+
+        then(studyQueryRepository).should(times(1))
+                .findWithCategoryAndStudyTagsAndTagById(any());
+    }
+
+    @Test
+    @DisplayName("스터디에 가입신청을 안한 로그인 유저가 스터디를 상세조회한다.")
+    void findByIdWhenLoginUser(){
+        // given
+        given(studyQueryRepository.findWithCategoryAndStudyTagsAndTagById(any()))
+                .willReturn(createTestOnlineStudy());
+
+        // when
+        StudyResponse result = studyService.findById(4L,1L);
+
+        // then
+        assertThat(result.getName()).isEqualTo("테스트 스터디");
+        assertThat(result.getContent()).isEqualTo("테스트 스터디 입니다.");
+        assertThat(result.getStudyTags().size()).isEqualTo(2);
+        assertThat(result.getStudyTags()).contains("스프링","JPA");
+        assertThat(result.getLocation().getId()).isNull();
+        assertThat(result.getImage()).isNull();
+        assertThat(result.getChildCategory().getName()).isEqualTo("프론트엔드");
+        assertThat(result.getParentCategory().getName()).isEqualTo("개발");
+        assertThat(result.getApply()).isEqualTo(false);
+
+        then(studyQueryRepository).should(times(1))
+                .findWithCategoryAndStudyTagsAndTagById(any());
+    }
+
+    @Test
+    @DisplayName("로그인하지 않은 유저가 스터디를 상세조회한다.")
+    void findById(){
+        // given
+        given(studyQueryRepository.findWithCategoryAndStudyTagsAndTagById(any()))
+                .willReturn(createTestOnlineStudy());
+
+        // when
+        StudyResponse result = studyService.findById(null,1L);
+
+        // then
+        assertThat(result.getName()).isEqualTo("테스트 스터디");
+        assertThat(result.getContent()).isEqualTo("테스트 스터디 입니다.");
+        assertThat(result.getStudyTags().size()).isEqualTo(2);
+        assertThat(result.getStudyTags()).contains("스프링","JPA");
+        assertThat(result.getLocation().getId()).isNull();
+        assertThat(result.getImage()).isNull();
+        assertThat(result.getChildCategory().getName()).isEqualTo("프론트엔드");
+        assertThat(result.getParentCategory().getName()).isEqualTo("개발");
+        assertThat(result.getApply()).isEqualTo(false);
+
+        then(studyQueryRepository).should(times(1))
+                .findWithCategoryAndStudyTagsAndTagById(any());
+    }
+
+    @Test
     @DisplayName("스터디 이미지가 있는 오프라인 스터디를 상세 조회한다.")
     void findByIdWithLocationAndImage(){
         // given
@@ -372,7 +472,7 @@ class StudyServiceTest {
         given(locationServiceClient.findLocationById(any()))
                 .willReturn(TEST_LOCATION_RESPONSE);
 
-        StudyResponse result = studyService.findById(1L);
+        StudyResponse result = studyService.findById(1L,1L);
 
         assertThat(result.getName()).isEqualTo("테스트 스터디");
         assertThat(result.getContent()).isEqualTo("테스트 스터디 입니다.");
@@ -395,7 +495,7 @@ class StudyServiceTest {
                 .willReturn(createTestOnlineStudy());
 
         // when
-        StudyResponse result = studyService.findById(1L);
+        StudyResponse result = studyService.findById(1L,1L);
 
         // then
         assertThat(result.getName()).isEqualTo("테스트 스터디");

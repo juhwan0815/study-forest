@@ -23,7 +23,7 @@ public interface StudyService {
 
     void delete(Long userId, Long studyId);
 
-    StudyResponse findById(Long studyId);
+    StudyResponse findById(Long userId,Long studyId);
 
     void createWaitUser(Long userId, Long studyId);
 

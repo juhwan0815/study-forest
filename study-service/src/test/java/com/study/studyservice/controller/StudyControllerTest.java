@@ -281,14 +281,15 @@ class StudyControllerTest {
     @DisplayName("스터디 상세 조회 API 테스트")
     void findById() throws Exception {
         // given
-        given(studyService.findById(any()))
-                .willReturn(TEST_STUDY_RESPONSE1);
+        given(studyService.findById(any(),any()))
+                .willReturn(TEST_STUDY_RESPONSE7);
 
         // when
         mockMvc.perform(RestDocumentationRequestBuilders.get("/studies/{studyId}", 1)
+                .header(HttpHeaders.AUTHORIZATION,TEST_AUTHORIZATION)
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(TEST_STUDY_RESPONSE1)))
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_STUDY_RESPONSE7)))
                 .andDo(document("study/findById",
                         pathParameters(
                                 parameterWithName("studyId").description("조회할 스터디 ID")
@@ -321,12 +322,13 @@ class StudyControllerTest {
                                 fieldWithPath("childCategory").type(JsonFieldType.OBJECT).description("자식 카테고리"),
                                 fieldWithPath("childCategory.id").type(JsonFieldType.NUMBER).description("자식 카테고리 ID"),
                                 fieldWithPath("childCategory.name").type(JsonFieldType.STRING).description("자식 카테고리 이름"),
-                                fieldWithPath("studyTags").type(JsonFieldType.ARRAY).description("스터디 태그")
+                                fieldWithPath("studyTags").type(JsonFieldType.ARRAY).description("스터디 태그"),
+                                fieldWithPath("apply").type(JsonFieldType.BOOLEAN).description("스터디 참가 신청 여부 null 일 경우 이미 스터디 참가 회원")
                         )
                 ));
 
         // then
-        then(studyService).should(times(1)).findById(any());
+        then(studyService).should(times(1)).findById(any(),any());
     }
 
     @Test

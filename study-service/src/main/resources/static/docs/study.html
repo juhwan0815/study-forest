@@ -1593,6 +1593,7 @@ Host: localhost:8080</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /studies/1 HTTP/1.1
+Authorization: Bearer 액세스토큰
 Accept: application/json
 Host: localhost:8080</code></pre>
 </div>
@@ -1626,7 +1627,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Content-Length: 736
+Content-Length: 755
 
 {
   "id" : 1,
@@ -1641,6 +1642,7 @@ Content-Length: 736
     "studyImage" : "테스트 이미지",
     "thumbnailImage" : "테스트 썸네일 이미지"
   },
+  "apply" : false,
   "location" : {
     "id" : 1,
     "code" : "1111054000",
@@ -1819,6 +1821,11 @@ Content-Length: 736
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>studyTags</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">스터디 태그</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>apply</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">스터디 참가 신청 여부 null 일 경우 이미 스터디 참가 회원</p></td>
 </tr>
 </tbody>
 </table>

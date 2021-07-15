@@ -99,25 +99,28 @@ public class StudyFixture {
                     "--리", 37.590758, 126.980996, "H");
 
     public static final StudyResponse TEST_STUDY_RESPONSE1 = new StudyResponse(1L,"테스트 스터디",5,1,"테스트 스터디 입니다.",
-            true,true,StudyStatus.OPEN,TEST_IMAGE,TEST_LOCATION_RESPONSE,TEST_CATEGORY_RESPONSE1,TEST_CATEGORY_RESPONSE2,
+            true,true,StudyStatus.OPEN,TEST_IMAGE,null,TEST_LOCATION_RESPONSE,TEST_CATEGORY_RESPONSE1,TEST_CATEGORY_RESPONSE2,
             Arrays.asList("JPA","스프링"));
 
     public static final StudyResponse TEST_STUDY_RESPONSE2 = new StudyResponse(1L,"테스트 스터디",5,1,"테스트 스터디 입니다.",
-            true,true,StudyStatus.CLOSE,TEST_IMAGE,TEST_LOCATION_RESPONSE,TEST_CATEGORY_RESPONSE1,TEST_CATEGORY_RESPONSE2,
+            true,true,StudyStatus.CLOSE,TEST_IMAGE,null,TEST_LOCATION_RESPONSE,TEST_CATEGORY_RESPONSE1,TEST_CATEGORY_RESPONSE2,
             Arrays.asList("JPA","스프링"));
 
     public static final StudyResponse TEST_STUDY_RESPONSE3 = new StudyResponse(3L,"테스트 스터디3",5,1,"테스트 스터디3 입니다.",
-            true,true,StudyStatus.CLOSE,TEST_IMAGE, null,null,null,null);
+            true,true,StudyStatus.CLOSE,TEST_IMAGE,null, null,null,null,null);
 
     public static final StudyResponse TEST_STUDY_RESPONSE4 = new StudyResponse(4L,"테스트 스터디4",5,1,"테스트 스터디4 입니다.",
-            true,true,StudyStatus.CLOSE,TEST_IMAGE,null,null,null,null);
+            true,true,StudyStatus.CLOSE,TEST_IMAGE,null,null,null,null,null);
 
     public static final StudyResponse TEST_STUDY_RESPONSE5 = new StudyResponse(5L,"테스트 스터디5",5,1,"테스트 스터디 5입니다.",
-            true,true,StudyStatus.OPEN,TEST_IMAGE,null,null,null,Arrays.asList("스프링","MYSQL"));
+            true,true,StudyStatus.OPEN,TEST_IMAGE,null,null,null,null,Arrays.asList("스프링","MYSQL"));
 
     public static final StudyResponse TEST_STUDY_RESPONSE6 = new StudyResponse(6L,"테스트 스터디6",5,1,"테스트 스터디 6입니다.",
-            true,true,StudyStatus.OPEN,TEST_IMAGE,null,null,null,Arrays.asList("뿌직1","뿌직2"));
+            true,true,StudyStatus.OPEN,TEST_IMAGE,null,null,null,null,Arrays.asList("뿌직1","뿌직2"));
 
+    public static final StudyResponse TEST_STUDY_RESPONSE7 = new StudyResponse(1L,"테스트 스터디",5,1,"테스트 스터디 입니다.",
+            true,true,StudyStatus.OPEN,TEST_IMAGE,false,TEST_LOCATION_RESPONSE,TEST_CATEGORY_RESPONSE1,TEST_CATEGORY_RESPONSE2,
+            Arrays.asList("JPA","스프링"));
 
     public static final UserImage TEST_USER_IMAGE = new UserImage("테스트 썸네일 이미지","테스트 프로필 이미지");
 

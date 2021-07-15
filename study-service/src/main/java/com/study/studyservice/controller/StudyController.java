@@ -11,7 +11,6 @@ import com.study.studyservice.model.waituser.WaitUserResponse;
 import com.study.studyservice.service.StudyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.LazyToOne;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -61,8 +60,8 @@ public class StudyController {
     }
 
     @GetMapping("/studies/{studyId}")
-    public ResponseEntity<StudyResponse> findById(@PathVariable Long studyId){
-        return ResponseEntity.ok(studyService.findById(studyId));
+    public ResponseEntity<StudyResponse> findById(@LoginUser Long userId,@PathVariable Long studyId){
+        return ResponseEntity.ok(studyService.findById(userId,studyId));
     }
 
     @PostMapping("/studies/{studyId}/waitUsers")
@@ -95,6 +94,7 @@ public class StudyController {
     public ResponseEntity<List<StudyUserResponse>> findStudyUsersByStudyId(@PathVariable Long studyId){
         return ResponseEntity.ok(studyService.findStudyUsersByStudyId(studyId));
     }
+
 
     @DeleteMapping("/studies/{studyId}/users/{userId}")
     public ResponseEntity<Void> deleteStudyUser(@LoginUser Long loginUserId,
