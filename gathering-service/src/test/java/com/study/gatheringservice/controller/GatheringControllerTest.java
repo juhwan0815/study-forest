@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -29,8 +30,7 @@ import java.util.List;
 import static com.study.gatheringservice.GatheringFixture.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -171,6 +171,30 @@ class GatheringControllerTest {
 
         // then
         then(gatheringService).should(times(1)).update(any(),any(),any());
+    }
+
+    @Test
+    @DisplayName("모임 삭제 API 테스트")
+    void delete() throws Exception{
+        // given
+        willDoNothing()
+                .given(gatheringService)
+                .delete(any(),any());
+
+        // when
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/gatherings/{gatheringId}",1)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
+                .andExpect(status().isOk())
+                .andDo(document("gathering/delete",
+                        requestHeaders(
+                                headerWithName("Authorization").description("액세스 토큰")
+                        ),
+                        pathParameters(
+                                parameterWithName("gatheringId").description("모임 ID")
+                        )));
+
+        // then
+        then(gatheringService).should(times(1)).delete(any(),any());
     }
 
 

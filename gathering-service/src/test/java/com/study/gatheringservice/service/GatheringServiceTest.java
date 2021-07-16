@@ -24,8 +24,7 @@ import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
@@ -161,7 +160,36 @@ public class GatheringServiceTest {
 
         // when
         assertThrows(GatheringException.class,()->gatheringService.update(2L, 1L, TEST_GATHERING_UPDATE_REQUEST2));
+    }
 
+    @Test
+    @DisplayName("모임 등록자가 모임을 삭제한다.")
+    void delete(){
+        // given
+        given(gatheringRepository.findWithGatheringUsersById(any()))
+                .willReturn(Optional.of(createOnlineGathering()));
+
+        willDoNothing()
+                .given(gatheringRepository)
+                .delete(any());
+
+        // when
+        gatheringService.delete(1L,1L);
+
+        // then
+        then(gatheringRepository).should(times(1)).findWithGatheringUsersById(any());
+        then(gatheringRepository).should(times(1)).delete(any());
+    }
+
+    @Test
+    @DisplayName("예외 테스트 : 모임 등록자가 아닌 유저가 모임을 삭제하려고 하면 예외가 발생한다.")
+    void deleteWhenIsNotRegister(){
+        // given
+        given(gatheringRepository.findWithGatheringUsersById(any()))
+                .willReturn(Optional.of(createOnlineGathering()));
+
+        // when
+        assertThrows(GatheringException.class,()->gatheringService.delete(2L,1L));
     }
 
 

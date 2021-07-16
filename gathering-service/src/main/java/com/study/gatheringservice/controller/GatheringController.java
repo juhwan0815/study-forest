@@ -53,4 +53,11 @@ public class GatheringController {
         return ResponseEntity.ok(gatheringService.update(userId,gatheringId,request));
     }
 
+    @DeleteMapping("/gatherings/{gatheringId}")
+    public ResponseEntity<Void> delete(@LoginUser Long userId,
+                                       @PathVariable Long gatheringId){
+        gatheringService.delete(userId,gatheringId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 }

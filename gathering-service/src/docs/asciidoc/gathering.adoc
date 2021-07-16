@@ -1,7 +1,7 @@
 :basedir: {docdir}/../../../
 :snippets: {basedir}/build/generated-snippets
 
-= 스터디 서비스 - 스터디 API
+= 모임 서비스 - 모임 API
 :doctype: location
 :icons: font
 :source-highlighter: highlightjs
@@ -45,3 +45,13 @@ include::{snippets}/gathering/update/request-fields.adoc[]
 include::{snippets}/gathering/update/http-response.adoc[]
 ====== Body
 include::{snippets}/gathering/update/response-fields.adoc[]
+
+==== 모임 삭제 API
+===== 요청
+include::{snippets}/gathering/delete/http-request.adoc[]
+====== Header
+include::{snippets}/gathering/delete/request-headers.adoc[]
+====== Path
+include::{snippets}/gathering/delete/path-parameters.adoc[]
+===== 응답
+include::{snippets}/gathering/delete/http-response.adoc[]
