@@ -36,8 +36,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -83,11 +82,11 @@ class GatheringControllerTest {
     @DisplayName("모임 생성 API 테스트")
     void create() throws Exception {
         // given
-        given(gatheringService.create(any(),any(),any()))
+        given(gatheringService.create(any(), any(), any()))
                 .willReturn(TEST_GATHERING_RESPONSE2);
 
         // when
-        mockMvc.perform(post("/studies/{studyId}/gatherings",1)
+        mockMvc.perform(post("/studies/{studyId}/gatherings", 1)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -119,22 +118,22 @@ class GatheringControllerTest {
                                 fieldWithPath("place").type(JsonFieldType.OBJECT).description("모임 장소"),
                                 fieldWithPath("place.name").type(JsonFieldType.STRING).description("모임 장소 이름"),
                                 fieldWithPath("place.let").type(JsonFieldType.NUMBER).description("모임 장소 위도"),
-                                fieldWithPath("place.len").type(JsonFieldType.NUMBER).description("모임 종소 경도")
+                                fieldWithPath("place.len").type(JsonFieldType.NUMBER).description("모임 장소 경도")
                         )));
 
         // then
-        then(gatheringService).should(times(1)).create(any(),any(),any());
+        then(gatheringService).should(times(1)).create(any(), any(), any());
     }
 
     @Test
     @DisplayName("모임 수정 API 테스트")
     void update() throws Exception {
         // given
-        given(gatheringService.update(any(),any(),any()))
+        given(gatheringService.update(any(), any(), any()))
                 .willReturn(TEST_GATHERING_RESPONSE3);
 
         // when
-        mockMvc.perform(patch("/gatherings/{gatheringId}",1)
+        mockMvc.perform(patch("/gatherings/{gatheringId}", 1)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -166,23 +165,23 @@ class GatheringControllerTest {
                                 fieldWithPath("place").type(JsonFieldType.OBJECT).description("변경된 모임 장소"),
                                 fieldWithPath("place.name").type(JsonFieldType.STRING).description("변경된 모임 장소 이름"),
                                 fieldWithPath("place.let").type(JsonFieldType.NUMBER).description("변경된 모임 장소 위도"),
-                                fieldWithPath("place.len").type(JsonFieldType.NUMBER).description("변경된 모임 종소 경도")
+                                fieldWithPath("place.len").type(JsonFieldType.NUMBER).description("변경된 모임 장소 경도")
                         )));
 
         // then
-        then(gatheringService).should(times(1)).update(any(),any(),any());
+        then(gatheringService).should(times(1)).update(any(), any(), any());
     }
 
     @Test
     @DisplayName("모임 삭제 API 테스트")
-    void delete() throws Exception{
+    void delete() throws Exception {
         // given
         willDoNothing()
                 .given(gatheringService)
-                .delete(any(),any());
+                .delete(any(), any());
 
         // when
-        mockMvc.perform(RestDocumentationRequestBuilders.delete("/gatherings/{gatheringId}",1)
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/gatherings/{gatheringId}", 1)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
                 .andDo(document("gathering/delete",
@@ -194,8 +193,46 @@ class GatheringControllerTest {
                         )));
 
         // then
-        then(gatheringService).should(times(1)).delete(any(),any());
+        then(gatheringService).should(times(1)).delete(any(), any());
     }
 
+    @Test
+    @DisplayName("모임 상세 조회 API 테스트")
+    void findById() throws Exception {
+
+        // given
+        given(gatheringService.findById(any(), any()))
+                .willReturn(TEST_GATHERING_RESPONSE4);
+
+        // when
+        mockMvc.perform(get("/gatherings/{gatheringId}", 1)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_GATHERING_RESPONSE4)))
+                .andDo(document("gathering/findById",
+                        requestHeaders(
+                                headerWithName("Authorization").description("액세스 토큰")
+                        ),
+                        pathParameters(
+                                parameterWithName("gatheringId").description("모임 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("모임 ID"),
+                                fieldWithPath("studyId").type(JsonFieldType.NUMBER).description("모임이 속한 스터디 ID"),
+                                fieldWithPath("gatheringTime").type(JsonFieldType.STRING).description("모임 시간"),
+                                fieldWithPath("numberOfPeople").type(JsonFieldType.NUMBER).description("모임 인원 수"),
+                                fieldWithPath("shape").type(JsonFieldType.STRING).description("모임 형태 ONLINE/OFFLINE"),
+                                fieldWithPath("content").type(JsonFieldType.STRING).description("모임 설명"),
+                                fieldWithPath("place").type(JsonFieldType.OBJECT).description("모임 장소"),
+                                fieldWithPath("place.name").type(JsonFieldType.STRING).description("모임 장소 이름"),
+                                fieldWithPath("place.let").type(JsonFieldType.NUMBER).description("모임 장소 위도"),
+                                fieldWithPath("place.len").type(JsonFieldType.NUMBER).description("모임 장소소 경도"),
+                                fieldWithPath("apply").type(JsonFieldType.BOOLEAN).description("모임 신청 여부 null일 경우 모임 등록자")
+                        )));
+
+        // then
+        then(gatheringService).should(times(1)).findById(any(), any());
+    }
 
 }

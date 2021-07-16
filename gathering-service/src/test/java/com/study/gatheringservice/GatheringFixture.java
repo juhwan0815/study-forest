@@ -48,6 +48,9 @@ public class GatheringFixture {
     public static GatheringResponse TEST_GATHERING_RESPONSE3
             = new GatheringResponse(1L,1L,TEST_LOCAL_DATE_TIME2,1,Shape.OFFLINE,"테스트 모임",TEST_PLACE,null);
 
+    public static GatheringResponse TEST_GATHERING_RESPONSE4
+            = new GatheringResponse(1L,1L,TEST_LOCAL_DATE_TIME2,1,Shape.OFFLINE,"테스트 모임",TEST_PLACE,false);
+
 
     public static Gathering createOnlineGathering(){
         Gathering gathering = new Gathering(1L, 1L, TEST_LOCAL_DATE_TIME1, Shape.ONLINE, "테스트 모임",

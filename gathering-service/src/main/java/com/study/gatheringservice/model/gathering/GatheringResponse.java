@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Data
 @AllArgsConstructor
@@ -38,7 +39,7 @@ public class GatheringResponse {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Boolean apply;
 
-    public static GatheringResponse from(Gathering gathering){
+    public static GatheringResponse from(Gathering gathering) {
         GatheringResponse gatheringResponse = new GatheringResponse();
         gatheringResponse.id = gathering.getId();
         gatheringResponse.studyId = gathering.getStudyId();
@@ -47,6 +48,34 @@ public class GatheringResponse {
         gatheringResponse.shape = gathering.getShape();
         gatheringResponse.content = gathering.getContent();
         gatheringResponse.place = gathering.getPlace();
+        return gatheringResponse;
+    }
+
+    public static GatheringResponse from(Gathering gathering, Long userId) {
+        GatheringResponse gatheringResponse = new GatheringResponse();
+        gatheringResponse.id = gathering.getId();
+        gatheringResponse.studyId = gathering.getStudyId();
+        gatheringResponse.gatheringTime = gathering.getGatheringTime();
+        gatheringResponse.numberOfPeople = gathering.getNumberOfPeople();
+        gatheringResponse.shape = gathering.getShape();
+        gatheringResponse.content = gathering.getContent();
+        gatheringResponse.place = gathering.getPlace();
+
+        gatheringResponse.apply = false;
+
+        Optional<GatheringUser> findGatheringUser = gathering.getGatheringUsers().stream()
+                .filter(gatheringUser -> gatheringUser.getUserId().equals(userId))
+                .findFirst();
+
+        if (findGatheringUser.isPresent()) {
+            gatheringResponse.apply = true;
+
+            GatheringUser gatheringUser = findGatheringUser.get();
+            if (gatheringUser.getRegister().equals(true)){
+                gatheringResponse.apply = null;
+            }
+        }
+
         return gatheringResponse;
     }
 }

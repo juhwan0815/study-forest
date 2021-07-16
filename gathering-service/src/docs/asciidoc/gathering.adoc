@@ -55,3 +55,15 @@ include::{snippets}/gathering/delete/request-headers.adoc[]
 include::{snippets}/gathering/delete/path-parameters.adoc[]
 ===== 응답
 include::{snippets}/gathering/delete/http-response.adoc[]
+
+==== 모임 상세조회 API
+===== 요청
+include::{snippets}/gathering/findById/http-request.adoc[]
+====== Header
+include::{snippets}/gathering/findById/request-headers.adoc[]
+====== Path
+include::{snippets}/gathering/findById/path-parameters.adoc[]
+===== 응답
+include::{snippets}/gathering/findById/http-response.adoc[]
+====== Body
+include::{snippets}/gathering/findById/response-fields.adoc[]

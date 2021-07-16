@@ -79,6 +79,13 @@ public class GatheringServiceImpl implements GatheringService {
         gatheringRepository.delete(findGathering);
     }
 
+    @Override
+    public GatheringResponse findById(Long userId, Long gatheringId) {
+        Gathering findGathering = gatheringRepository.findWithGatheringUsersById(gatheringId)
+                .orElseThrow(() -> new GatheringException(gatheringId + "는 존재하지 않는 모임 ID 입니다."));
+        return GatheringResponse.from(findGathering,userId);
+    }
+
 
     private Place CreatePlaceIfShapeIsOffline(Shape shape, String placeName, Double let, Double len) {
         Place place = null;

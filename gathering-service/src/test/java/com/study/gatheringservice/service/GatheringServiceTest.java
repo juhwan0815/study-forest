@@ -2,6 +2,7 @@ package com.study.gatheringservice.service;
 
 import com.study.gatheringservice.GatheringFixture;
 import com.study.gatheringservice.client.StudyServiceClient;
+import com.study.gatheringservice.domain.Gathering;
 import com.study.gatheringservice.domain.Shape;
 import com.study.gatheringservice.exception.GatheringException;
 import com.study.gatheringservice.model.gathering.GatheringResponse;
@@ -20,8 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.study.gatheringservice.GatheringFixture.*;
-import static org.assertj.core.api.Assertions.as;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
@@ -190,6 +190,78 @@ public class GatheringServiceTest {
 
         // when
         assertThrows(GatheringException.class,()->gatheringService.delete(2L,1L));
+    }
+
+    @Test
+    @DisplayName("모임 참가자가 아닌 사람이 모임을 상세 조회한다")
+    void findByIdWhenLoginUserIsNotGatheringUser(){
+        // given
+        given(gatheringRepository.findWithGatheringUsersById(any()))
+                .willReturn(Optional.of(createOnlineGathering()));
+
+        // when
+        GatheringResponse result = gatheringService.findById(3L, 1L);
+
+        // then
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getStudyId()).isEqualTo(1L);
+        assertThat(result.getGatheringTime()).isEqualTo(TEST_LOCAL_DATE_TIME1);
+        assertThat(result.getShape()).isEqualTo(Shape.ONLINE);
+        assertThat(result.getContent()).isEqualTo("테스트 모임");
+        assertThat(result.getNumberOfPeople()).isEqualTo(1);
+        assertThat(result.getPlace()).isNull();
+        assertThat(result.getApply()).isEqualTo(false);
+
+        then(gatheringRepository).should(times(1)).findWithGatheringUsersById(any());
+    }
+
+    @Test
+    @DisplayName("모임 참가자갸 모임을 상세조회한다.")
+    void findByIdWhenLoginUserIsGatheringUser(){
+        // given
+        Gathering testGathering = createOnlineGathering();
+        testGathering.addGatheringUser(2L,false);
+
+        given(gatheringRepository.findWithGatheringUsersById(any()))
+                .willReturn(Optional.of(testGathering));
+
+        // when
+        GatheringResponse result = gatheringService.findById(2L, 1L);
+
+        // then
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getStudyId()).isEqualTo(1L);
+        assertThat(result.getGatheringTime()).isEqualTo(TEST_LOCAL_DATE_TIME1);
+        assertThat(result.getShape()).isEqualTo(Shape.ONLINE);
+        assertThat(result.getContent()).isEqualTo("테스트 모임");
+        assertThat(result.getNumberOfPeople()).isEqualTo(2);
+        assertThat(result.getPlace()).isNull();
+        assertThat(result.getApply()).isEqualTo(true);
+
+        then(gatheringRepository).should(times(1)).findWithGatheringUsersById(any());
+    }
+
+    @Test
+    @DisplayName("모임 등록자가 모임을 상세조회한다.")
+    void findByIdWhenLoginUserIsGatheringRegister(){
+        // given
+        given(gatheringRepository.findWithGatheringUsersById(any()))
+                .willReturn(Optional.of(createOnlineGathering()));
+
+        // when
+        GatheringResponse result = gatheringService.findById(1L, 1L);
+
+        // then
+        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getStudyId()).isEqualTo(1L);
+        assertThat(result.getGatheringTime()).isEqualTo(TEST_LOCAL_DATE_TIME1);
+        assertThat(result.getShape()).isEqualTo(Shape.ONLINE);
+        assertThat(result.getContent()).isEqualTo("테스트 모임");
+        assertThat(result.getNumberOfPeople()).isEqualTo(1);
+        assertThat(result.getPlace()).isNull();
+        assertThat(result.getApply()).isNull();
+
+        then(gatheringRepository).should(times(1)).findWithGatheringUsersById(any());
     }
 
 
