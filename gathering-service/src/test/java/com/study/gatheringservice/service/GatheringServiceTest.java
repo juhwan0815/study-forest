@@ -57,7 +57,7 @@ public class GatheringServiceTest {
 
         // then
         assertThat(result.getId()).isNotNull();
-        assertThat(result.getGatheringTime()).isEqualTo(TEST_LOCAL_DATE_TIME);
+        assertThat(result.getGatheringTime()).isEqualTo(TEST_LOCAL_DATE_TIME1);
         assertThat(result.getContent()).isEqualTo(TEST_GATHERING_CREATE_REQUEST1.getContent());
         assertThat(result.getStudyId()).isEqualTo(1L);
         assertThat(result.getShape()).isEqualTo(Shape.ONLINE);
@@ -85,7 +85,7 @@ public class GatheringServiceTest {
 
         // then
         assertThat(result.getId()).isNotNull();
-        assertThat(result.getGatheringTime()).isEqualTo(TEST_LOCAL_DATE_TIME);
+        assertThat(result.getGatheringTime()).isEqualTo(TEST_LOCAL_DATE_TIME1);
         assertThat(result.getContent()).isEqualTo(TEST_GATHERING_CREATE_REQUEST2.getContent());
         assertThat(result.getStudyId()).isEqualTo(1L);
         assertThat(result.getShape()).isEqualTo(Shape.OFFLINE);
@@ -110,6 +110,58 @@ public class GatheringServiceTest {
         // when
         assertThrows(GatheringException.class,
                 ()->gatheringService.create(3L, 1L, TEST_GATHERING_CREATE_REQUEST2));
+    }
+
+    @Test
+    @DisplayName("오프라인 모임에서 온라임 모임으로 수정한다.")
+    void updateOfflineToOnline(){
+        // given
+        given(gatheringRepository.findWithGatheringUsersById(any()))
+                .willReturn(Optional.of(createOfflineGathering()));
+
+        // when
+        GatheringResponse result = gatheringService.update(1L, 1L, TEST_GATHERING_UPDATE_REQUEST1);
+
+        // then
+        assertThat(result.getGatheringTime()).isEqualTo(TEST_GATHERING_UPDATE_REQUEST1.getGatheringTime());
+        assertThat(result.getShape()).isEqualTo(Shape.ONLINE);
+        assertThat(result.getContent()).isEqualTo(TEST_GATHERING_UPDATE_REQUEST1.getContent());
+        assertThat(result.getPlace()).isNull();
+
+        then(gatheringRepository).should(times(1)).findWithGatheringUsersById(any());
+    }
+
+    @Test
+    @DisplayName("온라인 모임에서 오프라인 모임을 수정한다.")
+    void updateOnlineToOffline(){
+        // given
+        given(gatheringRepository.findWithGatheringUsersById(any()))
+                .willReturn(Optional.of(createOnlineGathering()));
+
+        // when
+        GatheringResponse result = gatheringService.update(1L, 1L, TEST_GATHERING_UPDATE_REQUEST2);
+
+        // then
+        assertThat(result.getGatheringTime()).isEqualTo(TEST_GATHERING_UPDATE_REQUEST2.getGatheringTime());
+        assertThat(result.getShape()).isEqualTo(Shape.OFFLINE);
+        assertThat(result.getContent()).isEqualTo(TEST_GATHERING_UPDATE_REQUEST2.getContent());
+        assertThat(result.getPlace().getName()).isEqualTo(TEST_GATHERING_UPDATE_REQUEST2.getPlaceName());
+        assertThat(result.getPlace().getLen()).isEqualTo(TEST_GATHERING_UPDATE_REQUEST2.getLen());
+        assertThat(result.getPlace().getLet()).isEqualTo(TEST_GATHERING_UPDATE_REQUEST2.getLet());
+
+        then(gatheringRepository).should(times(1)).findWithGatheringUsersById(any());
+    }
+
+    @Test
+    @DisplayName("예외 테스트 : 모임 등록자가 아닌 유저가 모임을 수정할 경우 예외가 발생한다.")
+    void updateWhenIsNotRegister(){
+        // given
+        given(gatheringRepository.findWithGatheringUsersById(any()))
+                .willReturn(Optional.of(createOnlineGathering()));
+
+        // when
+        assertThrows(GatheringException.class,()->gatheringService.update(2L, 1L, TEST_GATHERING_UPDATE_REQUEST2));
+
     }
 
 

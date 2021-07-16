@@ -1,5 +1,6 @@
 package com.study.gatheringservice.domain;
 
+import com.study.gatheringservice.exception.GatheringException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -56,5 +57,21 @@ public class Gathering extends BaseEntity {
         GatheringUser gatheringUser = GatheringUser.createGatheringUser(userId, register, this);
         gatheringUsers.add(gatheringUser);
         numberOfPeople += 1;
+    }
+
+    public void checkRegister(Long userId) {
+        boolean checkResult = gatheringUsers.stream()
+                .anyMatch(gatheringUser ->
+                        gatheringUser.getUserId().equals(userId) && gatheringUser.getRegister().equals(true));
+
+        if(!checkResult){
+            throw new GatheringException("모임을 수정할 권한이 없습니다.");
+        }
+    }
+
+    public void update(LocalDateTime gatheringTime, Shape shape, String content) {
+        this.gatheringTime = gatheringTime;
+        this.shape = shape;
+        this.content = content;
     }
 }

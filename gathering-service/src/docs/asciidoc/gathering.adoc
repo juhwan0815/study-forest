@@ -30,3 +30,18 @@ include::{snippets}/gathering/create/request-fields.adoc[]
 include::{snippets}/gathering/create/http-response.adoc[]
 ====== Body
 include::{snippets}/gathering/create/response-fields.adoc[]
+
+==== 모임 수정 API
+===== 요청
+include::{snippets}/gathering/update/http-request.adoc[]
+====== Header
+include::{snippets}/gathering/update/request-headers.adoc[]
+====== Path
+include::{snippets}/gathering/update/path-parameters.adoc[]
+====== Body
+include::{snippets}/gathering/update/request-fields.adoc[]
+
+===== 응답
+include::{snippets}/gathering/update/http-response.adoc[]
+====== Body
+include::{snippets}/gathering/update/response-fields.adoc[]

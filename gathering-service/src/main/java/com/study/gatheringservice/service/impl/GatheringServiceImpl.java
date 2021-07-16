@@ -7,6 +7,7 @@ import com.study.gatheringservice.domain.Shape;
 import com.study.gatheringservice.exception.GatheringException;
 import com.study.gatheringservice.model.gathering.GatheringCreateRequest;
 import com.study.gatheringservice.model.gathering.GatheringResponse;
+import com.study.gatheringservice.model.gathering.GatheringUpdateRequest;
 import com.study.gatheringservice.model.studyuser.StudyUserResponse;
 import com.study.gatheringservice.repository.GatheringRepository;
 import com.study.gatheringservice.service.GatheringService;
@@ -40,7 +41,8 @@ public class GatheringServiceImpl implements GatheringService {
         Gathering gathering = Gathering.createGathering(studyId, request.getGatheringTime(),
                 request.getShape(), request.getContent());
 
-        Place place = CreatePlaceIfOffline(request);
+        Place place = CreatePlaceIfShapeIsOffline(request.getShape(), request.getPlaceName(),
+                                                  request.getLet(),   request.getLen());
 
         gathering.changePlace(place);
         gathering.addGatheringUser(userId, true);
@@ -49,10 +51,28 @@ public class GatheringServiceImpl implements GatheringService {
         return GatheringResponse.from(savedGathering);
     }
 
-    private Place CreatePlaceIfOffline(GatheringCreateRequest request) {
+    @Override
+    @Transactional
+    public GatheringResponse update(Long userId, Long gatheringId, GatheringUpdateRequest request) {
+        Gathering findGathering = gatheringRepository.findWithGatheringUsersById(gatheringId)
+                .orElseThrow(() -> new GatheringException(gatheringId + "는 존재하지 않는 모임 ID 입니다."));
+
+        findGathering.checkRegister(userId);
+
+        Place place = CreatePlaceIfShapeIsOffline(request.getShape(), request.getPlaceName(),
+                                                  request.getLet(), request.getLen());
+
+        findGathering.update(request.getGatheringTime(),request.getShape(),request.getContent());
+        findGathering.changePlace(place);
+
+        return GatheringResponse.from(findGathering);
+    }
+
+
+    private Place CreatePlaceIfShapeIsOffline(Shape shape, String placeName, Double let, Double len) {
         Place place = null;
-        if (request.getShape().equals(Shape.OFFLINE)) {
-            place = Place.createPlace(request.getPlaceName(), request.getLet(), request.getLen());
+        if (shape.equals(Shape.OFFLINE)) {
+            place = Place.createPlace(placeName, let, len);
         }
         return place;
     }

@@ -36,6 +36,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -125,6 +126,52 @@ class GatheringControllerTest {
         then(gatheringService).should(times(1)).create(any(),any(),any());
     }
 
+    @Test
+    @DisplayName("모임 수정 API 테스트")
+    void update() throws Exception {
+        // given
+        given(gatheringService.update(any(),any(),any()))
+                .willReturn(TEST_GATHERING_RESPONSE3);
+
+        // when
+        mockMvc.perform(patch("/gatherings/{gatheringId}",1)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(TEST_GATHERING_UPDATE_REQUEST2)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_GATHERING_RESPONSE3)))
+                .andDo(document("gathering/update",
+                        requestHeaders(
+                                headerWithName("Authorization").description("액세스 토큰")
+                        ),
+                        pathParameters(
+                                parameterWithName("gatheringId").description("모임 ID")
+                        ),
+                        requestFields(
+                                fieldWithPath("gatheringTime").type(JsonFieldType.STRING).description("변경할 모임 시간"),
+                                fieldWithPath("shape").type(JsonFieldType.STRING).description("변경할 모임 형태 ONLINE / OFFLINE"),
+                                fieldWithPath("content").type(JsonFieldType.STRING).description("변경할 모임 설명"),
+                                fieldWithPath("placeName").type(JsonFieldType.STRING).description("변경할 모임 장소"),
+                                fieldWithPath("let").type(JsonFieldType.NUMBER).description("변경할 좌표 위도"),
+                                fieldWithPath("len").type(JsonFieldType.NUMBER).description("변경할 좌표 경도")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("모임 ID"),
+                                fieldWithPath("studyId").type(JsonFieldType.NUMBER).description("모임이 속한 스터디 ID"),
+                                fieldWithPath("gatheringTime").type(JsonFieldType.STRING).description("변경된 모임 시간"),
+                                fieldWithPath("numberOfPeople").type(JsonFieldType.NUMBER).description("모임 인원 수"),
+                                fieldWithPath("shape").type(JsonFieldType.STRING).description("변경된 모임 형태 ONLINE/OFFLINE"),
+                                fieldWithPath("content").type(JsonFieldType.STRING).description("변경된 모임 설명"),
+                                fieldWithPath("place").type(JsonFieldType.OBJECT).description("변경된 모임 장소"),
+                                fieldWithPath("place.name").type(JsonFieldType.STRING).description("변경된 모임 장소 이름"),
+                                fieldWithPath("place.let").type(JsonFieldType.NUMBER).description("변경된 모임 장소 위도"),
+                                fieldWithPath("place.len").type(JsonFieldType.NUMBER).description("변경된 모임 종소 경도")
+                        )));
+
+        // then
+        then(gatheringService).should(times(1)).update(any(),any(),any());
+    }
 
 
 }
