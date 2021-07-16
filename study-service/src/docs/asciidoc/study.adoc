@@ -173,3 +173,13 @@ include::{snippets}/study/user/request-headers.adoc[]
 include::{snippets}/study/user/http-response.adoc[]
 ====== Body
 include::{snippets}/study/user/response-fields.adoc[]
+
+==== 스터디 참가 신청 취소 API
+===== 요청
+include::{snippets}/study/waitUser/cancel/http-request.adoc[]
+====== Header
+include::{snippets}/study/waitUser/cancel/request-headers.adoc[]
+====== Path
+include::{snippets}/study/waitUser/cancel/path-parameters.adoc[]
+===== 응답
+include::{snippets}/study/waitUser/cancel/http-response.adoc[]

@@ -60,6 +60,7 @@ kafka:
       create: study-apply-create-topic
       success: study-apply-success-topic
       fail: study-apply-fail-topic
+      cancel : study-apply-cancel-topic
 
 management:
   endpoints:

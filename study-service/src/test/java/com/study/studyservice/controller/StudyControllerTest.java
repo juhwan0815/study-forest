@@ -676,4 +676,31 @@ class StudyControllerTest {
         then(studyService).should(times(1)).findByUser(any());
     }
 
+    @Test
+    @DisplayName("스터디 참가 신청 취소 API 테스트")
+    void deleteWaitUserSelf() throws Exception {
+        willDoNothing()
+                .given(studyService)
+                .deleteWaitUserSelf(any(), any());
+
+        given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
+                .willReturn(1L);
+
+        mockMvc.perform(RestDocumentationRequestBuilders
+                .delete("/studies/{studyId}/waitUsers", 1)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
+                .andExpect(status().isOk())
+                .andDo(document("study/waitUser/cancel",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("studyId").description("스터디 ID")
+                        )
+                ));
+
+        then(studyService).should(times(1)).deleteWaitUserSelf(any(), any());
+    }
+
+
 }

@@ -9,14 +9,8 @@ import com.study.studyservice.client.UserServiceClient;
 import com.study.studyservice.domain.*;
 import com.study.studyservice.exception.CategoryException;
 import com.study.studyservice.exception.StudyException;
-import com.study.studyservice.kafka.message.StudyApplyCreateMessage;
-import com.study.studyservice.kafka.message.StudyApplyFailMessage;
-import com.study.studyservice.kafka.message.StudyApplySuccessMessage;
-import com.study.studyservice.kafka.message.StudyDeleteMessage;
-import com.study.studyservice.kafka.sender.StudyApplyCreateMessageSender;
-import com.study.studyservice.kafka.sender.StudyApplyFailMessageSender;
-import com.study.studyservice.kafka.sender.StudyApplySuccessMessageSender;
-import com.study.studyservice.kafka.sender.StudyDeleteMessageSender;
+import com.study.studyservice.kafka.message.*;
+import com.study.studyservice.kafka.sender.*;
 import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
 import com.study.studyservice.model.study.request.StudyFindRequest;
@@ -67,6 +61,7 @@ public class StudyServiceImpl implements StudyService {
     private final StudyApplyCreateMessageSender studyApplyCreateMessageSender;
     private final StudyApplySuccessMessageSender studyApplySuccessMessageSender;
     private final StudyApplyFailMessageSender studyApplyFailMessageSender;
+    private final StudyApplyCancelMessageSender studyApplyCancelMessageSender;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -324,8 +319,8 @@ public class StudyServiceImpl implements StudyService {
     @Transactional
     public void deleteStudyUserSelf(Long userId, Long studyId) {
         Study findStudy = studyQueryRepository.findWithStudyUsersById(studyId);
-
         findStudy.deleteStudyUser(userId);
+
     }
 
     @Override
@@ -340,6 +335,15 @@ public class StudyServiceImpl implements StudyService {
         return studyQueryRepository.findByUser(userId).stream()
                 .map(study -> StudyResponse.searchFrom(study))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteWaitUserSelf(Long userId, Long studyId) {
+        Study findStudy = studyQueryRepository.findWithWaitUserById(studyId);
+        findStudy.deleteWaitUser(userId);
+
+        studyApplyCancelMessageSender.send(StudyApplyCancelMessage.from(userId,studyId));
     }
 
     private LocationResponse getLocation(boolean offline, String locationCode) {

@@ -43,4 +43,5 @@ public interface StudyService {
 
     List<StudyResponse> findByUser(Long userId);
 
+    void deleteWaitUserSelf(Long userId, Long studyId);
 }

@@ -71,6 +71,12 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @DeleteMapping("/studies/{studyId}/waitUsers")
+    public ResponseEntity<Void> deleteWaitUser(@LoginUser Long userId,@PathVariable Long studyId){
+        studyService.deleteWaitUserSelf(userId,studyId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @GetMapping("/studies/{studyId}/waitUsers")
     public ResponseEntity<List<WaitUserResponse>> findWaitUsersByStudyId(@PathVariable Long studyId){
         return ResponseEntity.ok(studyService.findWaitUsersByStudyId(studyId));

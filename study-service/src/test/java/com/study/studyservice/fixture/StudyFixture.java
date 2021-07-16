@@ -153,7 +153,8 @@ public class StudyFixture {
         return study;
     }
 
-    public static Study createTestOfflineStudy(){
+    public static Study
+    createTestOfflineStudy(){
         Study study = new Study(1L,
                 "테스트 스터디", 5, 1, "테스트 스터디 입니다.",
                 true, true, StudyStatus.OPEN, TEST_IMAGE, 1L, TEST_CATEGORY2,
