@@ -60,11 +60,13 @@ kafka:
       create: study-apply-create-topic
       success: study-apply-success-topic
       fail: study-apply-fail-topic
+      cancel: study-apply-cancel-topic
   consumer:
     studyApply:
       create: study-apply-create-consumer-group
       success: study-apply-success-consumer-group
       fail: study-apply-fail-consumer-group
+      cancel: study-apply-cancel-consumer-group
 
 
 

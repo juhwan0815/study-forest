@@ -9,10 +9,7 @@ import com.study.userservice.domain.Image;
 import com.study.userservice.domain.User;
 import com.study.userservice.domain.UserRole;
 import com.study.userservice.exception.UserException;
-import com.study.userservice.kafka.message.StudyApplyCreateMessage;
-import com.study.userservice.kafka.message.StudyApplyFailMessage;
-import com.study.userservice.kafka.message.StudyApplySuccessMessage;
-import com.study.userservice.kafka.message.UserDeleteMessage;
+import com.study.userservice.kafka.message.*;
 import com.study.userservice.kafka.sender.UserDeleteMessageSender;
 import com.study.userservice.model.interestTag.InterestTagResponse;
 import com.study.userservice.model.study.StudyResponse;
@@ -266,6 +263,15 @@ public class UserServiceImpl implements UserService {
         findUser.deleteStudyApply();
 
         return studyApplyResponses;
+    }
+
+    @Override
+    @Transactional
+    public void cancelStudyApply(StudyApplyCancelMessage studyApplyCancelMessage) {
+        User findUser = userQueryRepository
+                .findWithStudyApplyById(studyApplyCancelMessage.getUserId());
+
+        findUser.cancelStudyApply(studyApplyCancelMessage.getStudyId());
     }
 
 

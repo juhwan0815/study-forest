@@ -441,11 +441,28 @@ class UserServiceTest {
                 .willReturn(Optional.of(user));
 
         // when
-        UserResponse result = userService.updateSearchDistance(1L, 3);
+        UserResponse result = userService.updateSearchDistance(1L, 6);
 
         // then
-        assertThat(result.getSearchDistance()).isEqualTo(3);
+        assertThat(result.getSearchDistance()).isEqualTo(6);
         then(userRepository).should(times(1)).findById(any());
+    }
+
+    @Test
+    @DisplayName("회원의 스터디 참가 이력을 취소한다.")
+    void cancelStudyApply(){
+        // given
+        User user = createTestUser2();
+
+        given(userQueryRepository.findWithStudyApplyById(any()))
+                .willReturn(user);
+
+        // when
+        userService.cancelStudyApply(TEST_STUDY_APPLY_CANCEL_MESSAGE);
+
+        // then
+        assertThat(user.getStudyApplies().size()).isEqualTo(1);
+        then(userQueryRepository).should(times(1)).findWithStudyApplyById(any());
     }
 
 }

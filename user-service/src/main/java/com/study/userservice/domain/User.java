@@ -124,11 +124,21 @@ public class User extends BaseEntity{
             if(studyApply.getStatus().equals(StudyApplyStatus.FAIL)
                     || studyApply.getStatus().equals(StudyApplyStatus.SUCCESS)){
                 studyApplyIter.remove();
+                this.numberOfStudyApply -= 1;
             }
         }
     }
 
     public void changeSearchDistance(Integer searchDistance) {
         this.searchDistance = searchDistance;
+    }
+
+    public void cancelStudyApply(Long studyId) {
+        StudyApply matchStudyApply = studyApplies.stream()
+                .filter(studyApply -> studyApply.getStudyId().equals(studyId))
+                .findFirst().get();
+
+        studyApplies.remove(matchStudyApply);
+        this.numberOfStudyApply -= 1;
     }
 }

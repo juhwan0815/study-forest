@@ -165,6 +165,7 @@ class UserTest {
     }
 
     @Test
+    @DisplayName("오프라인 검색 거리를 수정한다.")
     void changeSearchDistance(){
         // given
         User user = User.createUser(1L,"황주환","10~19","male", UserRole.USER);
@@ -174,6 +175,24 @@ class UserTest {
 
         // then
         assertThat(user.getSearchDistance()).isEqualTo(6);
+    }
+
+    @Test
+    @DisplayName("스터디 참가 이력을 취소한다.")
+    void cancelStudyApply(){
+        // given
+        User user = User.createUser(1L,"황주환","10~19","male", UserRole.USER);
+        user.addStudyApply(1L);
+        user.addStudyApply(2L);
+        user.addStudyApply(3L);
+        user.failStudyApply(1L);
+        user.successStudyApply(3L);
+
+        // when
+        user.cancelStudyApply(2L);
+
+        // then
+        assertThat(user.getStudyApplies().size()).isEqualTo(2);
     }
 
 }

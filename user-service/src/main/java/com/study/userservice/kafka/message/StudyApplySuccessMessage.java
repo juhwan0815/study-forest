@@ -13,10 +13,4 @@ public class StudyApplySuccessMessage {
 
     private Long studyId;
 
-    public static StudyApplySuccessMessage from(Long userId, Long studyId){
-        StudyApplySuccessMessage studyApplySuccessMessage = new StudyApplySuccessMessage();
-        studyApplySuccessMessage.userId = userId;
-        studyApplySuccessMessage.studyId = studyId;
-        return studyApplySuccessMessage;
-    }
 }

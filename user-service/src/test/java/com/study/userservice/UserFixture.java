@@ -1,6 +1,7 @@
 package com.study.userservice;
 
 import com.study.userservice.domain.*;
+import com.study.userservice.kafka.message.StudyApplyCancelMessage;
 import com.study.userservice.kafka.message.StudyApplyCreateMessage;
 import com.study.userservice.kafka.message.StudyApplyFailMessage;
 import com.study.userservice.kafka.message.StudyApplySuccessMessage;
@@ -77,6 +78,9 @@ public class UserFixture {
     public static final StudyApplyFailMessage TEST_STUDY_APPLY_FAIL_MESSAGE =
             new StudyApplyFailMessage(1L,1L);
 
+    public static final StudyApplyCancelMessage TEST_STUDY_APPLY_CANCEL_MESSAGE =
+            new StudyApplyCancelMessage(1L,1L);
+
     public static final StudyResponse TEST_STUDY_RESPONSE1 = new StudyResponse(1L,"테스트 스터디1");
     public static final StudyResponse TEST_STUDY_RESPONSE2 = new StudyResponse(2L,"테스트 스터디2");
 
@@ -102,6 +106,4 @@ public class UserFixture {
 
         return user;
     }
-
-
 }

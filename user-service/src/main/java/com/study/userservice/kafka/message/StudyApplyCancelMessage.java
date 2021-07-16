@@ -1,6 +1,5 @@
 package com.study.userservice.kafka.message;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudyApplyFailMessage {
+public class StudyApplyCancelMessage {
 
     private Long userId;
 
