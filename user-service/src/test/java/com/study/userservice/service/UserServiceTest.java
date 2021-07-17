@@ -465,4 +465,23 @@ class UserServiceTest {
         then(userQueryRepository).should(times(1)).findWithStudyApplyById(any());
     }
 
+    @Test
+    @DisplayName("스터디가 삭제되면 회원의 스터다 참가 신청 이력에서 삭제된 스터디 참가 신청 이력을 삭제한다.")
+    void deleteStudyApplyByStudyId(){
+        // given
+        User user1 = createTestUser2();
+        User user2 = createTestUser2();
+
+        given(userQueryRepository.findWithStudyApplyByStudyId(any()))
+                .willReturn(Arrays.asList(user1,user2));
+
+        // when
+        userService.deleteStudyApplyByStudyId(TEST_STUDY_DELETE_MESSAGE);
+
+        // then
+        assertThat(user1.getStudyApplies().size()).isEqualTo(0);
+        assertThat(user2.getStudyApplies().size()).isEqualTo(0);
+        then(userQueryRepository).should(times(1)).findWithStudyApplyByStudyId(any());
+    }
+
 }

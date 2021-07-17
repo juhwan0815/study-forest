@@ -57,4 +57,13 @@ public class UserQueryRepository {
 
         return findUser;
     }
+
+    public List<User> findWithStudyApplyByStudyId(Long studyId){
+        return queryFactory
+                .selectFrom(user).distinct()
+                .leftJoin(user.studyApplies,studyApply).fetchJoin()
+                .where(studyApply.studyId.eq(studyId))
+                .orderBy(studyApply.id.desc())
+                .fetch();
+    }
 }

@@ -56,12 +56,16 @@ kafka:
   topic:
     user:
       delete: user-delete-topic
+    study:
+      delete: study-delete-topic
     studyApply:
       create: study-apply-create-topic
       success: study-apply-success-topic
       fail: study-apply-fail-topic
       cancel: study-apply-cancel-topic
   consumer:
+    study:
+      delete: study-delete-consumer-group1
     studyApply:
       create: study-apply-create-consumer-group
       success: study-apply-success-consumer-group

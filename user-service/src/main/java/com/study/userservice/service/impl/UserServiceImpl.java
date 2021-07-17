@@ -274,6 +274,16 @@ public class UserServiceImpl implements UserService {
         findUser.cancelStudyApply(studyApplyCancelMessage.getStudyId());
     }
 
+    @Override
+    @Transactional
+    public void deleteStudyApplyByStudyId(StudyDeleteMessage studyDeleteMessage) {
+        List<User> findUsers = userQueryRepository.findWithStudyApplyByStudyId(studyDeleteMessage.getStudyId());
+
+        findUsers.stream().forEach(user -> {
+            user.deleteStudyApply(studyDeleteMessage.getStudyId());
+        });
+    }
+
 
     private Image uploadImageToS3(MultipartFile image) {
         String ext = extractExt(image.getContentType());

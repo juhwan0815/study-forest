@@ -141,4 +141,13 @@ public class User extends BaseEntity{
         studyApplies.remove(matchStudyApply);
         this.numberOfStudyApply -= 1;
     }
+
+    public void deleteStudyApply(Long studyId){
+        List<StudyApply> matchStudyApplies = studyApplies.stream()
+                .filter(studyApply -> studyApply.getStudyId().equals(studyId))
+                .collect(Collectors.toList());
+
+        studyApplies.removeAll(matchStudyApplies);
+        numberOfStudyApply -= matchStudyApplies.size();
+    }
 }

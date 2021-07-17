@@ -195,4 +195,20 @@ class UserTest {
         assertThat(user.getStudyApplies().size()).isEqualTo(2);
     }
 
+    @Test
+    @DisplayName("스터디와 관련된 스터디 참가 이력을 모두 삭제한다.")
+    void deleteStudyApplyByStudyId(){
+        // given
+        User user = User.createUser(1L,"황주환","10~19","male", UserRole.USER);
+        user.addStudyApply(1L);
+        user.failStudyApply(1L);
+        user.addStudyApply(1L);
+
+        // when
+        user.deleteStudyApply(1L);
+
+        // then
+        assertThat(user.getStudyApplies().size()).isEqualTo(0);
+    }
+
 }

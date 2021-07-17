@@ -101,4 +101,29 @@ class UserQueryRepositoryTest {
         assertThat(result.getStudyApplies().get(0).getStudyId()).isEqualTo(2L);
         assertThat(result.getStudyApplies().get(1).getStudyId()).isEqualTo(1L);
     }
+
+    @Test
+    @DisplayName("스터디 ID로 회원과 스터디 참가 이력을 같이 조회한다.")
+    void findWithStudyApplyByStudyId(){
+        // given
+        User user1 = User.createUser(1L, "황주환", "10~19", "male", UserRole.USER);
+        User user2 = User.createUser(2L, "황주환", "10~19", "male", UserRole.USER);
+        User user3 = User.createUser(3L, "황주환", "10~19", "male", UserRole.USER);
+        user1.addStudyApply(1L);
+        user1.failStudyApply(1L);
+        user1.addStudyApply(1L);
+        user1.addStudyApply(2L);
+        userRepository.save(user1);
+        userRepository.save(user2);
+
+        em.flush();
+        em.clear();
+
+        // when
+        List<User> result = userQueryRepository.findWithStudyApplyByStudyId(1L);
+
+        // then
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getStudyApplies().size()).isEqualTo(2);
+    }
 }

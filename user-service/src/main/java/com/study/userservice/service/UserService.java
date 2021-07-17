@@ -1,9 +1,6 @@
 package com.study.userservice.service;
 
-import com.study.userservice.kafka.message.StudyApplyCancelMessage;
-import com.study.userservice.kafka.message.StudyApplyCreateMessage;
-import com.study.userservice.kafka.message.StudyApplyFailMessage;
-import com.study.userservice.kafka.message.StudyApplySuccessMessage;
+import com.study.userservice.kafka.message.*;
 import com.study.userservice.model.interestTag.InterestTagResponse;
 import com.study.userservice.model.studyapply.StudyApplyResponse;
 import com.study.userservice.model.user.UserFindRequest;
@@ -45,4 +42,6 @@ public interface UserService {
     List<StudyApplyResponse> findStudyAppliesByUserId(Long userId);
 
     void cancelStudyApply(StudyApplyCancelMessage studyApplyCancelMessage);
+
+    void deleteStudyApplyByStudyId(StudyDeleteMessage studyDeleteMessage);
 }
