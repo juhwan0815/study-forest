@@ -255,6 +255,36 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/study-service/(?<segment>.*),/$\{segment}
+        # 모임 서비스 - Actuator API
+        - id: gathering-service
+          uri: lb://GATHERING-SERVICE
+          predicates:
+            - Path=/gathering-service/actuator/**
+            - Method=GET,POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/gathering-service/(?<segment>.*),/$\{segment}
+        # 모임 서비스 - API 문서
+        - id: gathering-service
+          uri: lb://GATHERING-SERVICE
+          predicates:
+            - Path=/gathering-service/docs/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/gathering-service/(?<segment>.*),/$\{segment}
+        # 모임 서비스 - 모임 API
+        - id: gathering-service
+          uri: lb://GATHERING-SERVICE
+          predicates:
+            - Path=/gathering-service/**
+            - Method=GET,POST,PATCH,DELETE
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/gathering-service/(?<segment>.*),/$\{segment}
+            - AuthorizationHeaderFilter
+
+
 
 
 management:
