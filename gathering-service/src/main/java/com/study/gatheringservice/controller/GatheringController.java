@@ -9,6 +9,7 @@ import com.study.gatheringservice.model.gathering.GatheringUpdateRequest;
 import com.study.gatheringservice.service.GatheringService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.LazyToOne;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -76,9 +77,16 @@ public class GatheringController {
     }
 
     @PostMapping("/gatherings/{gatheringId}/users")
-    public ResponseEntity<Void> createGatheringUser(@LoginUser Long userId,
-                                                    @PathVariable Long gatheringId){
+    public ResponseEntity<Void> addGatheringUser(@LoginUser Long userId,
+                                                 @PathVariable Long gatheringId){
         gatheringService.addGatheringUser(userId,gatheringId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/gatherings/{gatheringId}/users")
+    public ResponseEntity<Void> deleteGatheringUser(@LoginUser Long userId,
+                                                    @PathVariable Long gatheringId){
+        gatheringService.deleteGatheringUser(userId,gatheringId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

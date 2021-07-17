@@ -89,3 +89,13 @@ include::{snippets}/gathering/gatheringUser/create/request-headers.adoc[]
 include::{snippets}/gathering/gatheringUser/create/path-parameters.adoc[]
 ===== 응답
 include::{snippets}/gathering/gatheringUser/create/http-response.adoc[]
+
+==== 모임 참가 취소 API
+===== 요청
+include::{snippets}/gathering/gatheringUser/delete/http-request.adoc[]
+====== Header
+include::{snippets}/gathering/gatheringUser/delete/request-headers.adoc[]
+====== Path
+include::{snippets}/gathering/gatheringUser/delete/path-parameters.adoc[]
+===== 응답
+include::{snippets}/gathering/gatheringUser/delete/http-response.adoc[]

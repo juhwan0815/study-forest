@@ -320,5 +320,35 @@ public class GatheringServiceTest {
         assertThrows(GatheringException.class,()->gatheringService.addGatheringUser(1L,1L));
     }
 
+    @Test
+    @DisplayName("모임에 참가 유저가 모임 참가를 취소한다.")
+    void deleteGatheringUser(){
+        // given
+        Gathering gathering = createOnlineGathering();
+        given(gatheringRepository.findWithGatheringUsersById(any()))
+                .willReturn(Optional.of(gathering));
+
+        // when
+        gatheringService.deleteGatheringUser(1L,1L);
+
+        // then
+        assertThat(gathering.getGatheringUsers().size()).isEqualTo(0);
+        assertThat(gathering.getNumberOfPeople()).isEqualTo(0);
+        then(gatheringRepository).should(times(1)).findWithGatheringUsersById(any());
+    }
+
+
+    @Test
+    @DisplayName("예외 테스트 : 모임에 참가하지 않은 유저가 모임 참가를 취소하면 예외가 발생한다.")
+    void deleteGatheringUserWhenLoginUserIsNotExistGatheringUser(){
+        // given
+        Gathering gathering = createOnlineGathering();
+        given(gatheringRepository.findWithGatheringUsersById(any()))
+                .willReturn(Optional.of(gathering));
+
+        // when
+        assertThrows(GatheringException.class,()->gatheringService.deleteGatheringUser(2L,1L));
+    }
+
 
 }

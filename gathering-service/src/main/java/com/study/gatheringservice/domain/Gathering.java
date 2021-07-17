@@ -83,4 +83,13 @@ public class Gathering extends BaseEntity {
         this.shape = shape;
         this.content = content;
     }
+
+    public void deleteGatheringUser(Long userId) {
+        GatheringUser findGatheringUser = gatheringUsers.stream()
+                .filter(gatheringUser -> gatheringUser.getUserId().equals(userId))
+                .findFirst().orElseThrow(() -> new GatheringException(userId + "는 존재하지 않는 참가 회원입니다."));
+
+        gatheringUsers.remove(findGatheringUser);
+        this.numberOfPeople -= 1;
+    }
 }

@@ -305,7 +305,7 @@ class GatheringControllerTest {
     }
 
     @Test
-    @DisplayName("모임 삭제 API 테스트")
+    @DisplayName("모임 참가 API 테스트")
     void addGatheringUser() throws Exception {
         // given
         willDoNothing()
@@ -327,4 +327,29 @@ class GatheringControllerTest {
         // then
         then(gatheringService).should(times(1)).addGatheringUser(any(), any());
     }
+
+    @Test
+    @DisplayName("모임 참가 취소 API 테스트")
+    void deleteGatheringUser() throws Exception {
+        // given
+        willDoNothing()
+                .given(gatheringService)
+                .deleteGatheringUser(any(), any());
+
+        // when
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/gatherings/{gatheringId}/users", 1)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
+                .andExpect(status().isOk())
+                .andDo(document("gathering/gatheringUser/delete",
+                        requestHeaders(
+                                headerWithName("Authorization").description("액세스 토큰")
+                        ),
+                        pathParameters(
+                                parameterWithName("gatheringId").description("모임 ID")
+                        )));
+
+        // then
+        then(gatheringService).should(times(1)).deleteGatheringUser(any(), any());
+    }
+
 }

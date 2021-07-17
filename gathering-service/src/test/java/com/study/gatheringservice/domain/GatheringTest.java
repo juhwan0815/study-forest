@@ -91,5 +91,34 @@ class GatheringTest {
         assertThat(gathering.getContent()).isEqualTo("테스트 스터디");
     }
 
+    @Test
+    @DisplayName("모임 참가 회원을 삭제한다.")
+    void deleteGatheringUser(){
+        // given
+        Gathering gathering = Gathering.createGathering(1L, LocalDateTime.now(), Shape.OFFLINE, "스프링 스터디입니다.");
+        gathering.addGatheringUser(1L,true);
+        gathering.addGatheringUser(2L,false);
+
+        // when
+        gathering.deleteGatheringUser(2L);
+
+        // then
+        assertThat(gathering.getGatheringUsers().size()).isEqualTo(1);
+        assertThat(gathering.getNumberOfPeople()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("예외 테스트 : 모임에 참가하지 않은 유저가 모임 참가 회원을 취소한다.")
+    void deleteGatheringUserWhenNotExistGatheringUser(){
+        // given
+        Gathering gathering = Gathering.createGathering(1L, LocalDateTime.now(), Shape.OFFLINE, "스프링 스터디입니다.");
+        gathering.addGatheringUser(1L,true);
+        gathering.addGatheringUser(2L,false);
+
+        // when
+        assertThrows(GatheringException.class,()->gathering.deleteGatheringUser(3L));
+    }
+
+
 }
 
