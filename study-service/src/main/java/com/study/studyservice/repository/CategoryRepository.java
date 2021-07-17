@@ -17,6 +17,6 @@ public interface CategoryRepository extends JpaRepository<Category,Long> {
 
     List<Category> findByParentAndStatus(Category category,CategoryStatus status);
 
-    @Query("select c from Category c left join fetch c.parent where c.id =:categoryId")
+    @Query("select distinct c from Category c left join fetch c.parent where c.id =:categoryId")
     Optional<Category> findWithParentById(@Param("categoryId") Long categoryId);
 }
