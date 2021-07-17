@@ -79,3 +79,13 @@ include::{snippets}/gathering/find/path-parameters.adoc[]
 include::{snippets}/gathering/find/http-response.adoc[]
 ====== Body
 include::{snippets}/gathering/find/response-fields.adoc[]
+
+==== 모임 참가 API
+===== 요청
+include::{snippets}/gathering/gatheringUser/create/http-request.adoc[]
+====== Header
+include::{snippets}/gathering/gatheringUser/create/request-headers.adoc[]
+====== Path
+include::{snippets}/gathering/gatheringUser/create/path-parameters.adoc[]
+===== 응답
+include::{snippets}/gathering/gatheringUser/create/http-response.adoc[]

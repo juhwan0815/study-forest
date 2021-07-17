@@ -456,10 +456,16 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_응답_4">응답</a></li>
 </ul>
 </li>
-<li><a href="#_모임_검색_api">5. 모임 검색 API</a>
+<li><a href="#_스터디_모임_조회_api">5. 스터디 모임 조회 API</a>
 <ul class="sectlevel4">
 <li><a href="#_요청_5">요청</a></li>
 <li><a href="#_응답_5">응답</a></li>
+</ul>
+</li>
+<li><a href="#_모임_참가_api">6. 모임 참가 API</a>
+<ul class="sectlevel4">
+<li><a href="#_요청_6">요청</a></li>
+<li><a href="#_응답_6">응답</a></li>
 </ul>
 </li>
 </ul>
@@ -1117,7 +1123,7 @@ Content-Length: 272
 </div>
 </div>
 <div class="sect3">
-<h4 id="_모임_검색_api"><a class="anchor" href="#_모임_검색_api"></a><a class="link" href="#_모임_검색_api">5. 모임 검색 API</a></h4>
+<h4 id="_스터디_모임_조회_api"><a class="anchor" href="#_스터디_모임_조회_api"></a><a class="link" href="#_스터디_모임_조회_api">5. 스터디 모임 조회 API</a></h4>
 <div class="sect4">
 <h5 id="_요청_5"><a class="anchor" href="#_요청_5"></a><a class="link" href="#_요청_5">요청</a></h5>
 <div class="listingblock">
@@ -1214,9 +1220,9 @@ Content-Length: 942
     "paged" : true,
     "unpaged" : false
   },
+  "last" : true,
   "totalPages" : 1,
   "totalElements" : 2,
-  "last" : true,
   "size" : 10,
   "number" : 0,
   "sort" : {
@@ -1401,10 +1407,74 @@ Content-Length: 942
 </div>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_모임_참가_api"><a class="anchor" href="#_모임_참가_api"></a><a class="link" href="#_모임_참가_api">6. 모임 참가 API</a></h4>
+<div class="sect4">
+<h5 id="_요청_6"><a class="anchor" href="#_요청_6"></a><a class="link" href="#_요청_6">요청</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /gatherings/1/users HTTP/1.1
+Authorization: Bearer 액세스토큰
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_header_6"><a class="anchor" href="#_header_6"></a><a class="link" href="#_header_6">Header</a></h6>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">액세스 토큰</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="_path_6"><a class="anchor" href="#_path_6"></a><a class="link" href="#_path_6">Path</a></h6>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 6. /gatherings/{gatheringId}/users</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>gatheringId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">모임 ID</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_응답_6"><a class="anchor" href="#_응답_6"></a><a class="link" href="#_응답_6">응답</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-07-17 16:27:41 KST
+Last updated 2021-07-17 16:58:08 KST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">

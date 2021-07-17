@@ -40,6 +40,18 @@ class GatheringTest {
     }
 
     @Test
+    @DisplayName("예외 테스트 : 이미 모임에 참가한 사람이 참가하면 예외가 발생한다.")
+    void addGatheringUserWhenExistGatheringUser(){
+        // given
+        Gathering gathering = Gathering.createGathering(1L, LocalDateTime.now(), Shape.OFFLINE, "스프링 스터디입니다.");
+        gathering.addGatheringUser(1L,true);
+
+        // when
+        assertThrows(GatheringException.class,()->gathering.addGatheringUser(1L,false));
+    }
+
+
+    @Test
     @DisplayName("모임 등록자 여부를 확인한다.")
     void checkRegister(){
         // given

@@ -291,4 +291,34 @@ public class GatheringServiceTest {
     }
 
 
+    @Test
+    @DisplayName("모임에 참가하지 않은 유저가 모임 참가를 한다.")
+    void addGatheringUser(){
+        // given
+        Gathering gathering = createOnlineGathering();
+        given(gatheringRepository.findWithGatheringUsersById(any()))
+                .willReturn(Optional.of(gathering));
+
+        // when
+        gatheringService.addGatheringUser(2L,1L);
+
+        // then
+        assertThat(gathering.getGatheringUsers().size()).isEqualTo(2);
+        assertThat(gathering.getNumberOfPeople()).isEqualTo(2);
+        then(gatheringRepository).should(times(1)).findWithGatheringUsersById(any());
+    }
+
+    @Test
+    @DisplayName("예외 테스트 : 모임에 이미 참가한 유저가 모임 참가를 하면 예외가 발생한다.")
+    void addGatheringUserWhenLoginUserIsExistGatheringUser(){
+        // given
+        Gathering gathering = createOnlineGathering();
+        given(gatheringRepository.findWithGatheringUsersById(any()))
+                .willReturn(Optional.of(gathering));
+
+        // when
+        assertThrows(GatheringException.class,()->gatheringService.addGatheringUser(1L,1L));
+    }
+
+
 }

@@ -10,6 +10,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -54,6 +55,14 @@ public class Gathering extends BaseEntity {
     }
 
     public void addGatheringUser(Long userId,Boolean register){
+        Optional<GatheringUser> optionalGatheringUser = gatheringUsers.stream()
+                .filter(gatheringUser -> gatheringUser.getUserId().equals(userId))
+                .findAny();
+
+        if(optionalGatheringUser.isPresent()){
+            throw new GatheringException("이미 모임에 참가한 유저입니다.");
+        }
+
         GatheringUser gatheringUser = GatheringUser.createGatheringUser(userId, register, this);
         gatheringUsers.add(gatheringUser);
         numberOfPeople += 1;

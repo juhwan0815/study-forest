@@ -18,5 +18,5 @@ public interface GatheringService {
 
     Page<GatheringResponse> find(Long studyId, Pageable pageable);
 
-//    void createGatheringUser(Long userId, Long gatheringId);
+    void addGatheringUser(Long userId, Long gatheringId);
 }
