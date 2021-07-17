@@ -99,3 +99,15 @@ include::{snippets}/gathering/gatheringUser/delete/request-headers.adoc[]
 include::{snippets}/gathering/gatheringUser/delete/path-parameters.adoc[]
 ===== 응답
 include::{snippets}/gathering/gatheringUser/delete/http-response.adoc[]
+
+==== 모임 참가자 조회 API
+===== 요청
+include::{snippets}/gathering/gatheringUser/find/http-request.adoc[]
+====== Header
+include::{snippets}/gathering/gatheringUser/find/request-headers.adoc[]
+====== Path
+include::{snippets}/gathering/gatheringUser/find/path-parameters.adoc[]
+===== 응답
+include::{snippets}/gathering/gatheringUser/find/http-response.adoc[]
+====== Body
+include::{snippets}/gathering/gatheringUser/find/response-fields.adoc[]

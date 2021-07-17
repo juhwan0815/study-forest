@@ -6,8 +6,6 @@ import com.study.gatheringservice.domain.Gathering;
 import com.study.gatheringservice.domain.GatheringUser;
 import com.study.gatheringservice.domain.Place;
 import com.study.gatheringservice.domain.Shape;
-import com.study.gatheringservice.model.gatheringuser.GatheringUserResponse;
-import com.study.gatheringservice.model.studyuser.StudyUserResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

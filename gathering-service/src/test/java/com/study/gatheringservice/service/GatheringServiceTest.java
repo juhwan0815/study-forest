@@ -2,10 +2,12 @@ package com.study.gatheringservice.service;
 
 import com.study.gatheringservice.GatheringFixture;
 import com.study.gatheringservice.client.StudyServiceClient;
+import com.study.gatheringservice.client.UserServiceClient;
 import com.study.gatheringservice.domain.Gathering;
 import com.study.gatheringservice.domain.Shape;
 import com.study.gatheringservice.exception.GatheringException;
 import com.study.gatheringservice.model.gathering.GatheringResponse;
+import com.study.gatheringservice.model.gatheringuser.GatheringUserResponse;
 import com.study.gatheringservice.model.studyuser.StudyUserResponse;
 import com.study.gatheringservice.repository.GatheringRepository;
 import com.study.gatheringservice.service.impl.GatheringServiceImpl;
@@ -18,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +45,9 @@ public class GatheringServiceTest {
 
     @Mock
     private StudyServiceClient studyServiceClient;
+
+    @Mock
+    private UserServiceClient userServiceClient;
 
     @Test
     @DisplayName("온라인 모임을 생성한다.")
@@ -350,5 +356,25 @@ public class GatheringServiceTest {
         assertThrows(GatheringException.class,()->gatheringService.deleteGatheringUser(2L,1L));
     }
 
+    @Test
+    @DisplayName("모임 참가자를 조회한다.")
+    void findGatheringUsers() {
+        // given
+        given(gatheringRepository.findWithGatheringUsersById(any()))
+                .willReturn(Optional.of(createOnlineGathering()));
+
+        given(userServiceClient.findUserByIdIn(any()))
+                .willReturn(Arrays.asList(TEST_USER_RESPONSE1));
+
+        // when
+        List<GatheringUserResponse> result = gatheringService.findGatheringUsers(1L);
+
+        // then
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getUserId()).isEqualTo(TEST_USER_RESPONSE1.getId());
+
+        then(gatheringRepository).should(times(1)).findWithGatheringUsersById(any());
+        then(userServiceClient).should(times(1)).findUserByIdIn(any());
+    }
 
 }

@@ -5,6 +5,7 @@ import com.study.gatheringservice.GatheringFixture;
 import com.study.gatheringservice.config.LoginUserArgumentResolver;
 import com.study.gatheringservice.domain.Gathering;
 import com.study.gatheringservice.model.gathering.GatheringResponse;
+import com.study.gatheringservice.model.gatheringuser.GatheringUserResponse;
 import com.study.gatheringservice.service.GatheringService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +30,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.study.gatheringservice.GatheringFixture.*;
@@ -248,7 +250,7 @@ class GatheringControllerTest {
         gatherings.add(TEST_GATHERING_RESPONSE2);
 
         PageRequest pageable = PageRequest.of(0, 10);
-        Page<GatheringResponse> pageGathering = new PageImpl<>(gatherings, pageable,gatherings.size());
+        Page<GatheringResponse> pageGathering = new PageImpl<>(gatherings, pageable, gatherings.size());
 
         // given
         given(gatheringService.find(any(), any()))
@@ -350,6 +352,46 @@ class GatheringControllerTest {
 
         // then
         then(gatheringService).should(times(1)).deleteGatheringUser(any(), any());
+    }
+
+    @Test
+    @DisplayName("모임 참가자 조회 API 테스트")
+    void findGatheringUsers() throws Exception {
+        // given
+        List<GatheringUserResponse> gatheringUsers = new ArrayList<>();
+        gatheringUsers.add(TEST_GATHERING_USER_RESPONSE1);
+        gatheringUsers.add(TEST_GATHERING_USER_RESPONSE2);
+
+        given(gatheringService.findGatheringUsers(any()))
+                .willReturn(gatheringUsers);
+        // when
+        mockMvc.perform(get("/gatherings/{gatheringId}/users", 1)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(gatheringUsers)))
+                .andDo(document("gathering/gatheringUser/find",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("gatheringId").description("모임 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("모임 참가 ID"),
+                                fieldWithPath("[].userId").type(JsonFieldType.NUMBER).description("모임 참가 유저 ID"),
+                                fieldWithPath("[].nickName").type(JsonFieldType.STRING).description("모임 참가 유저 닉네임"),
+                                fieldWithPath("[].image").type(JsonFieldType.OBJECT).description("모임 참가 유저 이미지"),
+                                fieldWithPath("[].image.thumbnailImage").type(JsonFieldType.STRING).description("모임 참가 유저 썸네일 이미지 URL"),
+                                fieldWithPath("[].image.profileImage").type(JsonFieldType.STRING).description("모임 참가  유저 이미지 URL"),
+                                fieldWithPath("[].gender").type(JsonFieldType.STRING).description("모임 참가 유저 성별"),
+                                fieldWithPath("[].ageRange").type(JsonFieldType.STRING).description("모임 참가 유저 나이대"),
+                                fieldWithPath("[].register").type(JsonFieldType.BOOLEAN).description("모임 등록자 여부")
+                        )
+                ));
+
+        // then
+        then(gatheringService).should(times(1)).findGatheringUsers(any());
     }
 
 }

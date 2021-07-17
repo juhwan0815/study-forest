@@ -1,14 +1,18 @@
 package com.study.gatheringservice.service.impl;
 
 import com.study.gatheringservice.client.StudyServiceClient;
+import com.study.gatheringservice.client.UserServiceClient;
 import com.study.gatheringservice.domain.Gathering;
+import com.study.gatheringservice.domain.GatheringUser;
 import com.study.gatheringservice.domain.Place;
 import com.study.gatheringservice.domain.Shape;
 import com.study.gatheringservice.exception.GatheringException;
 import com.study.gatheringservice.model.gathering.GatheringCreateRequest;
 import com.study.gatheringservice.model.gathering.GatheringResponse;
 import com.study.gatheringservice.model.gathering.GatheringUpdateRequest;
+import com.study.gatheringservice.model.gatheringuser.GatheringUserResponse;
 import com.study.gatheringservice.model.studyuser.StudyUserResponse;
+import com.study.gatheringservice.model.user.UserResponse;
 import com.study.gatheringservice.repository.GatheringRepository;
 import com.study.gatheringservice.service.GatheringService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +22,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -28,6 +34,7 @@ public class GatheringServiceImpl implements GatheringService {
 
     private final GatheringRepository gatheringRepository;
     private final StudyServiceClient studyServiceClient;
+    private final UserServiceClient userServiceClient;
 
     @Override
     @Transactional
@@ -110,6 +117,32 @@ public class GatheringServiceImpl implements GatheringService {
                 .orElseThrow(() -> new GatheringException(gatheringId + "는 존재하지 않는 모임 ID 입니다."));
 
         findGathering.deleteGatheringUser(userId);
+    }
+
+    @Override
+    public List<GatheringUserResponse> findGatheringUsers(Long gatheringId) {
+        Gathering findGathering = gatheringRepository.findWithGatheringUsersById(gatheringId)
+                .orElseThrow(() -> new GatheringException(gatheringId + "는 존재하지 않는 모임 ID 입니다."));
+
+        List<Long> userIdList = findGathering.getGatheringUsers().stream()
+                .map(gatheringUser -> gatheringUser.getUserId())
+                .collect(Collectors.toList());
+
+        List<UserResponse> users = userServiceClient.findUserByIdIn(userIdList);
+
+        List<GatheringUserResponse> gatheringUserResponses = new ArrayList<>();
+        findGathering.getGatheringUsers().stream()
+                .forEach(gatheringUser -> {
+                    for (UserResponse user : users) {
+                        if(gatheringUser.getUserId().equals(user.getId())){
+                            gatheringUserResponses.add(GatheringUserResponse.from(gatheringUser,user));
+                            break;
+                        }
+                    }
+                });
+
+
+        return gatheringUserResponses;
     }
 
     private Place CreatePlaceIfShapeIsOffline(Shape shape, String placeName, Double let, Double len) {

@@ -7,8 +7,11 @@ import com.study.gatheringservice.domain.Shape;
 import com.study.gatheringservice.model.gathering.GatheringCreateRequest;
 import com.study.gatheringservice.model.gathering.GatheringResponse;
 import com.study.gatheringservice.model.gathering.GatheringUpdateRequest;
+import com.study.gatheringservice.model.gatheringuser.GatheringUserResponse;
 import com.study.gatheringservice.model.studyuser.Role;
 import com.study.gatheringservice.model.studyuser.StudyUserResponse;
+import com.study.gatheringservice.model.user.UserImage;
+import com.study.gatheringservice.model.user.UserResponse;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,11 +23,22 @@ public class GatheringFixture {
 
     public static Place TEST_PLACE = new Place("테스트 장소",37.584009,126.970626);
 
+    public static UserImage TEST_USER_IMAGE = new UserImage("테스트 썸네일 이미지","테스트 이미지");
+
+    public static UserResponse TEST_USER_RESPONSE1
+            = new UserResponse(1L,"황주환",TEST_USER_IMAGE,"male","20~29",null,null);
+
     public static StudyUserResponse TEST_STUDY_USER_RESPONSE1
             = new StudyUserResponse(1L,1L,"황주환", Role.ADMIN);
 
     public static StudyUserResponse TEST_STUDY_USER_RESPONSE2
             = new StudyUserResponse(2L,2L,"황철원", Role.USER);
+
+    public static GatheringUserResponse TEST_GATHERING_USER_RESPONSE1
+            = new GatheringUserResponse(1L,1L,"황주환",TEST_USER_IMAGE,"male","20~29",true);
+
+    public static GatheringUserResponse TEST_GATHERING_USER_RESPONSE2
+            = new GatheringUserResponse(2L,2L,"황철원",TEST_USER_IMAGE,"male","20~29",false);
 
     public static GatheringCreateRequest TEST_GATHERING_CREATE_REQUEST1
             = new GatheringCreateRequest(TEST_LOCAL_DATE_TIME1, Shape.ONLINE,"테스트 모임",null,null,null);

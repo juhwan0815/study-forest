@@ -6,6 +6,7 @@ import com.study.gatheringservice.exception.GatheringException;
 import com.study.gatheringservice.model.gathering.GatheringCreateRequest;
 import com.study.gatheringservice.model.gathering.GatheringResponse;
 import com.study.gatheringservice.model.gathering.GatheringUpdateRequest;
+import com.study.gatheringservice.model.gatheringuser.GatheringUserResponse;
 import com.study.gatheringservice.service.GatheringService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -81,6 +83,11 @@ public class GatheringController {
                                                  @PathVariable Long gatheringId){
         gatheringService.addGatheringUser(userId,gatheringId);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/gatherings/{gatheringId}/users")
+    public ResponseEntity<List<GatheringUserResponse>> findGatheringUsers(@PathVariable Long gatheringId){
+        return ResponseEntity.ok(gatheringService.findGatheringUsers(gatheringId));
     }
 
     @DeleteMapping("/gatherings/{gatheringId}/users")
