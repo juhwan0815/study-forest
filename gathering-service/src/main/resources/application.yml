@@ -50,6 +50,9 @@ kafka:
   topic:
     study:
       delete: study-delete-topic
+  consumer:
+    study:
+      delete: study-delete-consumer-group
 
 management:
   endpoints:

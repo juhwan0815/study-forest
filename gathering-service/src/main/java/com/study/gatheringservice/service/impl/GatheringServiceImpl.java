@@ -7,6 +7,7 @@ import com.study.gatheringservice.domain.GatheringUser;
 import com.study.gatheringservice.domain.Place;
 import com.study.gatheringservice.domain.Shape;
 import com.study.gatheringservice.exception.GatheringException;
+import com.study.gatheringservice.kafka.message.StudyDeleteMessage;
 import com.study.gatheringservice.model.gathering.GatheringCreateRequest;
 import com.study.gatheringservice.model.gathering.GatheringResponse;
 import com.study.gatheringservice.model.gathering.GatheringUpdateRequest;
@@ -143,6 +144,13 @@ public class GatheringServiceImpl implements GatheringService {
 
 
         return gatheringUserResponses;
+    }
+
+    @Override
+    @Transactional
+    public void deleteByStudyId(StudyDeleteMessage studyDeleteMessage) {
+        List<Gathering> findGatherings = gatheringRepository.findWithGatheringUsersByStudyId(studyDeleteMessage.getStudyId());
+        gatheringRepository.deleteAll(findGatherings);
     }
 
     private Place CreatePlaceIfShapeIsOffline(Shape shape, String placeName, Double let, Double len) {

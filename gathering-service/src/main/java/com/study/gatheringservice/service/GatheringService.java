@@ -1,5 +1,6 @@
 package com.study.gatheringservice.service;
 
+import com.study.gatheringservice.kafka.message.StudyDeleteMessage;
 import com.study.gatheringservice.model.gathering.GatheringCreateRequest;
 import com.study.gatheringservice.model.gathering.GatheringResponse;
 import com.study.gatheringservice.model.gathering.GatheringUpdateRequest;
@@ -26,4 +27,7 @@ public interface GatheringService {
     void deleteGatheringUser(Long userId, Long gatheringId);
 
     List<GatheringUserResponse> findGatheringUsers(Long gatheringId);
+
+    void deleteByStudyId(StudyDeleteMessage studyDeleteMessage);
+
 }
