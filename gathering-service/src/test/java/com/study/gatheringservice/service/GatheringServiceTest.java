@@ -15,7 +15,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -264,6 +268,27 @@ public class GatheringServiceTest {
         then(gatheringRepository).should(times(1)).findWithGatheringUsersById(any());
     }
 
+    @Test
+    @DisplayName("모임을 검색한다")
+    void find(){
+        // given
+        List<Gathering> gatherings = new ArrayList<>();
+        gatherings.add(TEST_GATHERING2);
+        gatherings.add(TEST_GATHERING1);
+
+        PageRequest pageable = PageRequest.of(0, 10);
+        Page<Gathering> pageGathering = new PageImpl<>(gatherings, pageable,gatherings.size());
+
+        given(gatheringRepository.findByStudyIdOrderByGatheringTimeDesc(any(),any()))
+                .willReturn(pageGathering);
+
+        // when
+        Page<GatheringResponse> result = gatheringService.find(1L, pageable);
+
+        // then
+        assertThat(result.getContent().size()).isEqualTo(2);
+        then(gatheringRepository).should(times(1)).findByStudyIdOrderByGatheringTimeDesc(any(),any());
+    }
 
 
 }

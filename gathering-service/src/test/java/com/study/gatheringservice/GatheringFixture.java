@@ -38,6 +38,12 @@ public class GatheringFixture {
     public static GatheringUpdateRequest TEST_GATHERING_UPDATE_REQUEST2
             = new GatheringUpdateRequest(TEST_LOCAL_DATE_TIME2, Shape.OFFLINE,"테스트 모임","테스트 장소",37.584009,126.970626);
 
+    public static Gathering TEST_GATHERING1
+            = new Gathering(1L,1L,TEST_LOCAL_DATE_TIME1,Shape.ONLINE,"테스트 모임",1,null,null);
+
+    public static Gathering TEST_GATHERING2
+            = new Gathering(2L,1L,TEST_LOCAL_DATE_TIME2,Shape.OFFLINE,"테스트 모임",1,TEST_PLACE,null);
+
 
     public static GatheringResponse TEST_GATHERING_RESPONSE1
             = new GatheringResponse(1L,1L,TEST_LOCAL_DATE_TIME1,1,Shape.ONLINE,"테스트 모임",null,null);

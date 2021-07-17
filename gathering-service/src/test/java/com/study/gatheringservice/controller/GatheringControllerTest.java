@@ -3,6 +3,7 @@ package com.study.gatheringservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.gatheringservice.GatheringFixture;
 import com.study.gatheringservice.config.LoginUserArgumentResolver;
+import com.study.gatheringservice.domain.Gathering;
 import com.study.gatheringservice.model.gathering.GatheringResponse;
 import com.study.gatheringservice.service.GatheringService;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
@@ -235,4 +239,68 @@ class GatheringControllerTest {
         then(gatheringService).should(times(1)).findById(any(), any());
     }
 
+    @Test
+    @DisplayName("모임 조회 API 테스트")
+    void find() throws Exception {
+        // given
+        List<GatheringResponse> gatherings = new ArrayList<>();
+        gatherings.add(TEST_GATHERING_RESPONSE1);
+        gatherings.add(TEST_GATHERING_RESPONSE2);
+
+        PageRequest pageable = PageRequest.of(0, 10);
+        Page<GatheringResponse> pageGathering = new PageImpl<>(gatherings, pageable,gatherings.size());
+
+        // given
+        given(gatheringService.find(any(), any()))
+                .willReturn(pageGathering);
+
+        // when
+        mockMvc.perform(get("/studies/{studyId}/gatherings", 1)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(pageGathering)))
+                .andDo(document("gathering/find",
+                        requestHeaders(
+                                headerWithName("Authorization").description("액세스 토큰")
+                        ),
+                        pathParameters(
+                                parameterWithName("studyId").description("스터디 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("content").type(JsonFieldType.ARRAY).description("조회 결과 배열"),
+                                fieldWithPath("content.[].id").type(JsonFieldType.NUMBER).description("모임 ID"),
+                                fieldWithPath("content.[].studyId").type(JsonFieldType.NUMBER).description("스터디 ID"),
+                                fieldWithPath("content.[].gatheringTime").type(JsonFieldType.STRING).description("모임 날짜 및 시간"),
+                                fieldWithPath("content.[].numberOfPeople").type(JsonFieldType.NUMBER).description("모임 현재 참가 인원 수"),
+                                fieldWithPath("content.[].shape").type(JsonFieldType.STRING).description("모임 형태 ONLINE/OFFLINE"),
+                                fieldWithPath("content.[].content").type(JsonFieldType.STRING).description("모임 설명"),
+                                fieldWithPath("content.[].place").type(JsonFieldType.OBJECT).optional().description("모임 장소"),
+                                fieldWithPath("content.[].place.name").type(JsonFieldType.STRING).description("모임 장소명"),
+                                fieldWithPath("content.[].place.let").type(JsonFieldType.NUMBER).description("모임 장소 위도"),
+                                fieldWithPath("content.[].place.len").type(JsonFieldType.NUMBER).description("모임 장소 경도"),
+                                fieldWithPath("pageable.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬 여부 "),
+                                fieldWithPath("pageable.sort.unsorted").type(JsonFieldType.BOOLEAN).description("비정렬 여부"),
+                                fieldWithPath("pageable.sort.empty").type(JsonFieldType.BOOLEAN).description("값이 비었는지 여부"),
+                                fieldWithPath("pageable.offset").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                                fieldWithPath("pageable.pageNumber").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                                fieldWithPath("pageable.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                                fieldWithPath("pageable.paged").type(JsonFieldType.BOOLEAN).description("페이징 여부"),
+                                fieldWithPath("pageable.unpaged").type(JsonFieldType.BOOLEAN).description("비페이징 여부"),
+                                fieldWithPath("last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
+                                fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("총 페이지 수"),
+                                fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("총 결과 수"),
+                                fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                                fieldWithPath("number").type(JsonFieldType.NUMBER).description("페이지 번호"),
+                                fieldWithPath("sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬여부"),
+                                fieldWithPath("sort.unsorted").type(JsonFieldType.BOOLEAN).description("비정렬여부"),
+                                fieldWithPath("sort.empty").type(JsonFieldType.BOOLEAN).description("값이 비었는지 여부"),
+                                fieldWithPath("numberOfElements").type(JsonFieldType.NUMBER).description("현재 페이지 크기"),
+                                fieldWithPath("first").type(JsonFieldType.BOOLEAN).description("처음 페이지 여부"),
+                                fieldWithPath("empty").type(JsonFieldType.BOOLEAN).description("값이 비었는지 여부")
+                        )));
+
+        // then
+        then(gatheringService).should(times(1)).find(any(), any());
+    }
 }

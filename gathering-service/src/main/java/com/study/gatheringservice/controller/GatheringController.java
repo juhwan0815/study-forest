@@ -9,6 +9,9 @@ import com.study.gatheringservice.model.gathering.GatheringUpdateRequest;
 import com.study.gatheringservice.service.GatheringService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -22,6 +25,12 @@ import javax.validation.Valid;
 public class GatheringController {
 
     private final GatheringService gatheringService;
+
+    @GetMapping("/studies/{studyId}/gatherings")
+    public ResponseEntity<Page<GatheringResponse>> find(@PathVariable Long studyId,
+                                                        @PageableDefault(size = 25,page = 0) Pageable pageable){
+        return ResponseEntity.ok(gatheringService.find(studyId,pageable));
+    }
 
     @PostMapping("/studies/{studyId}/gatherings")
     public ResponseEntity<GatheringResponse> create(@LoginUser Long userId,
@@ -65,5 +74,13 @@ public class GatheringController {
                                                       @PathVariable Long gatheringId){
         return ResponseEntity.ok(gatheringService.findById(userId,gatheringId));
     }
+
+//    @PostMapping("/gathering/{gatheringId}/users")
+//    public ResponseEntity<Void> createGatheringUser(@LoginUser Long userId,
+//                                                    @PathVariable Long gatheringId){
+//        gatheringService.createGatheringUser(userId,gatheringId);
+//        return ResponseEntity.status(HttpStatus.OK).build();
+//    }
+
 
 }
