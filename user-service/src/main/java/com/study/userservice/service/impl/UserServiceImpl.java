@@ -24,6 +24,7 @@ import com.study.userservice.repository.query.UserQueryRepository;
 import com.study.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -286,7 +288,15 @@ public class UserServiceImpl implements UserService {
 
 
     private Image uploadImageToS3(MultipartFile image) {
-        String ext = extractExt(image.getOriginalFilename());
+        Tika tika = new Tika();
+
+        String contentType = null;
+        try {
+            contentType = tika.detect(image.getInputStream());
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        String ext = extractExt(contentType);
         String imageStoreName = UUID.randomUUID().toString() + "." + ext;
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -311,9 +321,9 @@ public class UserServiceImpl implements UserService {
         return uploadResult;
     }
 
-    private String extractExt(String originalFilename) {
-        int pos = originalFilename.lastIndexOf(".");
-        return originalFilename.substring(pos + 1);
+    private String extractExt(String contentType) {
+        int pos = contentType.lastIndexOf(".");
+        return contentType.substring(pos + 1);
     }
 
     private void deleteImageFromS3(String imageStoreName) {
