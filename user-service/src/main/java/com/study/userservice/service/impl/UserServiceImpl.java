@@ -322,7 +322,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private String extractExt(String contentType) {
-        int pos = contentType.lastIndexOf(".");
+        int pos = contentType.lastIndexOf("/");
         return contentType.substring(pos + 1);
     }
 
