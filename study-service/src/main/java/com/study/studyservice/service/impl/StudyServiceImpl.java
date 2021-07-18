@@ -27,6 +27,7 @@ import com.study.studyservice.service.StudyService;
 import com.study.studyservice.service.TagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -211,7 +213,7 @@ public class StudyServiceImpl implements StudyService {
 
 
     @Override
-    public StudyResponse findById(Long userId,Long studyId) {
+    public StudyResponse findById(Long userId, Long studyId) {
         Study findStudy = studyQueryRepository.findWithCategoryAndStudyTagsAndTagById(studyId);
 
         LocationResponse location;
@@ -222,7 +224,7 @@ public class StudyServiceImpl implements StudyService {
             location = new LocationResponse();
         }
 
-        return StudyResponse.from(findStudy, location,userId);
+        return StudyResponse.from(findStudy, location, userId);
     }
 
     @Override
@@ -343,7 +345,7 @@ public class StudyServiceImpl implements StudyService {
         Study findStudy = studyQueryRepository.findWithWaitUserById(studyId);
         findStudy.deleteWaitUser(userId);
 
-        studyApplyCancelMessageSender.send(StudyApplyCancelMessage.from(userId,studyId));
+        studyApplyCancelMessageSender.send(StudyApplyCancelMessage.from(userId, studyId));
     }
 
     private LocationResponse getLocation(boolean offline, String locationCode) {
@@ -369,7 +371,7 @@ public class StudyServiceImpl implements StudyService {
             }
         }
         if (!deleteImage && image != null) {
-            if(!image.isEmpty()) {
+            if (!image.isEmpty()) {
                 if (studyImage != null) {
                     deleteImageFromS3(studyImage.getImageStoreName());
                 }
@@ -392,7 +394,15 @@ public class StudyServiceImpl implements StudyService {
     }
 
     private Image uploadImageToS3(MultipartFile image) {
-        String ext = extractExt(image.getOriginalFilename());
+        Tika tika = new Tika();
+
+        String contentType = null;
+        try {
+            contentType = tika.detect(image.getInputStream());
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+        String ext = extractExt(contentType);
         String imageStoreName = UUID.randomUUID().toString() + "." + ext;
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -417,9 +427,9 @@ public class StudyServiceImpl implements StudyService {
         return uploadResult;
     }
 
-    private String extractExt(String originalFilename) {
-        int pos = originalFilename.lastIndexOf(".");
-        return originalFilename.substring(pos + 1);
+    private String extractExt(String contentType) {
+        int pos = contentType.lastIndexOf("/");
+        return contentType.substring(pos + 1);
     }
 
     private void deleteImageFromS3(String imageStoreName) {
