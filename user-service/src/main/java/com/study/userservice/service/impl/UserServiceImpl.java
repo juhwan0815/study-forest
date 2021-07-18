@@ -286,7 +286,7 @@ public class UserServiceImpl implements UserService {
 
 
     private Image uploadImageToS3(MultipartFile image) {
-        String ext = extractExt(image.getContentType());
+        String ext = extractExt(image.getOriginalFilename());
         String imageStoreName = UUID.randomUUID().toString() + "." + ext;
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -311,9 +311,9 @@ public class UserServiceImpl implements UserService {
         return uploadResult;
     }
 
-    private String extractExt(String contentType) {
-        int pos = contentType.lastIndexOf("/");
-        return contentType.substring(pos + 1);
+    private String extractExt(String originalFilename) {
+        int pos = originalFilename.lastIndexOf(".");
+        return originalFilename.substring(pos + 1);
     }
 
     private void deleteImageFromS3(String imageStoreName) {
