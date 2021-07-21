@@ -2,6 +2,7 @@ package com.study.notificationservice.service;
 
 import com.study.notificationservice.NotificationFixture;
 import com.study.notificationservice.client.StudyServiceClient;
+import com.study.notificationservice.client.UserServiceClient;
 import com.study.notificationservice.fcm.FcmMessageSender;
 import com.study.notificationservice.repository.NotificationRepository;
 import com.study.notificationservice.service.impl.NotificationServiceImpl;
@@ -32,6 +33,9 @@ class NotificationServiceTest {
     @Mock
     private StudyServiceClient studyServiceClient;
 
+    @Mock
+    private UserServiceClient userServiceClient;
+
     @Test
     @DisplayName("모임 생성 알림을 생성한다.")
     void createGatheringNotification(){
@@ -54,5 +58,51 @@ class NotificationServiceTest {
         then(studyServiceClient).should(times(1)).findWithStudyUserByStudyId(any());
         then(fcmMessageSender).should(times(2)).send(any(),any(),any());
         then(notificationRepository).should(times(2)).save(any());
+    }
+
+    @Test
+    @DisplayName("스터디 가입 실패 알림을 생성한다.")
+    void createStudyApplyFailNotification(){
+        // given
+        given(userServiceClient.findUserById(any()))
+            .willReturn(TEST_USER_RESPONSE);
+
+        willDoNothing()
+                .given(fcmMessageSender)
+                .send(any(),any(),any());
+
+        given(notificationRepository.save(any()))
+                .willReturn(null);
+
+        // when
+        notificationService.studyApplyFail(TEST_STUDY_APPLY_FAIL_MESSAGE);
+
+        // then
+        then(userServiceClient).should(times(1)).findUserById(any());
+        then(fcmMessageSender).should(times(1)).send(any(),any(),any());
+        then(notificationRepository).should(times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("스터디 가입 성공 알림을 생성한다.")
+    void createStudyApplySuccessNotification(){
+        // given
+        given(userServiceClient.findUserById(any()))
+                .willReturn(TEST_USER_RESPONSE);
+
+        willDoNothing()
+                .given(fcmMessageSender)
+                .send(any(),any(),any());
+
+        given(notificationRepository.save(any()))
+                .willReturn(null);
+
+        // when
+        notificationService.studyApplySuccess(TEST_STUDY_APPLY_SUCCESS_MESSAGE);
+
+        // then
+        then(userServiceClient).should(times(1)).findUserById(any());
+        then(fcmMessageSender).should(times(1)).send(any(),any(),any());
+        then(notificationRepository).should(times(1)).save(any());
     }
 }
