@@ -18,6 +18,24 @@ spring:
     username: guest
     password: guest
 
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+      path: /h2-console
+
+  jpa:
+    #    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        default_batch_fetch_size: 1000
+        show_sql: false
+        format_sql: true
+    open-in-view: false
+
 eureka:
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
@@ -54,9 +72,15 @@ kafka:
     chat:
       create: chat-create-consumer-group
 
+fcm:
+  tempFilePath: study-forest-firebase-adminsdk-fn2ez-6f5e36d81f.json
 
 management:
   endpoints:
     web:
       exposure:
         include: refresh, health, beans, busrefresh, info, metrics, prometheus
+
+logging:
+  level:
+    org.hibernate.SQL: debug
