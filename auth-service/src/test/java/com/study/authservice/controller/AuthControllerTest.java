@@ -74,7 +74,7 @@ class AuthControllerTest {
     @DisplayName("로그인 API 테스트")
     void login() throws Exception {
 
-        given(authService.login(any()))
+        given(authService.login(any(),any()))
                 .willReturn(TEST_CREATE_TOKEN_RESULT);
 
         mockMvc.perform(post("/auth")
@@ -84,14 +84,15 @@ class AuthControllerTest {
                 .andExpect(header().string("refreshToken", TEST_CREATE_TOKEN_RESULT.getRefreshToken()))
                 .andDo(document("auth/create",
                         requestHeaders(
-                                headerWithName("kakaoToken").description("카카오 토큰")
+                                headerWithName("kakaoToken").description("카카오 토큰"),
+                                headerWithName("fcmToken").optional().description("FCM 토큰, 필수값 X")
                         ),
                         responseHeaders(
                                 headerWithName("accessToken").description("Access 토큰"),
                                 headerWithName("refreshToken").description("Refresh 토큰")
                         )));
 
-        then(authService).should(times(1)).login(any());
+        then(authService).should(times(1)).login(any(),any());
     }
 
     @Test

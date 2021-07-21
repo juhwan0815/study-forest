@@ -13,4 +13,6 @@ public class UserResponse {
 
     private String role; // 회원 권한
 
+    private String nickName; // 회원 이름
+
 }

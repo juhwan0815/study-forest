@@ -20,7 +20,9 @@ public class UserLoginRequest {
 
     private String gender; // 성
 
-    public static UserLoginRequest from(KakaoProfile kakaoProfile){
+    private String fcmToken;
+
+    public static UserLoginRequest from(KakaoProfile kakaoProfile,String fcmToken){
         UserLoginRequest userLoginRequest = new UserLoginRequest();
         userLoginRequest.kakaoId = kakaoProfile.getId();
         userLoginRequest.nickName = kakaoProfile.getProperties().getNickname();
@@ -28,6 +30,7 @@ public class UserLoginRequest {
         userLoginRequest.profileImage = kakaoProfile.getProperties().getProfile_image();
         userLoginRequest.ageRange = kakaoProfile.getKakao_account().getAge_range();
         userLoginRequest.gender = kakaoProfile.getKakao_account().getGender();
+        userLoginRequest.fcmToken = fcmToken;
         return userLoginRequest;
     }
 

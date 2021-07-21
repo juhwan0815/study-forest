@@ -30,13 +30,13 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public CreateTokenResult login(String kakaoToken) {
+    public CreateTokenResult login(String kakaoToken,String fcmToken) {
         KakaoProfile kakaoProfile = kakaoServiceClient.getKakaoProfile(kakaoToken);
 
         // TODO Circuit Breaker 적용하기
-        UserResponse user = userServiceClient.login(UserLoginRequest.from(kakaoProfile));
+        UserResponse user = userServiceClient.login(UserLoginRequest.from(kakaoProfile,fcmToken));
 
-        CreateTokenResult createTokenResult = jwtTokenProvider.createToken(user.getId(),user.getRole());
+        CreateTokenResult createTokenResult = jwtTokenProvider.createToken(user.getId(),user.getRole(),user.getNickName());
 
         Optional<Auth> findAuth = authRepository.findByUserId(user.getId());
 

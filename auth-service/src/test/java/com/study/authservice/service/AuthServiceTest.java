@@ -68,21 +68,21 @@ class AuthServiceTest {
         given(userServiceClient.login(any()))
                 .willReturn(TEST_USER_RESPONSE);
 
-        given(jwtTokenProvider.createToken(any(),any()))
+        given(jwtTokenProvider.createToken(any(),any(),any()))
                 .willReturn(TEST_CREATE_TOKEN_RESULT);
 
         given(authRepository.findByUserId(any()))
                 .willReturn(Optional.of(TEST_AUTH));
 
         // when
-        CreateTokenResult tokenResult = authService.login("kakaoToken");
+        CreateTokenResult tokenResult = authService.login("kakaoToken","fcmToken");
 
         // then
         assertThat(tokenResult.getAccessToken()).isEqualTo(TEST_ACCESS_TOKEN);
         assertThat(tokenResult.getRefreshToken()).isEqualTo(TEST_REFRESH_TOKEN);
         then(kakaoServiceClient).should(times(1)).getKakaoProfile(any());
         then(userServiceClient).should(times(1)).login(any());
-        then(jwtTokenProvider).should(times(1)).createToken(any(),any());
+        then(jwtTokenProvider).should(times(1)).createToken(any(),any(),any());
         then(authRepository).should(times(1)).findByUserId(any());
     }
 
@@ -106,7 +106,7 @@ class AuthServiceTest {
         given(userServiceClient.login(any()))
                 .willReturn(TEST_USER_RESPONSE);
 
-        given(jwtTokenProvider.createToken(any(),any()))
+        given(jwtTokenProvider.createToken(any(),any(),any()))
                 .willReturn(TEST_CREATE_TOKEN_RESULT);
 
         given(authRepository.findByUserId(any()))
@@ -116,14 +116,14 @@ class AuthServiceTest {
                 .willReturn(TEST_AUTH);
 
         // when
-        CreateTokenResult result = authService.login("kakaoToken");
+        CreateTokenResult result = authService.login("kakaoToken","fcmToken");
 
         // then
         assertThat(result.getAccessToken()).isEqualTo(TEST_ACCESS_TOKEN);
         assertThat(result.getRefreshToken()).isEqualTo(TEST_REFRESH_TOKEN);
         then(kakaoServiceClient).should(times(1)).getKakaoProfile(any());
         then(userServiceClient).should(times(1)).login(any());
-        then(jwtTokenProvider).should(times(1)).createToken(any(),any());
+        then(jwtTokenProvider).should(times(1)).createToken(any(),any(),any());
         then(authRepository).should(times(1)).findByUserId(any());
         then(authRepository).should(times(1)).save(any());
     }

@@ -11,11 +11,12 @@ import java.util.Date;
 
 public class AuthFixture {
 
-    public static final  UserResponse TEST_USER_RESPONSE = new UserResponse(1L,"USER");
+    public static final  UserResponse TEST_USER_RESPONSE = new UserResponse(1L,"USER","황주환");
 
     public static final String TEST_ACCESS_TOKEN = Jwts.builder()
             .setSubject(String.valueOf(TEST_USER_RESPONSE.getId()))
             .claim("ROLE", TEST_USER_RESPONSE.getRole())
+            .claim("nickName", TEST_USER_RESPONSE.getNickName())
             .setIssuedAt(new Date())
             .setExpiration(new Date(new Date().getTime() + 86400000L))
             .signWith(SignatureAlgorithm.HS256, "study")
@@ -24,6 +25,7 @@ public class AuthFixture {
     public static final String TEST_REFRESH_TOKEN = Jwts.builder()
             .setSubject(String.valueOf(TEST_USER_RESPONSE.getId()))
             .claim("ROLE", TEST_USER_RESPONSE.getRole())
+            .claim("nickName", TEST_USER_RESPONSE.getNickName())
             .setIssuedAt(new Date())
             .setExpiration(new Date(new Date().getTime() + 604800000L))
             .signWith(SignatureAlgorithm.HS256, "study")

@@ -22,7 +22,7 @@ class JwtTokenProviderTest {
     @DisplayName("토큰 생성 테스트")
     void createToken(){
         // when
-        CreateTokenResult result = jwtTokenProvider.createToken(TEST_AUTH.getId(), TEST_AUTH.getRefreshToken());
+        CreateTokenResult result = jwtTokenProvider.createToken(TEST_AUTH.getId(), TEST_AUTH.getRefreshToken(),"황주환");
 
         // then
         assertThat(result.getAccessToken()).isNotNull();

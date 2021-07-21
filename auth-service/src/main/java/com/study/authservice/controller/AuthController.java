@@ -21,9 +21,10 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/auth")
-    public ResponseEntity create(@RequestHeader String kakaoToken){
+    public ResponseEntity create(@RequestHeader String kakaoToken,
+                                 @RequestHeader(required = false) String fcmToken){
 
-        CreateTokenResult createTokenResult = authService.login(kakaoToken);
+        CreateTokenResult createTokenResult = authService.login(kakaoToken,fcmToken);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .header("accessToken",createTokenResult.getAccessToken())
