@@ -6,6 +6,7 @@ import com.study.gatheringservice.client.UserServiceClient;
 import com.study.gatheringservice.domain.Gathering;
 import com.study.gatheringservice.domain.Shape;
 import com.study.gatheringservice.exception.GatheringException;
+import com.study.gatheringservice.kafka.sender.GatheringCreateMessageSender;
 import com.study.gatheringservice.model.gathering.GatheringResponse;
 import com.study.gatheringservice.model.gatheringuser.GatheringUserResponse;
 import com.study.gatheringservice.model.studyuser.StudyUserResponse;
@@ -49,6 +50,9 @@ public class GatheringServiceTest {
     @Mock
     private UserServiceClient userServiceClient;
 
+    @Mock
+    private GatheringCreateMessageSender gatheringCreateMessageSender;
+
     @Test
     @DisplayName("온라인 모임을 생성한다.")
     void createIfOnlineStudy(){
@@ -61,6 +65,9 @@ public class GatheringServiceTest {
         given(gatheringRepository.save(any()))
                 .willReturn(createOnlineGathering());
 
+        willDoNothing()
+                .given(gatheringCreateMessageSender)
+                .send(any());
         // when
         GatheringResponse result = gatheringService.create(1L, 1L, TEST_GATHERING_CREATE_REQUEST1);
 
@@ -75,6 +82,7 @@ public class GatheringServiceTest {
 
         then(studyServiceClient).should(times(1)).findStudyUserByStudyId(any());
         then(gatheringRepository).should(times(1)).save(any());
+        then(gatheringCreateMessageSender).should(times(1)).send(any());
     }
 
     @Test
@@ -88,6 +96,10 @@ public class GatheringServiceTest {
 
         given(gatheringRepository.save(any()))
                 .willReturn(createOfflineGathering());
+
+        willDoNothing()
+                .given(gatheringCreateMessageSender)
+                .send(any());
 
         // when
         GatheringResponse result = gatheringService.create(1L, 1L, TEST_GATHERING_CREATE_REQUEST2);
@@ -105,6 +117,7 @@ public class GatheringServiceTest {
 
         then(studyServiceClient).should(times(1)).findStudyUserByStudyId(any());
         then(gatheringRepository).should(times(1)).save(any());
+        then(gatheringCreateMessageSender).should(times(1)).send(any());
     }
 
     @Test

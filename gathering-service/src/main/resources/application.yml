@@ -50,6 +50,8 @@ kafka:
   topic:
     study:
       delete: study-delete-topic
+    gathering:
+      create: gathering-create-topic
   consumer:
     study:
       delete: study-delete-consumer-group

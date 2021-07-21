@@ -7,7 +7,9 @@ import com.study.gatheringservice.domain.GatheringUser;
 import com.study.gatheringservice.domain.Place;
 import com.study.gatheringservice.domain.Shape;
 import com.study.gatheringservice.exception.GatheringException;
+import com.study.gatheringservice.kafka.message.GatheringCreateMessage;
 import com.study.gatheringservice.kafka.message.StudyDeleteMessage;
+import com.study.gatheringservice.kafka.sender.GatheringCreateMessageSender;
 import com.study.gatheringservice.model.gathering.GatheringCreateRequest;
 import com.study.gatheringservice.model.gathering.GatheringResponse;
 import com.study.gatheringservice.model.gathering.GatheringUpdateRequest;
@@ -36,6 +38,7 @@ public class GatheringServiceImpl implements GatheringService {
     private final GatheringRepository gatheringRepository;
     private final StudyServiceClient studyServiceClient;
     private final UserServiceClient userServiceClient;
+    private final GatheringCreateMessageSender gatheringCreateMessageSender;
 
     @Override
     @Transactional
@@ -58,6 +61,8 @@ public class GatheringServiceImpl implements GatheringService {
         gathering.addGatheringUser(userId, true);
 
         Gathering savedGathering = gatheringRepository.save(gathering);
+
+        gatheringCreateMessageSender.send(GatheringCreateMessage.from(savedGathering));
         return GatheringResponse.from(savedGathering);
     }
 
