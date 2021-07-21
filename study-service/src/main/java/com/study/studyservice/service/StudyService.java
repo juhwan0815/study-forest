@@ -5,6 +5,7 @@ import com.study.studyservice.model.study.request.StudyFindRequest;
 import com.study.studyservice.model.study.request.StudySearchRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
+import com.study.studyservice.model.study.response.StudyWithUserResponse;
 import com.study.studyservice.model.studyuser.StudyUserResponse;
 import com.study.studyservice.model.waituser.WaitUserResponse;
 import org.springframework.data.domain.Page;
@@ -44,4 +45,6 @@ public interface StudyService {
     List<StudyResponse> findByUser(Long userId);
 
     void deleteWaitUserSelf(Long userId, Long studyId);
+
+    StudyWithUserResponse findByIdForNotification(Long studyId);
 }

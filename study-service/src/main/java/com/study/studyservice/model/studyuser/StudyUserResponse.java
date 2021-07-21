@@ -27,6 +27,8 @@ public class StudyUserResponse {
 
     private Role role;
 
+    private String fcmToken;
+
     public static StudyUserResponse from(StudyUser studyUser, UserResponse userResponse){
         StudyUserResponse studyUserResponse = new StudyUserResponse();
         studyUserResponse.id = studyUser.getId();
@@ -35,6 +37,7 @@ public class StudyUserResponse {
         studyUserResponse.image = userResponse.getImage();
         studyUserResponse.gender = userResponse.getGender();
         studyUserResponse.ageRange = userResponse.getAgeRange();
+        studyUserResponse.fcmToken = userResponse.getFcmToken();
         studyUserResponse.role = studyUser.getRole();
         return studyUserResponse;
     }

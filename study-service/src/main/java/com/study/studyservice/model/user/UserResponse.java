@@ -25,4 +25,6 @@ public class UserResponse {
 
     private Long locationId; // 회원 지역
 
+    private String fcmToken;
+
 }

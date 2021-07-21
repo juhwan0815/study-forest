@@ -8,6 +8,7 @@ import com.study.studyservice.domain.StudyStatus;
 import com.study.studyservice.exception.StudyException;
 import com.study.studyservice.kafka.sender.*;
 import com.study.studyservice.model.study.response.StudyResponse;
+import com.study.studyservice.model.study.response.StudyWithUserResponse;
 import com.study.studyservice.model.studyuser.StudyUserResponse;
 import com.study.studyservice.model.waituser.WaitUserResponse;
 import com.study.studyservice.repository.CategoryRepository;
@@ -687,6 +688,10 @@ class StudyServiceTest {
         // then
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get(0).getUserId()).isEqualTo(TEST_USER_RESPONSE3.getId());
+        assertThat(result.get(0).getFcmToken()).isEqualTo(TEST_USER_RESPONSE3.getFcmToken());
+
+        then(studyQueryRepository).should(times(1)).findWithStudyUsersById(any());
+        then(userServiceClient).should(times(1)).findUserByIdIn(any());
     }
 
     @Test
@@ -910,6 +915,28 @@ class StudyServiceTest {
                 .willReturn(study);
 
         assertThrows(StudyException.class,()->studyService.deleteWaitUserSelf(4L,1L));
+    }
+
+    @Test
+    @DisplayName("알림 서비스용 스터디 조회를 한다.")
+    void findWithStudyUserByStudyIdForNotification(){
+        // given
+        given(studyQueryRepository.findWithStudyUsersById(any()))
+                .willReturn(createTestOfflineStudy());
+
+        given(userServiceClient.findUserByIdIn(any()))
+                .willReturn(Arrays.asList(TEST_USER_RESPONSE3));
+
+        // when
+        StudyWithUserResponse result = studyService.findByIdForNotification(1L);
+
+        // then
+        assertThat(result.getStudyName()).isEqualTo("테스트 스터디");
+        assertThat(result.getStudyUsers().get(0).getUserId()).isEqualTo(TEST_USER_RESPONSE3.getId());
+        assertThat(result.getStudyUsers().get(0).getFcmToken()).isEqualTo(TEST_USER_RESPONSE3.getFcmToken());
+
+        then(studyQueryRepository).should(times(1)).findWithStudyUsersById(any());
+        then(userServiceClient).should(times(1)).findUserByIdIn(any());
     }
 
 }

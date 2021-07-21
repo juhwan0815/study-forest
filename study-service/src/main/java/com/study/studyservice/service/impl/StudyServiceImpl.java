@@ -17,6 +17,7 @@ import com.study.studyservice.model.study.request.StudyFindRequest;
 import com.study.studyservice.model.study.request.StudySearchRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
+import com.study.studyservice.model.study.response.StudyWithUserResponse;
 import com.study.studyservice.model.studyuser.StudyUserResponse;
 import com.study.studyservice.model.user.UserResponse;
 import com.study.studyservice.model.waituser.WaitUserResponse;
@@ -346,6 +347,30 @@ public class StudyServiceImpl implements StudyService {
         findStudy.deleteWaitUser(userId);
 
         studyApplyCancelMessageSender.send(StudyApplyCancelMessage.from(userId, studyId));
+    }
+
+    @Override
+    public StudyWithUserResponse findByIdForNotification(Long studyId) {
+        Study findStudy = studyQueryRepository.findWithStudyUsersById(studyId);
+
+        List<Long> userIdList = findStudy.getStudyUsers().stream()
+                .map(studyUser -> studyUser.getUserId())
+                .collect(Collectors.toList());
+
+        List<UserResponse> userList = userServiceClient.findUserByIdIn(userIdList);
+
+        List<StudyUserResponse> studyUserResponses = new ArrayList<>();
+        findStudy.getStudyUsers().stream()
+                .forEach(studyUser -> {
+                    for (UserResponse user : userList) {
+                        if (studyUser.getUserId().equals(user.getId())) {
+                            studyUserResponses.add(StudyUserResponse.from(studyUser, user));
+                            break;
+                        }
+                    }
+                });
+
+        return StudyWithUserResponse.from(findStudy,studyUserResponses);
     }
 
     private LocationResponse getLocation(boolean offline, String locationCode) {

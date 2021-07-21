@@ -124,9 +124,9 @@ public class StudyFixture {
 
     public static final UserImage TEST_USER_IMAGE = new UserImage("테스트 썸네일 이미지","테스트 프로필 이미지");
 
-    public static final UserResponse TEST_USER_RESPONSE1 = new UserResponse(2L,"황주환",TEST_USER_IMAGE,"male","20~29",3,800L);
-    public static final UserResponse TEST_USER_RESPONSE2 = new UserResponse(3L,"황철원",TEST_USER_IMAGE,"male","20~29",3,800L);
-    public static final UserResponse TEST_USER_RESPONSE3 = new UserResponse(1L,"한다빈",TEST_USER_IMAGE,"female","20~29",3,800L);
+    public static final UserResponse TEST_USER_RESPONSE1 = new UserResponse(2L,"황주환",TEST_USER_IMAGE,"male","20~29",3,800L,"fcmToken");
+    public static final UserResponse TEST_USER_RESPONSE2 = new UserResponse(3L,"황철원",TEST_USER_IMAGE,"male","20~29",3,800L,"fcmToken");
+    public static final UserResponse TEST_USER_RESPONSE3 = new UserResponse(1L,"한다빈",TEST_USER_IMAGE,"female","20~29",3,800L,"fcmToken");
 
     public static final WaitUserResponse TEST_WAIT_USER_RESPONSE1
             = new WaitUserResponse(1L,3L,"황철원",TEST_USER_IMAGE,"male","20~29");
@@ -135,10 +135,10 @@ public class StudyFixture {
             = new WaitUserResponse(2L,2L,"황주환",TEST_USER_IMAGE,"male","20~29");
 
     public static final StudyUserResponse TEST_STUDY_USER_RESPONSE1
-            = new StudyUserResponse(1L,1L,"한다빈",TEST_USER_IMAGE,"female","20~29",Role.ADMIN);
+            = new StudyUserResponse(1L,1L,"한다빈",TEST_USER_IMAGE,"female","20~29",Role.ADMIN,"fcmToken");
 
     public static final StudyUserResponse TEST_STUDY_USER_RESPONSE2
-            = new StudyUserResponse(2L,2L,"황주환",TEST_USER_IMAGE,"male","20~29",Role.USER);
+            = new StudyUserResponse(2L,2L,"황주환",TEST_USER_IMAGE,"male","20~29",Role.USER,"fcmToken");
 
     public static Study createTestOnlineStudy(){
         Study study = new Study(1L,
@@ -153,8 +153,7 @@ public class StudyFixture {
         return study;
     }
 
-    public static Study
-    createTestOfflineStudy(){
+    public static Study createTestOfflineStudy(){
         Study study = new Study(1L,
                 "테스트 스터디", 5, 1, "테스트 스터디 입니다.",
                 true, true, StudyStatus.OPEN, TEST_IMAGE, 1L, TEST_CATEGORY2,

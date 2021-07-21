@@ -6,6 +6,7 @@ import com.study.studyservice.model.study.request.StudyFindRequest;
 import com.study.studyservice.model.study.request.StudySearchRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
+import com.study.studyservice.model.study.response.StudyWithUserResponse;
 import com.study.studyservice.model.studyuser.StudyUserResponse;
 import com.study.studyservice.model.waituser.WaitUserResponse;
 import com.study.studyservice.service.StudyService;
@@ -124,4 +125,11 @@ public class StudyController {
     public ResponseEntity<List<StudyResponse>> findByUser(@LoginUser Long userId){
         return ResponseEntity.ok(studyService.findByUser(userId));
     }
+
+    @GetMapping("/studies/{studyId}/studyUsers")
+    public ResponseEntity<StudyWithUserResponse> findWithStudyUsersByStudyIdForNotification(@PathVariable Long studyId){
+        return ResponseEntity.ok(studyService.findByIdForNotification(studyId));
+    }
+
+
 }

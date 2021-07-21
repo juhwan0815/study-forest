@@ -9,6 +9,7 @@ import com.study.studyservice.model.location.response.LocationResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
 import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
+import com.study.studyservice.model.study.response.StudyWithUserResponse;
 import com.study.studyservice.model.studyuser.StudyUserResponse;
 import com.study.studyservice.model.waituser.WaitUserResponse;
 import com.study.studyservice.service.StudyService;
@@ -471,7 +472,8 @@ class StudyControllerTest {
                                 fieldWithPath("[].image.profileImage").type(JsonFieldType.STRING).description("스터디 참가  유저 이미지 URL"),
                                 fieldWithPath("[].gender").type(JsonFieldType.STRING).description("스터디 참가 유저 성별"),
                                 fieldWithPath("[].ageRange").type(JsonFieldType.STRING).description("스터디 참가 유저 나이대"),
-                                fieldWithPath("[].role").type(JsonFieldType.STRING).description("스터디 참가 유저 권한")
+                                fieldWithPath("[].role").type(JsonFieldType.STRING).description("스터디 참가 유저 권한"),
+                                fieldWithPath("[].fcmToken").type(JsonFieldType.STRING).description("스터디 참가 유저 FCM 토크")
                         )
                 ));
         then(studyService).should(times(1)).findStudyUsersByStudyId(any());
@@ -702,5 +704,43 @@ class StudyControllerTest {
         then(studyService).should(times(1)).deleteWaitUserSelf(any(), any());
     }
 
+    @Test
+    @DisplayName("알림서비스용 스터디 조회 API 테스트")
+    void findWithStudyUsersByIdForNotification() throws Exception{
+
+        List<StudyUserResponse> studyUserResponseList = Arrays.asList(TEST_STUDY_USER_RESPONSE1, TEST_STUDY_USER_RESPONSE2);
+        StudyWithUserResponse result = StudyWithUserResponse.from(TEST_STUDY1, studyUserResponseList);
+
+        given(studyService.findByIdForNotification(any()))
+                .willReturn(result);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/studies/{studyId}/studyUsers", 1)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(result)))
+                .andDo(document("study/notification",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access Token")
+                        ),
+                        pathParameters(
+                                parameterWithName("studyId").description("스터디 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("studyName").type(JsonFieldType.STRING).description("스터디 이름"),
+                                fieldWithPath("studyUsers.[].id").type(JsonFieldType.NUMBER).description("스터디 참가 ID"),
+                                fieldWithPath("studyUsers.[].userId").type(JsonFieldType.NUMBER).description("스터디 참가 유저 ID"),
+                                fieldWithPath("studyUsers.[].nickName").type(JsonFieldType.STRING).description("스터디 참가 유저 닉네임"),
+                                fieldWithPath("studyUsers.[].image").type(JsonFieldType.OBJECT).description("스터디 참가 유저 이미지"),
+                                fieldWithPath("studyUsers.[].image.thumbnailImage").type(JsonFieldType.STRING).description("스터디 참가 유저 썸네일 이미지 URL"),
+                                fieldWithPath("studyUsers.[].image.profileImage").type(JsonFieldType.STRING).description("스터디 참가  유저 이미지 URL"),
+                                fieldWithPath("studyUsers.[].gender").type(JsonFieldType.STRING).description("스터디 참가 유저 성별"),
+                                fieldWithPath("studyUsers.[].ageRange").type(JsonFieldType.STRING).description("스터디 참가 유저 나이대"),
+                                fieldWithPath("studyUsers.[].role").type(JsonFieldType.STRING).description("스터디 참가 유저 권한"),
+                                fieldWithPath("studyUsers.[].fcmToken").type(JsonFieldType.STRING).description("스터디 참가 유저 FCM 토큰")
+                        )
+                ));
+        then(studyService).should(times(1)).findByIdForNotification(any());
+    }
 
 }

@@ -183,3 +183,15 @@ include::{snippets}/study/waitUser/cancel/request-headers.adoc[]
 include::{snippets}/study/waitUser/cancel/path-parameters.adoc[]
 ===== 응답
 include::{snippets}/study/waitUser/cancel/http-response.adoc[]
+
+==== 알림서비스용 스터디 조회 API
+===== 요청
+include::{snippets}/study/notification/http-request.adoc[]
+====== Header
+include::{snippets}/study/notification/request-headers.adoc[]
+====== Path
+include::{snippets}/study/notification/path-parameters.adoc[]
+===== 응답
+include::{snippets}/study/notification/http-response.adoc[]
+====== Body
+include::{snippets}/study/notification/response-fields.adoc[]
