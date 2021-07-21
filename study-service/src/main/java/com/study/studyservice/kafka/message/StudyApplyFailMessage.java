@@ -13,9 +13,12 @@ public class StudyApplyFailMessage {
 
     private Long studyId;
 
-    public static StudyApplyFailMessage from(Long userId,Long studyId){
+    private String studyName;
+
+    public static StudyApplyFailMessage from(Long userId,Long studyId,String studyName){
         StudyApplyFailMessage studyApplyFailMessage = new StudyApplyFailMessage();
         studyApplyFailMessage.userId = userId;
+        studyApplyFailMessage.studyName = studyName;
         studyApplyFailMessage.studyId = studyId;
         return studyApplyFailMessage;
     }

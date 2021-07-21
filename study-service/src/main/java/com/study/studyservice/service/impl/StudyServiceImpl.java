@@ -272,7 +272,7 @@ public class StudyServiceImpl implements StudyService {
         findStudy.deleteWaitUser(userId);
         findStudy.addStudyUser(userId, Role.USER);
 
-        studyApplySuccessMessageSender.send(StudyApplySuccessMessage.from(userId, studyId));
+        studyApplySuccessMessageSender.send(StudyApplySuccessMessage.from(userId, studyId,findStudy.getName()));
     }
 
     @Override
@@ -283,7 +283,7 @@ public class StudyServiceImpl implements StudyService {
 
         findStudy.deleteWaitUser(userId);
 
-        studyApplyFailMessageSender.send(StudyApplyFailMessage.from(userId, studyId));
+        studyApplyFailMessageSender.send(StudyApplyFailMessage.from(userId, studyId,findStudy.getName()));
     }
 
     @Override
