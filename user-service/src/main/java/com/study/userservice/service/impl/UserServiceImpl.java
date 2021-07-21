@@ -82,11 +82,17 @@ public class UserServiceImpl implements UserService {
             user.changeImage(Image.createImage(request.getThumbnailImage(),
                     request.getProfileImage(),
                     null));
+            user.changeFcmToken(request.getFcmToken());
 
             User savedUser = userRepository.save(user);
 
             return UserResponse.from(savedUser);
         }
+
+        if(request.getFcmToken() != null){
+            findUser.get().changeFcmToken(request.getFcmToken());
+        }
+
         return UserResponse.from(findUser.get());
     }
 
@@ -147,7 +153,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponse> findByIdIn(UserFindRequest request) {
         return userQueryRepository.findByIdIn(request.getUserIdList()).stream()
-                .map(user -> UserResponse.from(user))
+                .map(user -> UserResponse.fromWithFcmToken(user))
                 .collect(Collectors.toList());
     }
 

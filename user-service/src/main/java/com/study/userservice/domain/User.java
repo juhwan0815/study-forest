@@ -36,6 +36,8 @@ public class User extends BaseEntity{
 
     private Integer numberOfStudyApply; // 스터디 신청 내역 개수
 
+    private String fcmToken; // fcmToken
+
     @Embedded
     private Image image; // 이미지 정보들
 
@@ -58,6 +60,10 @@ public class User extends BaseEntity{
         user.numberOfStudyApply = 0;
         user.searchDistance = 3;
         return user;
+    }
+
+    public void changeFcmToken(String fcmToken){
+        this.fcmToken = fcmToken;
     }
 
     public void changeImage(Image image){

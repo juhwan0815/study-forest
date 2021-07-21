@@ -211,4 +211,16 @@ class UserTest {
         assertThat(user.getStudyApplies().size()).isEqualTo(0);
     }
 
+    @Test
+    @DisplayName("회원의 FCM 토큰을 변경한다.")
+    void changeFcmToken(){
+        // given
+        User user = User.createUser(1L,"황주환","10~19","male", UserRole.USER);
+
+        // when
+        user.changeFcmToken("테스트 FCM 토큰");
+        // then
+
+        assertThat(user.getFcmToken()).isEqualTo("테스트 FCM 토큰");
+    }
 }

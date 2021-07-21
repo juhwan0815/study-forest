@@ -24,4 +24,6 @@ public class UserLoginRequest {
     private String ageRange;
 
     private String gender;
+
+    private String fcmToken;
 }

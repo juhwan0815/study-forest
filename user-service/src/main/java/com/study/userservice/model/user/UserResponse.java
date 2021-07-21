@@ -1,9 +1,9 @@
 package com.study.userservice.model.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.querydsl.core.annotations.QueryProjection;
 import com.study.userservice.domain.Image;
 import com.study.userservice.domain.User;
+import com.study.userservice.domain.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +31,11 @@ public class UserResponse {
 
     private Integer searchDistance; // 검색 거리
 
+    private UserRole role;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private String fcmToken;
+
     public static UserResponse from(User user){
         UserResponse userResponse = new UserResponse();
         userResponse.id = user.getId();
@@ -42,6 +47,23 @@ public class UserResponse {
         userResponse.numberOfStudyApply = user.getNumberOfStudyApply();
         userResponse.locationId = user.getLocationId();
         userResponse.searchDistance = user.getSearchDistance();
+        userResponse.role = user.getRole();
+        return userResponse;
+    }
+
+    public static UserResponse fromWithFcmToken(User user){
+        UserResponse userResponse = new UserResponse();
+        userResponse.id = user.getId();
+        userResponse.kakaoId = user.getKakaoId();
+        userResponse.nickName = user.getNickName();
+        userResponse.image = user.getImage();
+        userResponse.gender = user.getGender();
+        userResponse.ageRange = user.getAgeRange();
+        userResponse.numberOfStudyApply = user.getNumberOfStudyApply();
+        userResponse.locationId = user.getLocationId();
+        userResponse.searchDistance = user.getSearchDistance();
+        userResponse.role = user.getRole();
+        userResponse.fcmToken = user.getFcmToken();
         return userResponse;
     }
 

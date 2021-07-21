@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.study.userservice.client.StudyServiceClient;
 import com.study.userservice.domain.StudyApplyStatus;
 import com.study.userservice.domain.User;
+import com.study.userservice.domain.UserRole;
 import com.study.userservice.exception.UserException;
 import com.study.userservice.kafka.sender.UserDeleteMessageSender;
 import com.study.userservice.model.interestTag.InterestTagResponse;
@@ -79,6 +80,7 @@ class UserServiceTest {
         assertThat(userResponse.getAgeRange()).isEqualTo(TEST_USER_LOGIN_REQUEST.getAgeRange());
         assertThat(userResponse.getSearchDistance()).isEqualTo(3);
         assertThat(userResponse.getNumberOfStudyApply()).isEqualTo(0);
+        assertThat(userResponse.getRole()).isEqualTo(UserRole.USER);
 
         then(userRepository).should(times(1)).findByKakaoId(anyLong());
         then(userRepository).should(times(1)).save(any());
@@ -252,7 +254,9 @@ class UserServiceTest {
         // then
         assertThat(result.size()).isEqualTo(2);
         assertThat(result.get(0).getId()).isEqualTo(TEST_USER.getId());
+        assertThat(result.get(0).getFcmToken()).isEqualTo(TEST_USER.getFcmToken());
         assertThat(result.get(1).getId()).isEqualTo(TEST_USER2.getId());
+        assertThat(result.get(0).getFcmToken()).isEqualTo(TEST_USER2.getFcmToken());
         then(userQueryRepository).should(times(1)).findByIdIn(any());
     }
 

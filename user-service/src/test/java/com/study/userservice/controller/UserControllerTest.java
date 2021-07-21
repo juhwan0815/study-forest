@@ -109,7 +109,8 @@ class UserControllerTest {
                                 fieldWithPath("profileImage").type(JsonFieldType.STRING).description("카카오 프로필 이미지"),
                                 fieldWithPath("thumbnailImage").type(JsonFieldType.STRING).description("카카오 프로필 썸네일 이미지"),
                                 fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
-                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대")
+                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
+                                fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("FCM 토큰")
                         ),
                         responseFields(
                                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("회원 ID"),
@@ -122,7 +123,8 @@ class UserControllerTest {
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
                                 fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID"),
-                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리")
+                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리"),
+                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한")
                         )));
 
         // then
@@ -185,7 +187,8 @@ class UserControllerTest {
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
                                 fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID"),
-                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리")
+                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리"),
+                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한")
                         )));
 
         // then
@@ -219,7 +222,8 @@ class UserControllerTest {
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
                                 fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID"),
-                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리")
+                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리"),
+                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한")
                         )
                 ));
     }
@@ -249,7 +253,8 @@ class UserControllerTest {
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
                                 fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID"),
-                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리")
+                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리"),
+                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한")
                         )
                 ));
 
@@ -284,7 +289,7 @@ class UserControllerTest {
     @DisplayName("회원 목록 조회 API 테스트")
     void findUsers() throws Exception {
         // given
-        List<UserResponse> userResponses = Arrays.asList(TEST_USER_RESPONSE, TEST_USER_RESPONSE2);
+        List<UserResponse> userResponses = Arrays.asList(TEST_USER_RESPONSE3, TEST_USER_RESPONSE4);
 
         given(userService.findByIdIn(any()))
                 .willReturn(userResponses);
@@ -310,7 +315,9 @@ class UserControllerTest {
                                 fieldWithPath("[].ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("[].numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
                                 fieldWithPath("[].locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID"),
-                                fieldWithPath("[].searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리")
+                                fieldWithPath("[].searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리"),
+                                fieldWithPath("[].fcmToken").type(JsonFieldType.STRING).description("회원의 FCM 토큰"),
+                                fieldWithPath("[].role").type(JsonFieldType.STRING).description("회원 권한")
                         )
                 ));
         // then
@@ -346,7 +353,8 @@ class UserControllerTest {
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
                                 fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID"),
-                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리")
+                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("회원 오프라인 검색 거리"),
+                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한")
                         )
                 ));
 
@@ -490,7 +498,8 @@ class UserControllerTest {
                                 fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("numberOfStudyApply").type(JsonFieldType.NUMBER).description("스터디 신청 내역 수"),
                                 fieldWithPath("locationId").type(JsonFieldType.NUMBER).description("회원 지역 정보 ID"),
-                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("변경된 회원 오프라인 검색 거리")
+                                fieldWithPath("searchDistance").type(JsonFieldType.NUMBER).description("변경된 회원 오프라인 검색 거리"),
+                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한")
                         )
                 ));
 
