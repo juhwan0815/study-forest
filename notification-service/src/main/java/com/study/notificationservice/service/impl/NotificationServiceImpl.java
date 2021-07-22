@@ -4,19 +4,24 @@ import com.study.notificationservice.client.StudyServiceClient;
 import com.study.notificationservice.client.UserServiceClient;
 import com.study.notificationservice.domain.Notification;
 import com.study.notificationservice.fcm.FcmMessageSender;
-import com.study.notificationservice.kafka.message.GatheringCreateMessage;
-import com.study.notificationservice.kafka.message.StudyApplyFailMessage;
-import com.study.notificationservice.kafka.message.StudyApplySuccessMessage;
+import com.study.notificationservice.kafka.message.*;
 import com.study.notificationservice.model.study.StudyResponse;
+import com.study.notificationservice.model.study.StudyUserResponse;
+import com.study.notificationservice.model.tag.InterestTagResponse;
+import com.study.notificationservice.model.tag.TagResponse;
 import com.study.notificationservice.model.user.UserResponse;
+import com.study.notificationservice.model.user.UserWithTagResponse;
 import com.study.notificationservice.repository.NotificationRepository;
 import com.study.notificationservice.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.quartz.QuartzTransactionManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -38,7 +43,7 @@ public class NotificationServiceImpl implements NotificationService {
         String content = createGatheringNotificationMessage(gatheringCreateMessage);
 
         study.getStudyUsers().stream().forEach(studyUser -> {
-            fcmMessageSender.send(studyUser.getFcmToken(),study.getStudyName(),content);
+            fcmMessageSender.send(studyUser.getFcmToken(), study.getStudyName(), content);
 
             Notification notification = Notification.createNotification(studyUser.getUserId(), study.getStudyName(), content);
             notificationRepository.save(notification);
@@ -52,7 +57,7 @@ public class NotificationServiceImpl implements NotificationService {
 
         String content = createStudyApplyFailMessage(studyApplyFailMessage.getStudyName());
 
-        fcmMessageSender.send(user.getFcmToken(),studyApplyFailMessage.getStudyName(),content);
+        fcmMessageSender.send(user.getFcmToken(), studyApplyFailMessage.getStudyName(), content);
 
         Notification notification = Notification.
                 createNotification(user.getId(), studyApplyFailMessage.getStudyName(), content);
@@ -66,11 +71,65 @@ public class NotificationServiceImpl implements NotificationService {
 
         String content = createStudyApplySuccessMessage(studyApplySuccessMessage.getStudyName());
 
-        fcmMessageSender.send(user.getFcmToken(),studyApplySuccessMessage.getStudyName(),content);
+        fcmMessageSender.send(user.getFcmToken(), studyApplySuccessMessage.getStudyName(), content);
 
         Notification notification = Notification.
                 createNotification(user.getId(), studyApplySuccessMessage.getStudyName(), content);
         notificationRepository.save(notification);
+    }
+
+    @Override
+    @Transactional
+    public void studyCreate(StudyCreateMessage studyCreateMessage) {
+        List<TagResponse> tags = studyCreateMessage.getTags();
+        List<Long> tagIdList = tags.stream()
+                .map(tagResponse -> tagResponse.getId())
+                .collect(Collectors.toList());
+
+        List<UserWithTagResponse> users = userServiceClient.findWithInterestTagsByTagIdList(tagIdList);
+
+        tags.stream().forEach(tag -> {
+            String content = createStudyCreateMessage(tag.getName(), studyCreateMessage.getStudyName());
+            for (UserWithTagResponse user : users) {
+                for (InterestTagResponse interestTag : user.getTags()) {
+                    if (interestTag.getTagId().equals(tag.getId())) {
+                        fcmMessageSender.send(user.getFcmToken(), "스터디 생성 알림", content);
+                        Notification notification = Notification.createNotification(user.getId(), "스터디 생성 알림", content);
+                        notificationRepository.save(notification);
+                    }
+                }
+            }
+        });
+    }
+
+    @Override
+    public void chatCreate(ChatCreateMessage chatCreateMessage) {
+        StudyResponse study = studyServiceClient
+                .findWithStudyUserByStudyId(chatCreateMessage.getStudyId());
+
+        List<Long> userIdList = chatCreateMessage.getUserIdList();
+        String chatTitle = createChatTitle(study.getStudyName(), chatCreateMessage.getChatRoomName());
+        String chatContent = createChatContent(chatCreateMessage.getNickName(), chatCreateMessage.getContent());
+        userIdList.stream().forEach(userId -> {
+            for (StudyUserResponse studyUser : study.getStudyUsers()) {
+                if (studyUser.getUserId().equals(userId)) {
+                    fcmMessageSender.send(studyUser.getFcmToken(),chatTitle,chatContent);
+                    break;
+                }
+            }
+        });
+    }
+
+    private String createChatTitle(String studyName, String chatRoomName) {
+        return studyName + " - " + chatRoomName;
+    }
+
+    private String createChatContent(String nickName, String content) {
+        return nickName + " : " + content;
+    }
+
+    private String createStudyCreateMessage(String tagName, String studyName) {
+        return tagName + "주제의 스터디가 개설되었습니다.\n " + studyName;
     }
 
     private String createStudyApplySuccessMessage(String studyName) {

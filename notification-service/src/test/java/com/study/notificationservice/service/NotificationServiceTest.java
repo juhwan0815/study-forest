@@ -14,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
+
 import static com.study.notificationservice.NotificationFixture.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
@@ -105,4 +107,50 @@ class NotificationServiceTest {
         then(fcmMessageSender).should(times(1)).send(any(),any(),any());
         then(notificationRepository).should(times(1)).save(any());
     }
+
+    @Test
+    @DisplayName("스터디 생성 알림을 생성한다.")
+    void createStudyNotification(){
+        // given
+        given(userServiceClient.findWithInterestTagsByTagIdList(any()))
+                .willReturn(Arrays.asList(TEST_USER_WITH_TAG_RESPONSE1,TEST_USER_WITH_TAG_RESPONSE2));
+
+        willDoNothing()
+                .given(fcmMessageSender)
+                .send(any(),any(),any());
+
+        given(notificationRepository.save(any()))
+                .willReturn(null)
+                .willReturn(null)
+                .willReturn(null)
+                .willReturn(null);
+
+        // when
+        notificationService.studyCreate(TEST_STUDY_CREATE_MESSAGE);
+
+        // then
+        then(userServiceClient).should(times(1)).findWithInterestTagsByTagIdList(any());
+        then(fcmMessageSender).should(times(4)).send(any(),any(),any());
+        then(notificationRepository).should(times(4)).save(any());
+    }
+
+    @Test
+    @DisplayName("채팅 알림을 생성한다.")
+    void createChatNotification(){
+        // given
+        given(studyServiceClient.findWithStudyUserByStudyId(any()))
+                .willReturn(TEST_STUDY_RESPONSE);
+
+        willDoNothing()
+                .given(fcmMessageSender)
+                .send(any(),any(),any());
+
+        // when
+        notificationService.chatCreate(TEST_CHAT_CREATE_MESSAGE);
+
+        // then
+        then(studyServiceClient).should(times(1)).findWithStudyUserByStudyId(any());
+        then(fcmMessageSender).should(times(2)).send(any(),any(),any());
+    }
+
 }

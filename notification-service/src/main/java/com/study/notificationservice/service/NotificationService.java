@@ -1,8 +1,6 @@
 package com.study.notificationservice.service;
 
-import com.study.notificationservice.kafka.message.GatheringCreateMessage;
-import com.study.notificationservice.kafka.message.StudyApplyFailMessage;
-import com.study.notificationservice.kafka.message.StudyApplySuccessMessage;
+import com.study.notificationservice.kafka.message.*;
 
 public interface NotificationService {
 
@@ -11,5 +9,9 @@ public interface NotificationService {
     void studyApplyFail(StudyApplyFailMessage studyApplyFailMessage);
 
     void studyApplySuccess(StudyApplySuccessMessage studyApplySuccessMessage);
+
+    void studyCreate(StudyCreateMessage studyCreateMessage);
+
+    void chatCreate(ChatCreateMessage chatCreateMessage);
 
 }
