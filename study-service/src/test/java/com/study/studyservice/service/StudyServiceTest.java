@@ -86,6 +86,9 @@ class StudyServiceTest {
     @Mock
     private StudyApplyCancelMessageSender studyApplyCancelMessageSender;
 
+    @Mock
+    private StudyCreateMessageSender studyCreateMessageSender;
+
     @Test
     @DisplayName("예외테스트 : 동네정보 코드 없이 오프라인 스터디 생성 요청을 보낼 경우 예외가 발생한다.")
     void createStudyNotWithLocationCode() {
@@ -111,6 +114,10 @@ class StudyServiceTest {
         given(studyRepository.save(any()))
                 .willReturn(createTestOnlineStudy());
 
+        willDoNothing()
+                .given(studyCreateMessageSender)
+                .send(any());
+
         // when
         StudyResponse result = studyService.create(1L, null, TEST_STUDY_CREATE_REQUEST3);
 
@@ -134,6 +141,7 @@ class StudyServiceTest {
         then(categoryRepository).should(times(1)).findWithParentById(any());
         then(tagService).should(times(1)).FindAndCreate(any());
         then(studyRepository).should(times(1)).save(any());
+        then(studyCreateMessageSender).should(times(1)).send(any());
     }
 
     @Test
@@ -174,6 +182,10 @@ class StudyServiceTest {
         given(studyRepository.save(any()))
                 .willReturn(createTestOfflineStudy());
 
+        willDoNothing()
+                .given(studyCreateMessageSender)
+                .send(any());
+
         // when
         StudyResponse result = studyService.create(1L, TEST_IMAGE_FILE, TEST_STUDY_CREATE_REQUEST1);
 
@@ -200,6 +212,7 @@ class StudyServiceTest {
         then(amazonS3Client).should(times(1)).putObject(any());
         then(amazonS3Client).should(times(2)).getUrl(any(), any());
         then(studyRepository).should(times(1)).save(any());
+        then(studyCreateMessageSender).should(times(1)).send(any());
     }
 
     @Test

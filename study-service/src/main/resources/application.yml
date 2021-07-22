@@ -55,6 +55,7 @@ kafka:
   server: 127.0.0.1:9092
   topic:
     study:
+      create: study-create-topic
       delete: study-delete-topic
     studyApply:
       create: study-apply-create-topic

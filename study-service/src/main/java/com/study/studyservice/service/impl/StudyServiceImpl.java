@@ -60,6 +60,7 @@ public class StudyServiceImpl implements StudyService {
     private final CategoryRepository categoryRepository;
     private final StudyQueryRepository studyQueryRepository;
 
+    private final StudyCreateMessageSender studyCreateMessageSender;
     private final StudyDeleteMessageSender studyDeleteMessageSender;
     private final StudyApplyCreateMessageSender studyApplyCreateMessageSender;
     private final StudyApplySuccessMessageSender studyApplySuccessMessageSender;
@@ -141,6 +142,8 @@ public class StudyServiceImpl implements StudyService {
         study.changeLocation(location.getId());
 
         Study savedStudy = studyRepository.save(study);
+
+        studyCreateMessageSender.send(StudyCreateMessage.from(savedStudy));
 
         return StudyResponse.from(savedStudy, location);
     }
