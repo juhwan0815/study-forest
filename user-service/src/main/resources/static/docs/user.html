@@ -505,6 +505,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_응답_12">응답</a></li>
 </ul>
 </li>
+<li><a href="#_알림서비스용_회원_조회_api">13. 알림서비스용 회원 조회 API</a>
+<ul class="sectlevel4">
+<li><a href="#_요청_13">요청</a></li>
+<li><a href="#_응답_13">응답</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -625,7 +631,7 @@ Host: localhost:8080
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=utf-8
-Content-Length: 274
+Content-Length: 293
 
 {
   "id" : 1,
@@ -639,7 +645,8 @@ Content-Length: 274
   "ageRange" : "10~19",
   "numberOfStudyApply" : 2,
   "locationId" : 1,
-  "searchDistance" : 3
+  "searchDistance" : 3,
+  "role" : "USER"
 }</code></pre>
 </div>
 </div>
@@ -713,6 +720,11 @@ Content-Length: 274
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>searchDistance</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">회원 오프라인 검색 거리</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>role</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 권한</p></td>
 </tr>
 </tbody>
 </table>
@@ -814,7 +826,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=utf-8
-Content-Length: 274
+Content-Length: 293
 
 {
   "id" : 2,
@@ -828,7 +840,8 @@ Content-Length: 274
   "ageRange" : "10~19",
   "numberOfStudyApply" : 3,
   "locationId" : 2,
-  "searchDistance" : 3
+  "searchDistance" : 3,
+  "role" : "USER"
 }</code></pre>
 </div>
 </div>
@@ -902,6 +915,11 @@ Content-Length: 274
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>searchDistance</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">회원 오프라인 검색 거리</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>role</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 권한</p></td>
 </tr>
 </tbody>
 </table>
@@ -990,7 +1008,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=utf-8
-Content-Length: 274
+Content-Length: 293
 
 {
   "id" : 1,
@@ -1004,7 +1022,8 @@ Content-Length: 274
   "ageRange" : "10~19",
   "numberOfStudyApply" : 2,
   "locationId" : 1,
-  "searchDistance" : 3
+  "searchDistance" : 3,
+  "role" : "USER"
 }</code></pre>
 </div>
 </div>
@@ -1079,6 +1098,11 @@ Content-Length: 274
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">회원 오프라인 검색 거리</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>role</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 권한</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1124,7 +1148,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=utf-8
-Content-Length: 274
+Content-Length: 293
 
 {
   "id" : 1,
@@ -1138,7 +1162,8 @@ Content-Length: 274
   "ageRange" : "10~19",
   "numberOfStudyApply" : 2,
   "locationId" : 1,
-  "searchDistance" : 3
+  "searchDistance" : 3,
+  "role" : "USER"
 }</code></pre>
 </div>
 </div>
@@ -1213,6 +1238,11 @@ Content-Length: 274
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">회원 오프라인 검색 거리</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>role</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 권한</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1257,7 +1287,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=utf-8
-Content-Length: 610
+Content-Length: 648
 
 [ {
   "id" : 1,
@@ -1272,6 +1302,7 @@ Content-Length: 610
   "numberOfStudyApply" : 3,
   "locationId" : 1,
   "searchDistance" : 3,
+  "role" : "USER",
   "fcmToken" : "FCM Token"
 }, {
   "id" : 2,
@@ -1286,6 +1317,7 @@ Content-Length: 610
   "numberOfStudyApply" : 3,
   "locationId" : 2,
   "searchDistance" : 3,
+  "role" : "USER",
   "fcmToken" : "FCM Token"
 } ]</code></pre>
 </div>
@@ -1366,6 +1398,11 @@ Content-Length: 610
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">회원의 FCM 토큰</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].role</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 권한</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1432,7 +1469,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=utf-8
-Content-Length: 274
+Content-Length: 293
 
 {
   "id" : 2,
@@ -1446,7 +1483,8 @@ Content-Length: 274
   "ageRange" : "10~19",
   "numberOfStudyApply" : 3,
   "locationId" : 2,
-  "searchDistance" : 3
+  "searchDistance" : 3,
+  "role" : "USER"
 }</code></pre>
 </div>
 </div>
@@ -1521,6 +1559,11 @@ Content-Length: 274
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">회원 오프라인 검색 거리</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>role</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 권한</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1588,7 +1631,7 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=utf-8
-Content-Length: 274
+Content-Length: 293
 
 {
   "id" : 1,
@@ -1602,7 +1645,8 @@ Content-Length: 274
   "ageRange" : "10~19",
   "numberOfStudyApply" : 2,
   "locationId" : 1,
-  "searchDistance" : 3
+  "searchDistance" : 3,
+  "role" : "USER"
 }</code></pre>
 </div>
 </div>
@@ -1932,10 +1976,137 @@ Content-Length: 287
 </div>
 </div>
 </div>
+<div class="sect3">
+<h4 id="_알림서비스용_회원_조회_api"><a class="anchor" href="#_알림서비스용_회원_조회_api"></a><a class="link" href="#_알림서비스용_회원_조회_api">13. 알림서비스용 회원 조회 API</a></h4>
+<div class="sect4">
+<h5 id="_요청_13"><a class="anchor" href="#_요청_13"></a><a class="link" href="#_요청_13">요청</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /users/interestTags?tagIdList=1&amp;tagIdList=2 HTTP/1.1
+Authorization: Bearer 액세스토큰
+Accept: application/json
+Host: localhost:8080</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_header_11"><a class="anchor" href="#_header_11"></a><a class="link" href="#_header_11">Header</a></h6>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Access 토큰</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect5">
+<h6 id="_param_2"><a class="anchor" href="#_param_2"></a><a class="link" href="#_param_2">Param</a></h6>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tagIdList</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">태그 ID 배열</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_응답_13"><a class="anchor" href="#_응답_13"></a><a class="link" href="#_응답_13">응답</a></h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+Content-Length: 266
+
+[ {
+  "id" : 1,
+  "fcmToken" : "fcmToken",
+  "tags" : [ {
+    "id" : 1,
+    "tagId" : 1
+  }, {
+    "id" : 2,
+    "tagId" : 2
+  } ]
+}, {
+  "id" : 2,
+  "fcmToken" : "fcmToken",
+  "tags" : [ {
+    "id" : 1,
+    "tagId" : 1
+  }, {
+    "id" : 2,
+    "tagId" : 2
+  } ]
+} ]</code></pre>
+</div>
+</div>
+<div class="sect5">
+<h6 id="_body_11"><a class="anchor" href="#_body_11"></a><a class="link" href="#_body_11">Body</a></h6>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 ID</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].fcmToken</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 Fcm 토큰</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].tags.[].id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">회원 관심 태그 ID</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>[].tags.[].tagId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">화원 관심태그 태그ID</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-07-13 22:06:33 KST
+Last updated 2021-07-23 03:04:52 KST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">

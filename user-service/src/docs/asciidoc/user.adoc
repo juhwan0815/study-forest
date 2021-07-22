@@ -146,3 +146,15 @@ include::{snippets}/user/studyApply/find/request-headers.adoc[]
 include::{snippets}/user/studyApply/find/http-response.adoc[]
 ====== Body
 include::{snippets}/user/studyApply/find/response-fields.adoc[]
+
+==== 알림서비스용 회원 조회 API
+===== 요청
+include::{snippets}/user/notification/http-request.adoc[]
+====== Header
+include::{snippets}/user/notification/request-headers.adoc[]
+====== Param
+include::{snippets}/user/notification/request-parameters.adoc[]
+===== 응답
+include::{snippets}/user/notification/http-response.adoc[]
+====== Body
+include::{snippets}/user/notification/response-fields.adoc[]

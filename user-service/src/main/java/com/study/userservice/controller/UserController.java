@@ -3,10 +3,7 @@ package com.study.userservice.controller;
 import com.study.userservice.config.LoginUser;
 import com.study.userservice.model.interestTag.InterestTagResponse;
 import com.study.userservice.model.studyapply.StudyApplyResponse;
-import com.study.userservice.model.user.UserFindRequest;
-import com.study.userservice.model.user.UserLoginRequest;
-import com.study.userservice.model.user.UserResponse;
-import com.study.userservice.model.user.UserUpdateProfileRequest;
+import com.study.userservice.model.user.*;
 import com.study.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,6 +87,12 @@ public class UserController {
     public ResponseEntity<List<StudyApplyResponse>> findStudyAppliesByUserId(@LoginUser Long userId){
         return ResponseEntity.ok(userService.findStudyAppliesByUserId(userId));
     }
+
+    @GetMapping("/users/interestTags")
+    public ResponseEntity<List<UserWithTagResponse>> findWithInterestTagsByTagIdList(UserSearchRequest request){
+        return ResponseEntity.ok(userService.findInterestTagByTagIdList(request));
+    }
+
 
 
 

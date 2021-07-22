@@ -42,6 +42,33 @@ class UserQueryRepositoryTest {
     }
 
     @Test
+    @DisplayName("태그 ID 리스트로 회원과 관심 태그를 같이 조회한다.")
+    void findWithInterestTagsByTagIdList(){
+        // given
+        User user1 = User.createUser(1L, "황주환", "10~19", "male", UserRole.USER);
+        user1.addInterestTag(1L);
+        user1.addInterestTag(2L);
+        User user2 = User.createUser(2L, "황철원", "10~19", "male", UserRole.USER);
+        user2.addInterestTag(1L);
+        user2.addInterestTag(2L);
+        user2.addInterestTag(3L);
+
+        userRepository.save(user1);
+        userRepository.save(user2);
+
+        em.flush();
+        em.clear();
+
+        // when
+        List<User> result = userQueryRepository.findWithInterestTagByTagIdList(Arrays.asList(1L, 2L));
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).getInterestTags().size()).isEqualTo(2);
+        assertThat(result.get(1).getInterestTags().size()).isEqualTo(2);
+    }
+
+    @Test
     @DisplayName("회원 ID 리스트로 회원 목록을 조회한다.")
     void findByIdIn(){
         // given

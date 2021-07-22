@@ -22,6 +22,14 @@ public class UserQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
+    public List<User> findWithInterestTagByTagIdList(List<Long> tagIdList){
+        return queryFactory
+                .selectFrom(user).distinct()
+                .leftJoin(user.interestTags,interestTag).fetchJoin()
+                .where(interestTag.tagId.in(tagIdList))
+                .fetch();
+    }
+
     public List<User> findByIdIn(List<Long> userIdList){
         return queryFactory
                 .selectFrom(user).distinct()

@@ -6,10 +6,7 @@ import com.study.userservice.model.interestTag.InterestTagResponse;
 import com.study.userservice.model.study.StudyResponse;
 import com.study.userservice.model.studyapply.StudyApplyResponse;
 import com.study.userservice.model.tag.TagResponse;
-import com.study.userservice.model.user.UserFindRequest;
-import com.study.userservice.model.user.UserLoginRequest;
-import com.study.userservice.model.user.UserUpdateProfileRequest;
-import com.study.userservice.model.user.UserResponse;
+import com.study.userservice.model.user.*;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -72,6 +69,8 @@ public class UserFixture {
 
     public static final InterestTagResponse TEST_INTEREST_TAG_RESPONSE1 = new InterestTagResponse(1L,1L,"스프링");
     public static final InterestTagResponse TEST_INTEREST_TAG_RESPONSE2 = new InterestTagResponse(1L,1L,"스프링");
+    public static final InterestTagResponse TEST_INTEREST_TAG_RESPONSE3 = new InterestTagResponse(1L,1L,null);
+    public static final InterestTagResponse TEST_INTEREST_TAG_RESPONSE4 = new InterestTagResponse(2L,2L,null);
 
     public static final StudyApplyCreateMessage TEST_STUDY_APPLY_CREATE_MESSAGE =
             new StudyApplyCreateMessage(1L,1L);
@@ -97,6 +96,14 @@ public class UserFixture {
             = new StudyApplyResponse(2L,1L,"테스트 스터디1",StudyApplyStatus.SUCCESS);
     public static final StudyApplyResponse TEST_STUDY_APPLY_RESPONSE3
             = new StudyApplyResponse(3L,2L,"테스트 스터디2",StudyApplyStatus.WAIT);
+
+    public static final UserSearchRequest TEST_USER_SEARCH_REQUEST = new UserSearchRequest(Arrays.asList(1L,2L));
+
+    public static final UserWithTagResponse TEST_USER_WITH_TAG_RESPONSE1 = new UserWithTagResponse(1L,"fcmToken",
+            Arrays.asList(TEST_INTEREST_TAG_RESPONSE3,TEST_INTEREST_TAG_RESPONSE4));
+
+    public static final UserWithTagResponse TEST_USER_WITH_TAG_RESPONSE2 = new UserWithTagResponse(2L,"fcmToken",
+            Arrays.asList(TEST_INTEREST_TAG_RESPONSE3,TEST_INTEREST_TAG_RESPONSE4));
 
     public static User createTestUser(){
         return new User(1L,1L,1L,3,"황주환","10~19","male",0,

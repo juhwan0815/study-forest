@@ -15,10 +15,7 @@ import com.study.userservice.model.interestTag.InterestTagResponse;
 import com.study.userservice.model.study.StudyResponse;
 import com.study.userservice.model.studyapply.StudyApplyResponse;
 import com.study.userservice.model.tag.TagResponse;
-import com.study.userservice.model.user.UserFindRequest;
-import com.study.userservice.model.user.UserLoginRequest;
-import com.study.userservice.model.user.UserResponse;
-import com.study.userservice.model.user.UserUpdateProfileRequest;
+import com.study.userservice.model.user.*;
 import com.study.userservice.repository.UserRepository;
 import com.study.userservice.repository.query.UserQueryRepository;
 import com.study.userservice.service.UserService;
@@ -136,7 +133,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse findById(Long userId) {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(userId + "는 존재하지 않는 회원 ID 입니다."));
-        return UserResponse.from(findUser);
+        return UserResponse.fromWithFcmToken(findUser);
     }
 
     @Override
@@ -290,6 +287,13 @@ public class UserServiceImpl implements UserService {
         findUsers.stream().forEach(user -> {
             user.deleteStudyApply(studyDeleteMessage.getStudyId());
         });
+    }
+
+    @Override
+    public List<UserWithTagResponse> findInterestTagByTagIdList(UserSearchRequest request) {
+        return userQueryRepository.findWithInterestTagByTagIdList(request.getTagIdList()).stream()
+                .map(user -> UserWithTagResponse.from(user))
+                .collect(Collectors.toList());
     }
 
 

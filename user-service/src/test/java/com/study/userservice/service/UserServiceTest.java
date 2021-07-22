@@ -10,6 +10,7 @@ import com.study.userservice.kafka.sender.UserDeleteMessageSender;
 import com.study.userservice.model.interestTag.InterestTagResponse;
 import com.study.userservice.model.studyapply.StudyApplyResponse;
 import com.study.userservice.model.user.UserResponse;
+import com.study.userservice.model.user.UserWithTagResponse;
 import com.study.userservice.repository.UserRepository;
 import com.study.userservice.repository.query.UserQueryRepository;
 import com.study.userservice.service.impl.UserServiceImpl;
@@ -487,5 +488,28 @@ class UserServiceTest {
         assertThat(user2.getStudyApplies().size()).isEqualTo(0);
         then(userQueryRepository).should(times(1)).findWithStudyApplyByStudyId(any());
     }
+
+
+    @Test
+    @DisplayName("태그 ID 리스트로 회원의 관심 태그 목록을 조회한다.")
+    void findWithInterestTagsByTagIdList(){
+        // given
+        User user1 = createTestUser2();
+        User user2 = createTestUser2();
+
+        given(userQueryRepository.findWithInterestTagByTagIdList(any()))
+                .willReturn(Arrays.asList(user1,user2));
+
+        // when
+        List<UserWithTagResponse> result = userService.findInterestTagByTagIdList(TEST_USER_SEARCH_REQUEST);
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).getTags().size()).isEqualTo(2);
+        assertThat(result.get(1).getTags().size()).isEqualTo(2);
+
+        then(userQueryRepository).should(times(1)).findWithInterestTagByTagIdList(any());
+    }
+
 
 }

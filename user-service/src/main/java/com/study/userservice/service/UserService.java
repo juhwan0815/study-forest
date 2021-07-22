@@ -3,10 +3,7 @@ package com.study.userservice.service;
 import com.study.userservice.kafka.message.*;
 import com.study.userservice.model.interestTag.InterestTagResponse;
 import com.study.userservice.model.studyapply.StudyApplyResponse;
-import com.study.userservice.model.user.UserFindRequest;
-import com.study.userservice.model.user.UserLoginRequest;
-import com.study.userservice.model.user.UserUpdateProfileRequest;
-import com.study.userservice.model.user.UserResponse;
+import com.study.userservice.model.user.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -44,4 +41,7 @@ public interface UserService {
     void cancelStudyApply(StudyApplyCancelMessage studyApplyCancelMessage);
 
     void deleteStudyApplyByStudyId(StudyDeleteMessage studyDeleteMessage);
+
+    List<UserWithTagResponse> findInterestTagByTagIdList(UserSearchRequest request);
+
 }

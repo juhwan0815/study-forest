@@ -6,6 +6,7 @@ import com.study.userservice.model.interestTag.InterestTagResponse;
 import com.study.userservice.model.studyapply.StudyApplyResponse;
 import com.study.userservice.model.user.UserLoginRequest;
 import com.study.userservice.model.user.UserResponse;
+import com.study.userservice.model.user.UserWithTagResponse;
 import com.study.userservice.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +31,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -504,6 +506,39 @@ class UserControllerTest {
                 ));
 
         then(userService).should(times(1)).updateSearchDistance(any(),any());
+    }
+
+    @Test
+    @DisplayName("알림서비스용 회원 조회 API 테스트")
+    void findWithInterestTagsByTagIdList() throws Exception{
+        // given
+        List<UserWithTagResponse> result = Arrays.asList(TEST_USER_WITH_TAG_RESPONSE1,TEST_USER_WITH_TAG_RESPONSE2);
+        given(userService.findInterestTagByTagIdList(any()))
+                .willReturn(result);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/users/interestTags")
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .param("tagIdList", "1", "2")
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(result)))
+                .andDo(document("user/notification",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("Access 토큰")
+                        ),
+                        requestParameters(
+                                parameterWithName("tagIdList").description("태그 ID 배열")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("회원 ID"),
+                                fieldWithPath("[].fcmToken").type(JsonFieldType.STRING).description("회원 Fcm 토큰"),
+                                fieldWithPath("[].tags.[].id").type(JsonFieldType.NUMBER).description("회원 관심 태그 ID"),
+                                fieldWithPath("[].tags.[].tagId").type(JsonFieldType.NUMBER).description("화원 관심태그 태그ID")
+                        )
+                ));
+
+        // then
+        then(userService).should(times(1)).findInterestTagByTagIdList(any());
     }
 
 
