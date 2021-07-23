@@ -3,15 +3,13 @@ package com.study.chatservice.controller;
 import com.study.chatservice.config.LoginUser;
 import com.study.chatservice.model.chatroom.ChatRoomCreateRequest;
 import com.study.chatservice.model.chatroom.ChatRoomResponse;
+import com.study.chatservice.model.chatroom.ChatRoomUpdateRequest;
 import com.study.chatservice.service.ChatRoomService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -30,6 +28,11 @@ public class ChatRoomController {
     }
 
     // 채팅방 수정
+    @PatchMapping("/chatRooms/{chatRoomId}")
+    public ResponseEntity<ChatRoomResponse> update(@PathVariable Long chatRoomId,
+                                                   @RequestBody @Valid ChatRoomUpdateRequest request){
+        return ResponseEntity.ok(chatRoomService.update(chatRoomId,request));
+    }
 
 
 

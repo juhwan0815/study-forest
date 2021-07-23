@@ -32,6 +32,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -107,5 +108,40 @@ class ChatRoomControllerTest {
 
         // then
         then(chatRoomService).should(times(1)).create(any(),any());
+    }
+
+    @Test
+    @DisplayName("채팅방 수정 API 테스트")
+    void update() throws Exception {
+        // given
+        given(chatRoomService.update(any(),any()))
+                .willReturn(TEST_CHAT_ROOM_RESPONSE);
+
+        // when
+        mockMvc.perform(patch("/chatRooms/{chatRoomId}",1)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(TEST_CHAT_ROOM_UPDATE_REQUEST))
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_CHAT_ROOM_RESPONSE)))
+                .andDo(document("chatRoom/update",
+                        requestHeaders(
+                                headerWithName("Authorization").description("액세스 토큰")
+                        ),
+                        pathParameters(
+                                parameterWithName("chatRoomId").description("채팅방 ID")
+                        ),
+                        requestFields(
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("변경할 채팅방 이름")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("채팅방 ID"),
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("변경된 채팅방 이름"),
+                                fieldWithPath("studyId").type(JsonFieldType.NUMBER).description("채팅방이 속한 스터디 ID")
+                        )));
+
+        // then
+        then(chatRoomService).should(times(1)).update(any(),any());
     }
 }

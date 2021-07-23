@@ -29,3 +29,16 @@ include::{snippets}/chatRoom/create/request-fields.adoc[]
 include::{snippets}/chatRoom/create/http-response.adoc[]
 ====== Body
 include::{snippets}/chatRoom/create/response-fields.adoc[]
+
+==== 채팅방 수정 API
+include::{snippets}/chatRoom/update/http-request.adoc[]
+====== Header
+include::{snippets}/chatRoom/update/request-headers.adoc[]
+====== Path
+include::{snippets}/chatRoom/update/path-parameters.adoc[]
+====== Body
+include::{snippets}/chatRoom/update/request-fields.adoc[]
+===== 응답
+include::{snippets}/chatRoom/update/http-response.adoc[]
+====== Body
+include::{snippets}/chatRoom/update/response-fields.adoc[]

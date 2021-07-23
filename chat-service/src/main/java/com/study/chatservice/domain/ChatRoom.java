@@ -28,4 +28,8 @@ public class ChatRoom extends BaseEntity{
         chatRoom.studyId = studyId;
         return chatRoom;
     }
+
+    public void changeName(String name){
+        this.name = name;
+    }
 }
