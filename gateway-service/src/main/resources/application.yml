@@ -21,6 +21,15 @@ spring:
       httpclient:
         pool:
           maxIdleTime: 2000
+      filter:
+        remove-non-proxy-headers:
+          headers:
+            - Proxy-Authenticate
+            - Proxy-Authorization
+            - Keep-Alive
+            - TE
+            - Trailer
+            - Transfer-Encoding
       default-filters:
         - name: GlobalFilter
           args:
@@ -321,7 +330,60 @@ spring:
             - RemoveRequestHeader=Cookie
             - RewritePath=/notification-service/(?<segment>.*),/$\{segment}
             - AuthorizationHeaderFilter
-
+        # 채팅 서비스 - Actuator API
+        - id: chat-service
+          uri: lb://CHAT-SERVICE
+          predicates:
+            - Path=/chat-service/actuator/**
+            - Method=GET,POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/chat-service/(?<segment>.*),/$\{segment}
+        # 채팅 서비스 - API 문서
+        - id: chat-service
+          uri: lb://CHAT-SERVICE
+          predicates:
+            - Path=/chat-service/docs/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/chat-service/(?<segment>.*),/$\{segment}
+        # 채팅 서비스 - 채팅 API
+        - id: chat-service
+          uri: lb://CHAT-SERVICE
+          predicates:
+            - Path=/chat-service/chatRooms/**
+            - Method=GET,POST,PATCH,DELETE
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/chat-service/(?<segment>.*),/$\{segment}
+            - AuthorizationHeaderFilter
+        # 채팅 서비스 - 채팅 API
+        - id: chat-service
+          uri: lb://CHAT-SERVICE
+          predicates:
+            - Path=/chat-service/studies/**
+            - Method=GET,POST,PATCH,DELETE
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/chat-service/(?<segment>.*),/$\{segment}
+            - AuthorizationHeaderFilter
+        # 채팅 서비스 - 채팅 API
+        - id: chat-service
+          uri: lb://CHAT-SERVICE
+          predicates:
+            - Path=/chat-service/**
+            - Method=GET
+          filters:
+            - RewritePath=/chat-service/(?<segment>.*),/$\{segment}
+            - DedupeResponseHeader=Access-Control-Allow-Origin
+        # 채팅 서비스 - 웹 소켓
+        - id: chat-service
+          uri: lb:ws://CHAT-SERVICE
+          predicates:
+            - Path=/chat-service/**
+          filters:
+            - RewritePath=/chat-service/(?<segment>.*),/$\{segment}
 
 
 
