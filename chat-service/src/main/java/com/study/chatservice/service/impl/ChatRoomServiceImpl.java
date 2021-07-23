@@ -5,6 +5,7 @@ import com.study.chatservice.exception.ChatRoomException;
 import com.study.chatservice.model.chatroom.ChatRoomCreateRequest;
 import com.study.chatservice.model.chatroom.ChatRoomResponse;
 import com.study.chatservice.model.chatroom.ChatRoomUpdateRequest;
+import com.study.chatservice.repository.ChatMessageRepository;
 import com.study.chatservice.repository.ChatRoomRepository;
 import com.study.chatservice.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,8 @@ import java.util.Optional;
 public class ChatRoomServiceImpl implements ChatRoomService {
 
     private final ChatRoomRepository chatRoomRepository;
+
+    private final ChatMessageRepository chatMessageRepository;
 
     @Override
     @Transactional
@@ -42,6 +45,16 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         findChatRoom.changeName(request.getName());
 
         return ChatRoomResponse.from(findChatRoom);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long chatRoomId) {
+        ChatRoom findChatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new ChatRoomException("존재하지 않는 채팅방입니다."));
+
+        chatRoomRepository.delete(findChatRoom);
+        chatMessageRepository.deleteByChatRoomId(findChatRoom.getId());
     }
 
     private void validateDuplicatedChatRoom(Long studyId, String name) {

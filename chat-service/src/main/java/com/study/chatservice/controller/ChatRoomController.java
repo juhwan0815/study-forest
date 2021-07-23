@@ -8,8 +8,10 @@ import com.study.chatservice.service.ChatRoomService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.Valid;
 
@@ -34,10 +36,14 @@ public class ChatRoomController {
         return ResponseEntity.ok(chatRoomService.update(chatRoomId,request));
     }
 
-
-
     // 채팅방 삭제
+    @DeleteMapping("/chatRooms/{chatRoomId}")
+    public ResponseEntity<Void> delete(@PathVariable Long chatRoomId){
+        chatRoomService.delete(chatRoomId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
     // 채팅방 조회
+
 
 }

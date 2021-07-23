@@ -10,4 +10,6 @@ public interface ChatRoomService {
 
     ChatRoomResponse update(Long chatRoomId, ChatRoomUpdateRequest request);
 
+    void delete(Long chatRoomId);
+
 }

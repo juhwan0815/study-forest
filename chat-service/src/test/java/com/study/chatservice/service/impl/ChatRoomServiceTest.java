@@ -4,6 +4,7 @@ import com.study.chatservice.ChatRoomFixture;
 import com.study.chatservice.domain.ChatRoom;
 import com.study.chatservice.exception.ChatRoomException;
 import com.study.chatservice.model.chatroom.ChatRoomResponse;
+import com.study.chatservice.repository.ChatMessageRepository;
 import com.study.chatservice.repository.ChatRoomRepository;
 import com.study.chatservice.service.ChatRoomService;
 import org.junit.jupiter.api.DisplayName;
@@ -16,13 +17,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static com.study.chatservice.ChatRoomFixture.*;
-import static org.assertj.core.api.Assertions.as;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +32,9 @@ class ChatRoomServiceTest {
 
     @Mock
     private ChatRoomRepository chatRoomRepository;
+
+    @Mock
+    private ChatMessageRepository chatMessageRepository;
 
     @Test
     @DisplayName("채팅방을 생성한다.")
@@ -98,5 +100,29 @@ class ChatRoomServiceTest {
         // when
         assertThrows(ChatRoomException.class,
                 () -> chatRoomService.update(1L, TEST_CHAT_ROOM_UPDATE_REQUEST));
+    }
+
+    @Test
+    @DisplayName("채팅방을 삭제한다.")
+    void deleteChatRoom(){
+        // given
+        given(chatRoomRepository.findById(any()))
+                .willReturn(Optional.of(TEST_CHAT_ROOM));
+
+        willDoNothing()
+                .given(chatRoomRepository)
+                .delete(any());
+
+        willDoNothing()
+                .given(chatMessageRepository)
+                .deleteByChatRoomId(any());
+
+        // when
+        chatRoomService.delete(1L);
+
+        // then
+        then(chatRoomRepository).should(times(1)).findById(any());
+        then(chatRoomRepository).should(times(1)).delete(any());
+        then(chatMessageRepository).should(times(1)).deleteByChatRoomId(any());
     }
 }

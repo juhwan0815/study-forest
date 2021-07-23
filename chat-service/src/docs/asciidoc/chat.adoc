@@ -42,3 +42,12 @@ include::{snippets}/chatRoom/update/request-fields.adoc[]
 include::{snippets}/chatRoom/update/http-response.adoc[]
 ====== Body
 include::{snippets}/chatRoom/update/response-fields.adoc[]
+
+==== 채팅방 삭제 API
+include::{snippets}/chatRoom/delete/http-request.adoc[]
+====== Header
+include::{snippets}/chatRoom/delete/request-headers.adoc[]
+====== Path
+include::{snippets}/chatRoom/delete/path-parameters.adoc[]
+===== 응답
+include::{snippets}/chatRoom/delete/http-response.adoc[]
