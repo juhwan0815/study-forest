@@ -12,8 +12,11 @@ public class ChatRoomFixture {
     public static final ChatRoomUpdateRequest TEST_CHAT_ROOM_UPDATE_REQUEST = new ChatRoomUpdateRequest("공지사항");
 
     public static final ChatRoomResponse TEST_CHAT_ROOM_RESPONSE = new ChatRoomResponse(1L,"공지사항",1L);
+    public static final ChatRoomResponse TEST_CHAT_ROOM_RESPONSE2 = new ChatRoomResponse(2L,"토론방",1L);
 
     public static final ChatRoom TEST_CHAT_ROOM = new ChatRoom(1L,"공지사항",1L);
+    public static final ChatRoom TEST_CHAT_ROOM2 = new ChatRoom(2L,"토론방",1L);
+
 
     public static ChatRoom createTestChatRoom(){
         return new ChatRoom(1L,"공지사항",1L);

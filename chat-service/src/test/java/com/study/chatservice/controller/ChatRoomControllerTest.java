@@ -3,6 +3,7 @@ package com.study.chatservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.chatservice.ChatRoomFixture;
 import com.study.chatservice.config.LoginUserArgumentResolver;
+import com.study.chatservice.model.chatroom.ChatRoomResponse;
 import com.study.chatservice.service.ChatRoomService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +24,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static com.study.chatservice.ChatRoomFixture.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,8 +36,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -168,5 +171,37 @@ class ChatRoomControllerTest {
 
         // then
         then(chatRoomService).should(times(1)).delete(any());
+    }
+
+
+    @Test
+    @DisplayName("채팅방 조회 API 테스트")
+    void findByStudyId() throws Exception {
+        List<ChatRoomResponse> result = Arrays.asList(TEST_CHAT_ROOM_RESPONSE, TEST_CHAT_ROOM_RESPONSE2);
+        // given
+        given(chatRoomService.findByStudyId(any()))
+                .willReturn(result);
+
+        // when
+        mockMvc.perform(get("/studies/{studyId}/chatRooms", 1)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(result)))
+                .andDo(document("chatRoom/findByStudyId",
+                        requestHeaders(
+                                headerWithName("Authorization").description("액세스 토큰")
+                        ),
+                        pathParameters(
+                                parameterWithName("studyId").description("스터디 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("채팅방 ID"),
+                                fieldWithPath("[].name").type(JsonFieldType.STRING).description("채팅방 이름"),
+                                fieldWithPath("[].studyId").type(JsonFieldType.NUMBER).description("채팅방이 속한 스터디 ID")
+                        )));
+
+        // then
+        then(chatRoomService).should(times(1)).findByStudyId(any());
     }
 }

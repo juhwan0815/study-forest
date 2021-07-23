@@ -14,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static com.study.chatservice.ChatRoomFixture.*;
@@ -124,5 +126,19 @@ class ChatRoomServiceTest {
         then(chatRoomRepository).should(times(1)).findById(any());
         then(chatRoomRepository).should(times(1)).delete(any());
         then(chatMessageRepository).should(times(1)).deleteByChatRoomId(any());
+    }
+
+    @Test
+    @DisplayName("스터디 ID로 채팅방을 조회한다.")
+    void findByStudyId(){
+        // given
+        given(chatRoomRepository.findByStudyId(any()))
+                .willReturn(Arrays.asList(TEST_CHAT_ROOM,TEST_CHAT_ROOM2));
+
+        // when
+        List<ChatRoomResponse> result = chatRoomService.findByStudyId(1L);
+
+        // then
+        assertThat(result.size()).isEqualTo(2);
     }
 }

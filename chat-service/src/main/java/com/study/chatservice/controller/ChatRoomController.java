@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.Valid;
+import javax.ws.rs.Path;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -44,6 +46,9 @@ public class ChatRoomController {
     }
 
     // 채팅방 조회
-
+    @GetMapping("/studies/{studyId}/chatRooms")
+    public ResponseEntity<List<ChatRoomResponse>> find(@PathVariable Long studyId){
+        return ResponseEntity.ok(chatRoomService.findByStudyId(studyId));
+    }
 
 }
