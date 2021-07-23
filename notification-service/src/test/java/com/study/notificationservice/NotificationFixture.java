@@ -20,6 +20,7 @@ public class NotificationFixture {
     public static final StudyUserResponse TEST_STUDY_USER_RESPONSE1 =
             new StudyUserResponse(2L, 2L, "fcmToken");
 
+
     public static final StudyResponse TEST_STUDY_RESPONSE =
             new StudyResponse("테스트 스터디",
                     Arrays.asList(TEST_STUDY_USER_RESPONSE,TEST_STUDY_USER_RESPONSE1));
@@ -59,7 +60,7 @@ public class NotificationFixture {
             Arrays.asList(TEST_INTEREST_TAG_RESPONSE1,TEST_INTEREST_TAG_RESPONSE2));
 
     public static final ChatCreateMessage TEST_CHAT_CREATE_MESSAGE
-            = new ChatCreateMessage(1L,"공지사항","황주환","오늘 스터디있어여",Arrays.asList(1L,2L));
+            = new ChatCreateMessage(1L,"공지사항","황주환","오늘 스터디있어여",Arrays.asList(3L,4L));
 
     public static final Notification TEST_NOTIFICATION1
             = new Notification(1L,1L,"테스트 제목","테스트 내용",

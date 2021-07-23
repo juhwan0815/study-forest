@@ -113,14 +113,20 @@ public class NotificationServiceImpl implements NotificationService {
         List<Long> userIdList = chatCreateMessage.getUserIdList();
         String chatTitle = createChatTitle(study.getStudyName(), chatCreateMessage.getChatRoomName());
         String chatContent = createChatContent(chatCreateMessage.getNickName(), chatCreateMessage.getContent());
-        userIdList.stream().forEach(userId -> {
-            for (StudyUserResponse studyUser : study.getStudyUsers()) {
-                if (studyUser.getUserId().equals(userId)) {
-                    fcmMessageSender.send(studyUser.getFcmToken(),chatTitle,chatContent);
-                    break;
-                }
-            }
-        });
+        study.getStudyUsers().stream()
+                .forEach(studyUser -> {
+                    boolean matchResult = false;
+                    for (Long userId : userIdList) {
+                        if(studyUser.getUserId().equals(userId)){
+                            matchResult = true;
+                            break;
+                        }
+                    }
+
+                    if(!matchResult){
+                        fcmMessageSender.send(studyUser.getFcmToken(),chatTitle,chatContent);
+                    }
+                });
     }
 
     @Override
