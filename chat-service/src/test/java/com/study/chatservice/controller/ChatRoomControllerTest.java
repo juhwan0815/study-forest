@@ -1,0 +1,111 @@
+package com.study.chatservice.controller;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.study.chatservice.ChatRoomFixture;
+import com.study.chatservice.config.LoginUserArgumentResolver;
+import com.study.chatservice.service.ChatRoomService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
+
+import static com.study.chatservice.ChatRoomFixture.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@AutoConfigureRestDocs
+@ExtendWith(RestDocumentationExtension.class)
+@WebMvcTest(ChatRoomController.class)
+class ChatRoomControllerTest {
+
+    private final String TEST_AUTHORIZATION = "Bearer 액세스토큰";
+
+    @MockBean
+    private ChatRoomService chatRoomService;
+
+    @MockBean
+    private LoginUserArgumentResolver loginUserArgumentResolver;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private MockMvc mockMvc;
+
+    @BeforeEach
+    public void setUp(WebApplicationContext wac,
+                      RestDocumentationContextProvider restDocumentationContextProvider) {
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(wac)
+                .alwaysDo(print())
+                .addFilters(new CharacterEncodingFilter("utf-8", true))
+                .apply(documentationConfiguration(restDocumentationContextProvider)
+                        .operationPreprocessors()
+                        .withRequestDefaults(prettyPrint())
+                        .withResponseDefaults(prettyPrint()))
+                .build();
+    }
+
+    @Test
+    @DisplayName("채팅방 생성 API 테스트")
+    void create() throws Exception {
+        // given
+        given(chatRoomService.create(any(),any()))
+                .willReturn(TEST_CHAT_ROOM_RESPONSE);
+
+        // when
+        mockMvc.perform(post("/studies/{studyId}/chatRooms",1)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(TEST_CHAT_ROOM_CREATE_REQUEST))
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_CHAT_ROOM_RESPONSE)))
+                .andDo(document("chatRoom/create",
+                        requestHeaders(
+                                headerWithName("Authorization").description("액세스 토큰")
+                        ),
+                        pathParameters(
+                                parameterWithName("studyId").description("스터디 ID")
+                        ),
+                        requestFields(
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("채팅방 이름")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("채팅방 ID"),
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("채팅방 이름"),
+                                fieldWithPath("studyId").type(JsonFieldType.NUMBER).description("채팅방이 속한 스터디 ID")
+                        )));
+
+        // then
+        then(chatRoomService).should(times(1)).create(any(),any());
+    }
+}

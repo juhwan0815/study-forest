@@ -1,0 +1,31 @@
+:basedir: {docdir}/../../../
+:snippets: {basedir}/build/generated-snippets
+
+= 채팅 서비스 API
+:doctype: auth
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectnums:
+:sectlinks:
+:sectanchors:
+
+채팅서비스 요청 URL
+
+Gateway-service 주소 : 포트 + /chat-service
+
+[[api]]
+==== 채팅방 생성 API
+===== 요청
+include::{snippets}/chatRoom/create/http-request.adoc[]
+====== Header
+include::{snippets}/chatRoom/create/request-headers.adoc[]
+====== Path
+include::{snippets}/chatRoom/create/path-parameters.adoc[]
+====== Body
+include::{snippets}/chatRoom/create/request-fields.adoc[]
+===== 응답
+include::{snippets}/chatRoom/create/http-response.adoc[]
+====== Body
+include::{snippets}/chatRoom/create/response-fields.adoc[]
