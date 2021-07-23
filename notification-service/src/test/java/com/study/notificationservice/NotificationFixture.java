@@ -1,6 +1,8 @@
 package com.study.notificationservice;
 
+import com.study.notificationservice.domain.Notification;
 import com.study.notificationservice.kafka.message.*;
+import com.study.notificationservice.model.notification.NotificationResponse;
 import com.study.notificationservice.model.study.StudyResponse;
 import com.study.notificationservice.model.study.StudyUserResponse;
 import com.study.notificationservice.model.tag.InterestTagResponse;
@@ -58,5 +60,18 @@ public class NotificationFixture {
 
     public static final ChatCreateMessage TEST_CHAT_CREATE_MESSAGE
             = new ChatCreateMessage(1L,"공지사항","황주환","오늘 스터디있어여",Arrays.asList(1L,2L));
+
+    public static final Notification TEST_NOTIFICATION1
+            = new Notification(1L,1L,"테스트 제목","테스트 내용",
+            LocalDateTime.of(2021,7,23,10,30));
+    public static final Notification TEST_NOTIFICATION2
+            = new Notification(2L,1L,"테스트 제목","테스트 내용",
+            LocalDateTime.of(2021,7,24,10,30));
+
+    public static final NotificationResponse TEST_NOTIFICATION_RESPONSE1
+            = new NotificationResponse(1L,2L,"테스트 제목","테스트 내용",LocalDateTime.of(2021,7,23,10,30));
+
+    public static final NotificationResponse TEST_NOTIFICATION_RESPONSE2
+            = new NotificationResponse(2L,2L,"테스트 제목","테스트 내용",LocalDateTime.of(2021,7,24,10,30));
 
 }

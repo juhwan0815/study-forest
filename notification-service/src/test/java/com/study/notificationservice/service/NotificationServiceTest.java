@@ -3,7 +3,9 @@ package com.study.notificationservice.service;
 import com.study.notificationservice.NotificationFixture;
 import com.study.notificationservice.client.StudyServiceClient;
 import com.study.notificationservice.client.UserServiceClient;
+import com.study.notificationservice.domain.Notification;
 import com.study.notificationservice.fcm.FcmMessageSender;
+import com.study.notificationservice.model.notification.NotificationResponse;
 import com.study.notificationservice.repository.NotificationRepository;
 import com.study.notificationservice.service.impl.NotificationServiceImpl;
 import org.junit.jupiter.api.Disabled;
@@ -13,10 +15,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.study.notificationservice.NotificationFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 
@@ -151,6 +159,28 @@ class NotificationServiceTest {
         // then
         then(studyServiceClient).should(times(1)).findWithStudyUserByStudyId(any());
         then(fcmMessageSender).should(times(2)).send(any(),any(),any());
+    }
+
+    @Test
+    @DisplayName("회원의 알림을 조회한다")
+    void findByUserIdOrderCreatedAtDesc(){
+        // given
+        List<Notification> content = new ArrayList<>();
+        content.add(TEST_NOTIFICATION2);
+        content.add(TEST_NOTIFICATION1);
+
+        PageRequest pageable = PageRequest.of(0, 10);
+        Page<Notification> notificationPage =
+                new PageImpl<>(content, pageable,content.size());
+
+        given(notificationRepository.findByUserIdOrderByCreatedAtDesc(any(),any()))
+                .willReturn(notificationPage);
+        // when
+        Page<NotificationResponse> result = notificationService.findByUserId(1L, pageable);
+
+        // then
+        assertThat(result.getContent().size()).isEqualTo(2);
+        then(notificationRepository).should(times(1)).findByUserIdOrderByCreatedAtDesc(any(),any());
     }
 
 }

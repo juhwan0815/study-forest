@@ -5,12 +5,16 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 public class Notification {
 
@@ -25,18 +29,15 @@ public class Notification {
 
     private String content;
 
-    @Enumerated(EnumType.STRING)
-    private Status status;
+    @CreatedDate
+    private LocalDateTime createdAt;
 
     public static Notification createNotification(Long userId,String title,String content){
         Notification notification = new Notification();
         notification.userId = userId;
         notification.title = title;
         notification.content = content;
-        notification.status = Status.NOTREAD;
         return notification;
     }
-
-
 
 }

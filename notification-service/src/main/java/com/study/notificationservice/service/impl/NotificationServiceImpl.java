@@ -5,6 +5,7 @@ import com.study.notificationservice.client.UserServiceClient;
 import com.study.notificationservice.domain.Notification;
 import com.study.notificationservice.fcm.FcmMessageSender;
 import com.study.notificationservice.kafka.message.*;
+import com.study.notificationservice.model.notification.NotificationResponse;
 import com.study.notificationservice.model.study.StudyResponse;
 import com.study.notificationservice.model.study.StudyUserResponse;
 import com.study.notificationservice.model.tag.InterestTagResponse;
@@ -16,6 +17,8 @@ import com.study.notificationservice.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.quartz.QuartzTransactionManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -118,6 +121,12 @@ public class NotificationServiceImpl implements NotificationService {
                 }
             }
         });
+    }
+
+    @Override
+    public Page<NotificationResponse> findByUserId(Long userId, Pageable pageable) {
+        return notificationRepository.findByUserIdOrderByCreatedAtDesc(pageable,userId)
+                .map(notification -> NotificationResponse.from(notification));
     }
 
     private String createChatTitle(String studyName, String chatRoomName) {
