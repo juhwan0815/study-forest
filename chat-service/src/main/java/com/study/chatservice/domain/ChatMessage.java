@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 public class ChatMessage {
 
     @Id

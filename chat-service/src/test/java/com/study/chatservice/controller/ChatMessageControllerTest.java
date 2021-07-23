@@ -3,6 +3,7 @@ package com.study.chatservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.chatservice.ChatRoomFixture;
 import com.study.chatservice.config.LoginUserArgumentResolver;
+import com.study.chatservice.config.security.JwtTokenProvider;
 import com.study.chatservice.domain.ChatMessage;
 import com.study.chatservice.model.chatMessage.ChatMessageResponse;
 import com.study.chatservice.service.ChatMessageService;
@@ -63,6 +64,9 @@ public class ChatMessageControllerTest {
     @MockBean
     private LoginUserArgumentResolver loginUserArgumentResolver;
 
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -96,7 +100,6 @@ public class ChatMessageControllerTest {
 
         given(chatMessageService.findByChatRoomId(any(),any()))
                 .willReturn(result);
-
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/chatRooms/{chatRoomId}/chatMessages",1)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
