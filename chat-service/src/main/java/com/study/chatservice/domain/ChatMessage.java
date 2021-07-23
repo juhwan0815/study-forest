@@ -29,7 +29,7 @@ public class ChatMessage {
     private Long chatRoomId;
 
     @CreatedDate
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
 
     public static ChatMessage createMessage(String sender,String message,Long chatRoomId){
         ChatMessage chatMessage = new ChatMessage();

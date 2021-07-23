@@ -65,3 +65,18 @@ include::{snippets}/chatRoom/findByStudyId/path-parameters.adoc[]
 include::{snippets}/chatRoom/findByStudyId/http-response.adoc[]
 ====== Body
 include::{snippets}/chatRoom/findByStudyId/response-fields.adoc[]
+
+==== 채팅 조회 API
+===== 요청
+include::{snippets}/chatMessage/find/http-request.adoc[]
+====== Header
+include::{snippets}/chatMessage/find/request-headers.adoc[]
+====== Path
+include::{snippets}/chatMessage/find/path-parameters.adoc[]
+====== Param
+include::{snippets}/chatMessage/find/request-parameters.adoc[]
+===== 응답
+include::{snippets}/chatMessage/find/http-response.adoc[]
+====== Body
+include::{snippets}/chatMessage/find/response-fields.adoc[]
+

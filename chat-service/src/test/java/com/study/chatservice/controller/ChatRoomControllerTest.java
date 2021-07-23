@@ -3,6 +3,7 @@ package com.study.chatservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.chatservice.ChatRoomFixture;
 import com.study.chatservice.config.LoginUserArgumentResolver;
+import com.study.chatservice.domain.ChatMessage;
 import com.study.chatservice.model.chatroom.ChatRoomResponse;
 import com.study.chatservice.service.ChatRoomService;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
@@ -24,6 +28,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -204,4 +209,8 @@ class ChatRoomControllerTest {
         // then
         then(chatRoomService).should(times(1)).findByStudyId(any());
     }
+
+
 }
+
+

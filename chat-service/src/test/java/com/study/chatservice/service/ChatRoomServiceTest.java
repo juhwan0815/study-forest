@@ -1,4 +1,4 @@
-package com.study.chatservice.service.impl;
+package com.study.chatservice.service;
 
 import com.study.chatservice.ChatRoomFixture;
 import com.study.chatservice.domain.ChatRoom;
@@ -7,6 +7,7 @@ import com.study.chatservice.model.chatroom.ChatRoomResponse;
 import com.study.chatservice.repository.ChatMessageRepository;
 import com.study.chatservice.repository.ChatRoomRepository;
 import com.study.chatservice.service.ChatRoomService;
+import com.study.chatservice.service.impl.ChatRoomServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -141,4 +142,5 @@ class ChatRoomServiceTest {
         // then
         assertThat(result.size()).isEqualTo(2);
     }
+
 }
