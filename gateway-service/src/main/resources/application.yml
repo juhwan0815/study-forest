@@ -293,6 +293,34 @@ spring:
             - RemoveRequestHeader=Cookie
             - RewritePath=/gathering-service/(?<segment>.*),/$\{segment}
             - AuthorizationHeaderFilter
+        # 알림 서비스 - Actuator API
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/notification-service/actuator/**
+            - Method=GET,POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/notification-service/(?<segment>.*),/$\{segment}
+        # 알림 서비스 - API 문서
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/notification-service/docs/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/notification-service/(?<segment>.*),/$\{segment}
+        # 알림 서비스 - 알림 API
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/notification-service/notifications/**
+            - Method=GET
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/notification-service/(?<segment>.*),/$\{segment}
+            - AuthorizationHeaderFilter
 
 
 
