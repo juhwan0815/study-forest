@@ -143,4 +143,21 @@ class ChatRoomServiceTest {
         assertThat(result.size()).isEqualTo(2);
     }
 
+    @Test
+    @DisplayName("삭제된 스터디 ID로 채팅방과 채팅을 모두 삭제한다.")
+    void deleteChatRoomsAndChatMessages(){
+        // given
+        given(chatRoomRepository.findByStudyId(any()))
+                .willReturn(Arrays.asList(TEST_CHAT_ROOM,TEST_CHAT_ROOM2));
+
+        willDoNothing().given(chatRoomRepository).delete(any());
+        willDoNothing().given(chatMessageRepository).deleteByChatRoomId(any());
+        // when
+        chatRoomService.deleteChatRoomsAndChatMessages(TEST_STUDY_DELETE_MESSAGE);
+
+        // then
+        then(chatRoomRepository).should(times(1)).findByStudyId(any());
+        then(chatMessageRepository).should(times(2)).deleteByChatRoomId(any());
+    }
+
 }

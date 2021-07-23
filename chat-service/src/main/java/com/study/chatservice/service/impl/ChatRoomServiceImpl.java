@@ -2,6 +2,7 @@ package com.study.chatservice.service.impl;
 
 import com.study.chatservice.domain.ChatRoom;
 import com.study.chatservice.exception.ChatRoomException;
+import com.study.chatservice.kafka.message.StudyDeleteMessage;
 import com.study.chatservice.model.chatroom.ChatRoomCreateRequest;
 import com.study.chatservice.model.chatroom.ChatRoomResponse;
 import com.study.chatservice.model.chatroom.ChatRoomUpdateRequest;
@@ -64,6 +65,18 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         return chatRoomRepository.findByStudyId(studyId).stream()
                 .map(chatRoom -> ChatRoomResponse.from(chatRoom))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteChatRoomsAndChatMessages(StudyDeleteMessage studyDeleteMessage) {
+
+        List<ChatRoom> findChatRooms = chatRoomRepository.findByStudyId(studyDeleteMessage.getStudyId());
+
+        findChatRooms.stream().forEach(chatRoom -> {
+            chatRoomRepository.delete(chatRoom);
+            chatMessageRepository.deleteByChatRoomId(chatRoom.getId());
+        });
     }
 
     private void validateDuplicatedChatRoom(Long studyId, String name) {

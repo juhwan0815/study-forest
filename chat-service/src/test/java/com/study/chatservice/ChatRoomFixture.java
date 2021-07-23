@@ -2,6 +2,8 @@ package com.study.chatservice;
 
 import com.study.chatservice.domain.ChatMessage;
 import com.study.chatservice.domain.ChatRoom;
+import com.study.chatservice.kafka.listener.StudyDeleteListener;
+import com.study.chatservice.kafka.message.StudyDeleteMessage;
 import com.study.chatservice.model.chatMessage.ChatMessageResponse;
 import com.study.chatservice.model.chatroom.ChatRoomCreateRequest;
 import com.study.chatservice.model.chatroom.ChatRoomResponse;
@@ -28,6 +30,8 @@ public class ChatRoomFixture {
     public static final ChatMessageResponse TEST_CHAT_MESSAGE_RESPONSE1 = new ChatMessageResponse("황주환","안녕하세요", LocalDateTime.of(2021,7,23,10,0));
     public static final ChatMessageResponse TEST_CHAT_MESSAGE_RESPONSE2 = new ChatMessageResponse("황주환","안녕하세요", LocalDateTime.of(2021,7,23,10,1));
     public static final ChatMessageResponse TEST_CHAT_MESSAGE_RESPONSE3 = new ChatMessageResponse("황주환","안녕하세요", LocalDateTime.of(2021,7,23,10,2));
+
+    public static final StudyDeleteMessage TEST_STUDY_DELETE_MESSAGE = new StudyDeleteMessage(1L);
 
     public static ChatRoom createTestChatRoom(){
         return new ChatRoom(1L,"공지사항",1L);

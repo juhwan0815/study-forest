@@ -1,5 +1,6 @@
 package com.study.chatservice.service;
 
+import com.study.chatservice.kafka.message.StudyDeleteMessage;
 import com.study.chatservice.model.chatroom.ChatRoomCreateRequest;
 import com.study.chatservice.model.chatroom.ChatRoomResponse;
 import com.study.chatservice.model.chatroom.ChatRoomUpdateRequest;
@@ -15,4 +16,7 @@ public interface ChatRoomService {
     void delete(Long chatRoomId);
 
     List<ChatRoomResponse> findByStudyId(Long studyId);
+
+    void deleteChatRoomsAndChatMessages(StudyDeleteMessage studyDeleteMessage);
+
 }
