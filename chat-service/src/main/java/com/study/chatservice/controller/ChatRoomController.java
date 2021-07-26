@@ -1,20 +1,16 @@
 package com.study.chatservice.controller;
 
-import com.study.chatservice.config.LoginUser;
 import com.study.chatservice.model.chatroom.ChatRoomCreateRequest;
 import com.study.chatservice.model.chatroom.ChatRoomResponse;
 import com.study.chatservice.model.chatroom.ChatRoomUpdateRequest;
 import com.study.chatservice.service.ChatRoomService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.Valid;
-import javax.ws.rs.Path;
 import java.util.List;
 
 @Slf4j
