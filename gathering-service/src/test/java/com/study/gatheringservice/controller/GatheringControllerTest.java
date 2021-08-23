@@ -46,8 +46,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -259,7 +258,9 @@ class GatheringControllerTest {
         // when
         mockMvc.perform(get("/studies/{studyId}/gatherings", 1)
                 .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
-                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .param("page","0")
+                .param("size","20"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(pageGathering)))
                 .andDo(document("gathering/find",
@@ -268,6 +269,10 @@ class GatheringControllerTest {
                         ),
                         pathParameters(
                                 parameterWithName("studyId").description("스터디 ID")
+                        ),
+                        requestParameters(
+                                parameterWithName("page").description("페이지 번호"),
+                                parameterWithName("size").description("페이지 사이즈")
                         ),
                         responseFields(
                                 fieldWithPath("content").type(JsonFieldType.ARRAY).description("조회 결과 배열"),

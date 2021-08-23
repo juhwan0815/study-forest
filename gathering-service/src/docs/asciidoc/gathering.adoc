@@ -75,6 +75,8 @@ include::{snippets}/gathering/find/http-request.adoc[]
 include::{snippets}/gathering/find/request-headers.adoc[]
 ====== Path
 include::{snippets}/gathering/find/path-parameters.adoc[]
+====== Param
+include::{snippets}/gathering/find/request-parameters.adoc[]
 ===== 응답
 include::{snippets}/gathering/find/http-response.adoc[]
 ====== Body
