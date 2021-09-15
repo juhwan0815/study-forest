@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ChatMessageResponse {
 
+    private Long userId;
+
     private String sender;
 
     private String message;
@@ -24,6 +26,7 @@ public class ChatMessageResponse {
 
     public static ChatMessageResponse from(ChatMessage chatMessage){
         ChatMessageResponse chatMessageResponse = new ChatMessageResponse();
+        chatMessageResponse.userId = chatMessage.getUserId();
         chatMessageResponse.sender = chatMessage.getSender();
         chatMessageResponse.message = chatMessage.getMessage();
         chatMessageResponse.createdAt = chatMessage.getCreatedAt();

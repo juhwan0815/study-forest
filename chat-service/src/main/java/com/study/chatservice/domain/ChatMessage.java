@@ -22,6 +22,8 @@ public class ChatMessage {
     @Column(name = "chat_message_id")
     private Long id;
 
+    private Long userId;
+
     private String sender;
 
     private String message;
@@ -31,8 +33,9 @@ public class ChatMessage {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    public static ChatMessage createMessage(String sender,String message,Long chatRoomId){
+    public static ChatMessage createMessage(Long userId,String sender,String message,Long chatRoomId){
         ChatMessage chatMessage = new ChatMessage();
+        chatMessage.userId = userId;
         chatMessage.sender = sender;
         chatMessage.message = message;
         chatMessage.chatRoomId = chatRoomId;

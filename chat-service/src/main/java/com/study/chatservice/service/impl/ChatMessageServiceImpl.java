@@ -43,7 +43,8 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     @Override
     @Transactional
     public void sendChatMessage(ChatMessageRequest request) {
-        ChatMessage chatMessage = ChatMessage.createMessage(request.getSender(), request.getMessage(), request.getRoomId());
+        ChatMessage chatMessage = ChatMessage
+                .createMessage(request.getUserId(),request.getSender(), request.getMessage(), request.getRoomId());
         redisTemplate.convertAndSend(channelTopic.getTopic(), chatMessage);
 
         chatMessageRepository.save(chatMessage);
