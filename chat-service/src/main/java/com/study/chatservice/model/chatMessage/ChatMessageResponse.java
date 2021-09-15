@@ -29,7 +29,7 @@ public class ChatMessageResponse {
         chatMessageResponse.userId = chatMessage.getUserId();
         chatMessageResponse.sender = chatMessage.getSender();
         chatMessageResponse.message = chatMessage.getMessage();
-        chatMessageResponse.createdAt = chatMessage.getCreatedAt();
+        chatMessageResponse.createdAt = LocalDateTime.now();
         return chatMessageResponse;
     }
 }
