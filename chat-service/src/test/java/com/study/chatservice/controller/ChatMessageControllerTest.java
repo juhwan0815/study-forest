@@ -121,6 +121,7 @@ public class ChatMessageControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("content").type(JsonFieldType.ARRAY).description("조회 결과 배열"),
+                                fieldWithPath("content.[].userId").type(JsonFieldType.NUMBER).description("채팅 전송자 ID"),
                                 fieldWithPath("content.[].sender").type(JsonFieldType.STRING).description("채팅 전송자"),
                                 fieldWithPath("content.[].message").type(JsonFieldType.STRING).description("채팅 메세지"),
                                 fieldWithPath("content.[].createdAt").type(JsonFieldType.STRING).description("채팅 생성 날짜"),

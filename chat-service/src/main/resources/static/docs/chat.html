@@ -1013,18 +1013,21 @@ Host: localhost:8080</code></pre>
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=utf-8
-Content-Length: 803
+Content-Length: 857
 
 {
   "content" : [ {
+    "userId" : 1,
     "sender" : "황주환",
     "message" : "안녕하세요",
     "createdAt" : "2021-07-23T10:02:00"
   }, {
+    "userId" : 1,
     "sender" : "황주환",
     "message" : "안녕하세요",
     "createdAt" : "2021-07-23T10:01:00"
   }, {
+    "userId" : 1,
     "sender" : "황주환",
     "message" : "안녕하세요",
     "createdAt" : "2021-07-23T10:00:00"
@@ -1077,6 +1080,11 @@ Content-Length: 803
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>content</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">조회 결과 배열</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>content.[].userId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">채팅 전송자 ID</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>content.[].sender</code></p></td>

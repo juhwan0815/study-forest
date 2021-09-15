@@ -23,13 +23,13 @@ public class ChatRoomFixture {
     public static final ChatRoom TEST_CHAT_ROOM = new ChatRoom(1L,"공지사항",1L);
     public static final ChatRoom TEST_CHAT_ROOM2 = new ChatRoom(2L,"토론방",1L);
 
-    public static final ChatMessage TEST_CHAT_MESSAGE1 = new ChatMessage(1L,"황주환","안녕하세요",1L, LocalDateTime.of(2021,7,23,10,0));
-    public static final ChatMessage TEST_CHAT_MESSAGE2 = new ChatMessage(1L,"황주환","안녕하세요",1L, LocalDateTime.of(2021,7,23,10,1));
-    public static final ChatMessage TEST_CHAT_MESSAGE3 = new ChatMessage(1L,"황주환","안녕하세요",1L, LocalDateTime.of(2021,7,23,10,2));
+    public static final ChatMessage TEST_CHAT_MESSAGE1 = new ChatMessage(1L,1L,"황주환","안녕하세요",1L, LocalDateTime.of(2021,7,23,10,0));
+    public static final ChatMessage TEST_CHAT_MESSAGE2 = new ChatMessage(1L,1L,"황주환","안녕하세요",1L, LocalDateTime.of(2021,7,23,10,1));
+    public static final ChatMessage TEST_CHAT_MESSAGE3 = new ChatMessage(1L,1L,"황주환","안녕하세요",1L, LocalDateTime.of(2021,7,23,10,2));
 
-    public static final ChatMessageResponse TEST_CHAT_MESSAGE_RESPONSE1 = new ChatMessageResponse("황주환","안녕하세요", LocalDateTime.of(2021,7,23,10,0));
-    public static final ChatMessageResponse TEST_CHAT_MESSAGE_RESPONSE2 = new ChatMessageResponse("황주환","안녕하세요", LocalDateTime.of(2021,7,23,10,1));
-    public static final ChatMessageResponse TEST_CHAT_MESSAGE_RESPONSE3 = new ChatMessageResponse("황주환","안녕하세요", LocalDateTime.of(2021,7,23,10,2));
+    public static final ChatMessageResponse TEST_CHAT_MESSAGE_RESPONSE1 = new ChatMessageResponse(1L,"황주환","안녕하세요", LocalDateTime.of(2021,7,23,10,0));
+    public static final ChatMessageResponse TEST_CHAT_MESSAGE_RESPONSE2 = new ChatMessageResponse(1L,"황주환","안녕하세요", LocalDateTime.of(2021,7,23,10,1));
+    public static final ChatMessageResponse TEST_CHAT_MESSAGE_RESPONSE3 = new ChatMessageResponse(1L,"황주환","안녕하세요", LocalDateTime.of(2021,7,23,10,2));
 
     public static final StudyDeleteMessage TEST_STUDY_DELETE_MESSAGE = new StudyDeleteMessage(1L);
 
