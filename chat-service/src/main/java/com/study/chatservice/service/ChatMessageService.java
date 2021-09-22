@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface ChatMessageService {
 
-    Page<ChatMessageResponse> findByChatRoomId(Long chatRoomId, Pageable pageable);
+    Page<ChatMessageResponse> findByChatRoomId(Long chatRoomId, Pageable pageable,String lastMessageDate);
 
     void sendChatMessage(ChatMessageRequest message);
 

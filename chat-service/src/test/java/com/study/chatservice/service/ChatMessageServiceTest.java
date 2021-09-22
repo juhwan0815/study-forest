@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,11 +50,11 @@ class ChatMessageServiceTest {
         PageRequest pageable = PageRequest.of(0, 10);
         Page<ChatMessage> pageData = new PageImpl<>(content,pageable,content.size());
 
-        given(chatMessageRepository.findByChatRoomIdOrderByCreatedAtDesc(any(),any()))
+        given(chatMessageRepository.findByChatRoomIdAndCreatedAtBeforeOrderByCreatedAtDesc(any(),any(),any()))
                 .willReturn(pageData);
 
         // when
-        Page<ChatMessageResponse> result = chatMessageService.findByChatRoomId(1L, pageable);
+        Page<ChatMessageResponse> result = chatMessageService.findByChatRoomId(1L, pageable,LocalDateTime.now().toString());
 
         // then
         assertThat(result.getContent().size()).isEqualTo(3);
@@ -61,7 +62,7 @@ class ChatMessageServiceTest {
         assertThat(result.getTotalElements()).isEqualTo(3);
 
         then(chatMessageRepository).should(times(1))
-                .findByChatRoomIdOrderByCreatedAtDesc(any(),any());
+                .findByChatRoomIdAndCreatedAtBeforeOrderByCreatedAtDesc(any(),any(),any());
     }
 
 }

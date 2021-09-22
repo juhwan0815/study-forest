@@ -13,6 +13,8 @@ import org.springframework.data.domain.Sort;
 
 import javax.persistence.EntityManager;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.LongStream;
 
 import static org.assertj.core.api.Assertions.*;
@@ -54,16 +56,16 @@ class ChatMessageRepositoryTest {
     void findByChatRoomIdOrderByCreatedAtDesc() {
         // given
         LongStream.range(0, 20).forEach(value -> {
-            ChatMessage message = ChatMessage.createMessage(1L,"황주환", "안녕하세요", 1L);
-            chatMessageRepository.save(message);
+            ChatMessage chatMessage = new ChatMessage(null, 1L, "황주환", "안녕하세요" + value, 1L, LocalDateTime.now());
+            chatMessageRepository.save(chatMessage);
         });
 
         em.flush();
         em.clear();
 
         // when
-        Page<ChatMessage> result = chatMessageRepository.findByChatRoomIdOrderByCreatedAtDesc(
-                PageRequest.of(0,5), 1L);
+        Page<ChatMessage> result = chatMessageRepository.findByChatRoomIdAndCreatedAtBeforeOrderByCreatedAtDesc(
+                PageRequest.of(0,5), 1L, LocalDateTime.now().plusSeconds(1L));
 
         // then
         assertThat(result.getContent().size()).isEqualTo(5);

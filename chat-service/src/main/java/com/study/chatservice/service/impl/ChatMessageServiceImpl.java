@@ -19,6 +19,7 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,8 +36,9 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final ChatCreateMessageSender chatCreateMessageSender;
 
     @Override
-    public Page<ChatMessageResponse> findByChatRoomId(Long chatRoomId, Pageable pageable) {
-        return chatMessageRepository.findByChatRoomIdOrderByCreatedAtDesc(pageable,chatRoomId)
+    public Page<ChatMessageResponse> findByChatRoomId(Long chatRoomId, Pageable pageable,String lastMessageDate) {
+        return chatMessageRepository
+                .findByChatRoomIdAndCreatedAtBeforeOrderByCreatedAtDesc(pageable,chatRoomId, LocalDateTime.parse(lastMessageDate))
                 .map(chatMessage -> ChatMessageResponse.from(chatMessage));
     }
 

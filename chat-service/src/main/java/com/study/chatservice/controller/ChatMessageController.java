@@ -16,7 +16,10 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
@@ -29,8 +32,9 @@ public class ChatMessageController {
     @GetMapping("/chatRooms/{chatRoomId}/chatMessages")
     public ResponseEntity<Page<ChatMessageResponse>> findByChatRoomId(
             @PathVariable Long chatRoomId,
-            @PageableDefault(size = 20, page = 0) Pageable pageable) {
-        return ResponseEntity.ok(chatMessageService.findByChatRoomId(chatRoomId, pageable));
+            @PageableDefault(size = 20, page = 0) Pageable pageable,
+            @RequestParam String lastMessageDate) {
+        return ResponseEntity.ok(chatMessageService.findByChatRoomId(chatRoomId, pageable,lastMessageDate));
     }
 
     /**
