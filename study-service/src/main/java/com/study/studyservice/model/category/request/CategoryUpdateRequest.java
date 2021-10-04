@@ -11,6 +11,6 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class CategoryUpdateRequest {
 
-    @NotBlank
+    @NotBlank(message = "카테고리 이름은 필수 입니다.")
     private String name;
 }

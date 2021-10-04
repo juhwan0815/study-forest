@@ -16,10 +16,10 @@ public class StudySearchRequest {
 
     private Long categoryId;
 
-    @NotNull
+    @NotNull(message = "온라인 여부는 필수입니다.")
     private Boolean online;
 
-    @NotNull
+    @NotNull(message = "오프라인 여부는 필수입니다.")
     private Boolean offline;
 
 }

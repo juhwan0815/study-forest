@@ -2,12 +2,8 @@ package com.study.studyservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.studyservice.config.LoginUserArgumentResolver;
-import com.study.studyservice.domain.StudyStatus;
-import com.study.studyservice.fixture.StudyFixture;
-import com.study.studyservice.model.category.response.CategoryResponse;
-import com.study.studyservice.model.location.response.LocationResponse;
+import com.study.studyservice.model.common.ExceptionResponse;
 import com.study.studyservice.model.study.request.StudyCreateRequest;
-import com.study.studyservice.model.study.request.StudyUpdateRequest;
 import com.study.studyservice.model.study.response.StudyResponse;
 import com.study.studyservice.model.study.response.StudyWithUserResponse;
 import com.study.studyservice.model.studyuser.StudyUserResponse;
@@ -35,15 +31,12 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static com.study.studyservice.fixture.StudyFixture.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -56,7 +49,8 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -91,6 +85,35 @@ class StudyControllerTest {
                         .withRequestDefaults(prettyPrint())
                         .withResponseDefaults(prettyPrint()))
                 .build();
+    }
+
+    @Test
+    @DisplayName("예외 처리 API 테스트")
+    void exception() throws Exception{
+        MockMultipartFile request = new MockMultipartFile("request",
+                "request",
+                MediaType.APPLICATION_JSON_VALUE,
+                objectMapper.writeValueAsString(TEST_STUDY_CREATE_REQUEST_EXCEPTION).getBytes(StandardCharsets.UTF_8));
+
+        Map<String,String> errors = new HashMap<>();
+        errors.put("locationCode","오프라인일 경우 지역코드는 필수입니다.");
+
+        ExceptionResponse exceptionResponse = new ExceptionResponse("잘못된 요청입니다.", errors);
+
+        mockMvc.perform(multipart("/studies").file(TEST_IMAGE_FILE).file(request)
+                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json(objectMapper.writeValueAsString(exceptionResponse)))
+                .andDo(document("study/exception",
+                        responseFields(
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("예외 메세지"),
+                                fieldWithPath("attributes").type(JsonFieldType.OBJECT).description("예외 필드"),
+                                fieldWithPath("attributes.locationCode").type(JsonFieldType.STRING).description("필드 오류")
+                        )
+                ));
+
     }
 
     @Test

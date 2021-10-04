@@ -66,6 +66,10 @@ public class StudyFixture {
     public static final WaitUser TEST_WAIT_USER2 = new WaitUser(2L,4L,TEST_STUDY1);
 
 
+    public static final StudyCreateRequest TEST_STUDY_CREATE_REQUEST_EXCEPTION = new StudyCreateRequest(
+            "테스트 스터디",5,"테스트 스터디 입니다.",Arrays.asList("JPA","스프링"),
+            true,true,null,2L);
+
     public static final StudyCreateRequest TEST_STUDY_CREATE_REQUEST1 = new StudyCreateRequest(
                  "테스트 스터디",5,"테스트 스터디 입니다.",Arrays.asList("JPA","스프링"),
             true,true,"1111054000",2L);

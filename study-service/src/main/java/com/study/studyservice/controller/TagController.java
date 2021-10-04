@@ -31,7 +31,7 @@ public class TagController {
     }
 
     @GetMapping("/tags/name")
-    public ResponseEntity<List<TagResponse>> findByIdIn(TagFindRequest request){
+    public ResponseEntity<List<TagResponse>> findByIdIn(@Valid TagFindRequest request){
         return ResponseEntity.ok(tagService.findByIdIn(request));
     }
 }

@@ -123,7 +123,7 @@ public class StudyServiceImpl implements StudyService {
         Category findCategory = categoryRepository.findWithParentById(request.getCategoryId())
                 .orElseThrow(() -> new CategoryException(request.getCategoryId() + "는 존재하지 않는 카테고리 ID입니다."));
 
-        LocationResponse location = getLocation(request.isOffline(), request.getLocationCode());
+        LocationResponse location = getLocation(request.getOffline(), request.getLocationCode());
 
         List<Tag> tags = tagService.FindAndCreate(request.getTags());
 
@@ -132,8 +132,8 @@ public class StudyServiceImpl implements StudyService {
         Study study = Study.createStudy(request.getName(),
                 request.getNumberOfPeople(),
                 request.getContent(),
-                request.isOnline(),
-                request.isOffline(),
+                request.getOnline(),
+                request.getOffline(),
                 findCategory);
 
         study.addStudyUser(userId, Role.ADMIN);
@@ -159,17 +159,17 @@ public class StudyServiceImpl implements StudyService {
         Category findCategory = categoryRepository.findWithParentById(request.getCategoryId())
                 .orElseThrow(() -> new CategoryException(request.getCategoryId() + "는 존재하지 않는 카테고리입니다."));
 
-        LocationResponse location = getLocation(request.isOffline(), request.getLocationCode());
+        LocationResponse location = getLocation(request.getOffline(), request.getLocationCode());
         List<Tag> tags = tagService.FindAndCreate(request.getTags());
 
-        Image studyImage = updateImage(image, request.isDeleteImage(), findStudy);
+        Image studyImage = updateImage(image, request.getDeleteImage(), findStudy);
 
         findStudy.update(request.getName(),
                 request.getNumberOfPeople(),
                 request.getContent(),
-                request.isOnline(),
-                request.isOffline(),
-                request.isClose(),
+                request.getOnline(),
+                request.getOffline(),
+                request.getClose(),
                 findCategory);
 
         findStudy.changeImage(studyImage);

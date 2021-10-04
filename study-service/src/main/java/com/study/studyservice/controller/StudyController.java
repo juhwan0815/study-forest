@@ -12,11 +12,16 @@ import com.study.studyservice.model.waituser.WaitUserResponse;
 import com.study.studyservice.service.StudyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.MethodParameter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,7 +38,7 @@ public class StudyController {
     @GetMapping("/studies")
     public ResponseEntity<Page<StudyResponse>> search(@LoginUser Long userId,
                                                       @PageableDefault(size = 25,page = 0) Pageable pageable,
-                                                      StudySearchRequest request){
+                                                      @Valid StudySearchRequest request){
         Page<StudyResponse> body = studyService.find(userId, request, pageable);
         return ResponseEntity.ok(body);
     }
@@ -41,7 +46,15 @@ public class StudyController {
     @PostMapping("/studies")
     public ResponseEntity<StudyResponse> create(@LoginUser Long userId,
                                                 @RequestPart(required = false) MultipartFile image,
-                                                @RequestPart @Valid StudyCreateRequest request){
+                                                @RequestPart @Valid StudyCreateRequest request,
+                                                BindingResult bindingResult) throws BindException {
+        if(request.getOffline()){
+            if (!StringUtils.hasText(request.getLocationCode()) || request.getLocationCode() == null){
+                bindingResult.rejectValue("locationCode",null,"오프라인일 경우 지역코드는 필수입니다.");
+                throw new BindException(bindingResult);
+            }
+        }
+
         return ResponseEntity.ok(studyService.create(userId,image,request));
     }
 
@@ -49,7 +62,15 @@ public class StudyController {
     public ResponseEntity<StudyResponse> update(@LoginUser Long userId,
                                                 @PathVariable Long studyId,
                                                 @RequestPart(required = false) MultipartFile image,
-                                                @RequestPart @Valid StudyUpdateRequest request){
+                                                @RequestPart @Valid StudyUpdateRequest request,
+                                                BindingResult bindingResult) throws BindException {
+
+        if(request.getOffline()){
+            if (!StringUtils.hasText(request.getLocationCode()) || request.getLocationCode() == null){
+                bindingResult.rejectValue("locationCode",null,"오프라인일 경우 지역코드는 필수입니다.");
+                throw new BindException(bindingResult);
+            }
+        }
         return ResponseEntity.ok(studyService.update(userId,studyId,image,request));
     }
 
