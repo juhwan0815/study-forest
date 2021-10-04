@@ -49,7 +49,7 @@ public class StudyController {
                                                 @RequestPart @Valid StudyCreateRequest request,
                                                 BindingResult bindingResult) throws BindException {
         if(request.getOffline()){
-            if (!StringUtils.hasText(request.getLocationCode()) || request.getLocationCode() != null){
+            if (!StringUtils.hasText(request.getLocationCode()) || request.getLocationCode() == null){
                 bindingResult.rejectValue("locationCode",null,"오프라인일 경우 지역코드는 필수입니다.");
                 throw new BindException(bindingResult);
             }
@@ -66,7 +66,7 @@ public class StudyController {
                                                 BindingResult bindingResult) throws BindException {
 
         if(request.getOffline()){
-            if (!StringUtils.hasText(request.getLocationCode()) || request.getLocationCode() != null){
+            if (!StringUtils.hasText(request.getLocationCode()) || request.getLocationCode() == null){
                 bindingResult.rejectValue("locationCode",null,"오프라인일 경우 지역코드는 필수입니다.");
                 throw new BindException(bindingResult);
             }
