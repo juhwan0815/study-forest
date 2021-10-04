@@ -22,7 +22,7 @@ public class AuthController {
 
     @PostMapping("/auth")
     public ResponseEntity create(@RequestHeader String kakaoToken,
-                                 @RequestHeader(required = false) String fcmToken){
+                                 @RequestHeader String fcmToken){
 
         CreateTokenResult createTokenResult = authService.login(kakaoToken,fcmToken);
 
