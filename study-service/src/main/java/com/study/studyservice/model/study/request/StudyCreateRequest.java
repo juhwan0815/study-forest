@@ -17,7 +17,7 @@ public class StudyCreateRequest {
 
     @Min(value = 2,message = "참여인원은 최소 2명이어야 합니다.")
     @NotNull(message = "참여인원은 필수입니다.")
-    private int numberOfPeople; // 참여인원
+    private Integer numberOfPeople; // 참여인원
 
     @NotBlank(message = "스터디 설명은 필수입니다.")
     private String content; // 내용
