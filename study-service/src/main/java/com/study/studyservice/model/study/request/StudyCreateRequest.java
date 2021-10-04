@@ -32,7 +32,7 @@ public class StudyCreateRequest {
 
     private String locationCode; // 지역정보
 
-    @NotNull(message = "참여인원은 필수입니다.")
+    @NotNull(message = "카테고리 ID는 필수입니다.")
     @Positive(message = "카테고리 ID는 양수이어야 합니다.")
     private Long categoryId; // 카테고리 ID
 }
