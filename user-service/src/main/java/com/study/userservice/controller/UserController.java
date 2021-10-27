@@ -38,7 +38,7 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponse>> findUserByIdIn(UserFindRequest request){
+    public ResponseEntity<List<UserResponse>> findUserByIdIn(@Valid UserFindRequest request){
         return ResponseEntity.ok(userService.findByIdIn(request));
     }
 
@@ -89,7 +89,7 @@ public class UserController {
     }
 
     @GetMapping("/users/interestTags")
-    public ResponseEntity<List<UserWithTagResponse>> findWithInterestTagsByTagIdList(UserSearchRequest request){
+    public ResponseEntity<List<UserWithTagResponse>> findWithInterestTagsByTagIdList(@Valid UserSearchRequest request){
         return ResponseEntity.ok(userService.findInterestTagByTagIdList(request));
     }
 

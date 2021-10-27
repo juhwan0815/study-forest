@@ -3,8 +3,8 @@ package com.study.userservice.model.user;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.w3c.dom.stylesheets.LinkStyle;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
@@ -12,5 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 public class UserSearchRequest {
 
+    @NotNull(message = "태그 ID 리스트는 필수입니다.")
     private List<Long> tagIdList;
 }

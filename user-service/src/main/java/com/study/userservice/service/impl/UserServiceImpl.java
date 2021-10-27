@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
 
         findUser.changeNickName(request.getNickName());
 
-        Image updateImage = updateImage(image, request.isDeleteImage(), findUser);
+        Image updateImage = updateImage(image, request.getDeleteImage(), findUser);
 
         findUser.changeImage(updateImage);
 
