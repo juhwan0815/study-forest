@@ -2,7 +2,6 @@ package com.study.gatheringservice.controller;
 
 import com.study.gatheringservice.config.LoginUser;
 import com.study.gatheringservice.domain.Shape;
-import com.study.gatheringservice.exception.GatheringException;
 import com.study.gatheringservice.model.gathering.GatheringCreateRequest;
 import com.study.gatheringservice.model.gathering.GatheringResponse;
 import com.study.gatheringservice.model.gathering.GatheringUpdateRequest;
@@ -10,13 +9,14 @@ import com.study.gatheringservice.model.gatheringuser.GatheringUserResponse;
 import com.study.gatheringservice.service.GatheringService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.LazyToOne;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -38,13 +38,17 @@ public class GatheringController {
     @PostMapping("/studies/{studyId}/gatherings")
     public ResponseEntity<GatheringResponse> create(@LoginUser Long userId,
                                                     @PathVariable Long studyId,
-                                                    @RequestBody @Valid GatheringCreateRequest request){
+                                                    @RequestBody @Valid GatheringCreateRequest request,
+                                                    BindingResult bindingResult) throws BindException {
         if(request.getShape() == Shape.OFFLINE){
             if(request.getPlaceName() == null ||!StringUtils.hasText(request.getPlaceName())){
-                throw new GatheringException("오프라인일 경우 장소는 필수 값입니다.");
+                bindingResult.rejectValue("placeName",null,"오프라인일 경우 장소명은 필수입니다.");
+                throw new BindException(bindingResult);
             }
             if(request.getLen() == null || request.getLet() == null){
-                throw new GatheringException("오프라인일 경우 좌표는 필수 값입니다.");
+                bindingResult.rejectValue("len",null,"오프라인일 경우 위도는 필수입니다.");
+                bindingResult.rejectValue("let",null,"오프라인일 경우 경도는 필수입니다.");
+                throw new BindException(bindingResult);
             }
         }
         return ResponseEntity.ok(gatheringService.create(userId,studyId,request));
@@ -53,13 +57,17 @@ public class GatheringController {
     @PatchMapping("/gatherings/{gatheringId}")
     public ResponseEntity<GatheringResponse> update(@LoginUser Long userId,
                                                     @PathVariable Long gatheringId,
-                                                    @RequestBody @Valid GatheringUpdateRequest request){
+                                                    @RequestBody @Valid GatheringUpdateRequest request,
+                                                    BindingResult bindingResult) throws BindException {
         if(request.getShape() == Shape.OFFLINE){
             if(request.getPlaceName() == null ||!StringUtils.hasText(request.getPlaceName())){
-                throw new GatheringException("오프라인일 경우 장소는 필수 값입니다.");
+                bindingResult.rejectValue("placeName",null,"오프라인일 경우 장소명은 필수입니다.");
+                throw new BindException(bindingResult);
             }
             if(request.getLen() == null || request.getLet() == null){
-                throw new GatheringException("오프라인일 경우 좌표는 필수 값입니다.");
+                bindingResult.rejectValue("len",null,"오프라인일 경우 위도는 필수입니다.");
+                bindingResult.rejectValue("let",null,"오프라인일 경우 경도는 필수입니다.");
+                throw new BindException(bindingResult);
             }
         }
         return ResponseEntity.ok(gatheringService.update(userId,gatheringId,request));
