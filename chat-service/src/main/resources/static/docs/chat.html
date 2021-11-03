@@ -932,7 +932,7 @@ Content-Length: 119
 <h5 id="_요청_5"><a class="anchor" href="#_요청_5"></a><a class="link" href="#_요청_5">요청</a></h5>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /chatRooms/1/chatMessages?page=0&amp;size=20 HTTP/1.1
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /chatRooms/1/chatMessages?page=0&amp;size=20&amp;lastMessageDate=2021-09-22T16%3A17%3A49.317410 HTTP/1.1
 Authorization: Bearer 액세스토큰
 Accept: application/json
 Host: localhost:8080</code></pre>
@@ -1002,6 +1002,10 @@ Host: localhost:8080</code></pre>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>size</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">페이지 사이즈</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>lastMessageDate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">채팅방 입장 시간</p></td>
 </tr>
 </tbody>
 </table>

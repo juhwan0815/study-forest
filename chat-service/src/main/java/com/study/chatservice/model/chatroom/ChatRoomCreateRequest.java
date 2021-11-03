@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class ChatRoomCreateRequest {
 
-    @NotBlank
+    @NotBlank(message = "채팅방 이름은 필수입니다.")
     private String name;
 
 }
