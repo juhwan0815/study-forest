@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class LocationSearchRequest {
 
-    @NotBlank
+    @NotBlank(message = "검색어는 필수입니다.")
     private String searchName; // 문자 검색용
 
 }

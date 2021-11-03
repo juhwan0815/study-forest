@@ -49,11 +49,8 @@ public class LocationController {
 
     @GetMapping("/locations/{locationId}/around")
     public ResponseEntity<List<LocationResponse>> around(@PathVariable Long locationId,
-                                                 @RequestParam Integer searchDistance){
+                                                         @RequestParam Integer searchDistance){
         return ResponseEntity.ok(locationService.findAroundById(locationId,searchDistance));
     }
-
-
-
 
 }

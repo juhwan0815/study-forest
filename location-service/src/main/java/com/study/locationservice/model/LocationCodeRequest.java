@@ -11,6 +11,6 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class LocationCodeRequest {
 
-    @NotBlank
+    @NotBlank(message = "지역코드는 필수입니다.")
     private String code;
 }
