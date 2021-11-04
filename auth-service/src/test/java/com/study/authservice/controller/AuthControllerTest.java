@@ -45,6 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthControllerTest {
 
     private final String TEST_AUTHORIZATION = "Bearer 토큰";
+    private final String TEST_FCMTOKEN = "FCM 토큰";
 
     @MockBean
     private AuthService authService;
@@ -74,11 +75,13 @@ class AuthControllerTest {
     @DisplayName("로그인 API 테스트")
     void login() throws Exception {
 
-        given(authService.login(any(),any()))
+        given(authService.login(any(), any()))
                 .willReturn(TEST_CREATE_TOKEN_RESULT);
 
         mockMvc.perform(post("/auth")
-                .header("kakaoToken", "kakaoToken"))
+                        .header("kakaoToken", "kakaoToken")
+                        .header("fcmToken",TEST_FCMTOKEN)
+                )
                 .andExpect(status().isOk())
                 .andExpect(header().string("accessToken", TEST_CREATE_TOKEN_RESULT.getAccessToken()))
                 .andExpect(header().string("refreshToken", TEST_CREATE_TOKEN_RESULT.getRefreshToken()))
@@ -92,7 +95,7 @@ class AuthControllerTest {
                                 headerWithName("refreshToken").description("Refresh 토큰")
                         )));
 
-        then(authService).should(times(1)).login(any(),any());
+        then(authService).should(times(1)).login(any(), any());
     }
 
     @Test
@@ -106,7 +109,7 @@ class AuthControllerTest {
                 .willReturn(1L);
 
         mockMvc.perform(post("/auth/refresh")
-                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
+                        .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
                 .andExpect(header().string("accessToken", TEST_ACCESS_TOKEN))
                 .andDo(document("auth/refresh",
@@ -134,7 +137,7 @@ class AuthControllerTest {
 
         // when
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/auth")
-                .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
+                        .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
                 .andDo(document("auth/delete",
                         requestHeaders(
