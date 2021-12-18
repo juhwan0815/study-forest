@@ -1,18 +1,23 @@
-plugins {
-    id 'java'
-}
-
-group 'com.study'
-version '0.0.1-SNAPSHOT'
-
-repositories {
-    mavenCentral()
+ext {
+    set('springCloudVersion', "2021.0.0")
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    implementation 'org.springframework.cloud:spring-cloud-config-server'
+
+    implementation 'org.springframework.cloud:spring-cloud-starter'
+    implementation 'org.springframework.cloud:spring-cloud-starter-bootstrap'
+    implementation 'org.springframework.cloud:spring-cloud-starter-bus-amqp'
 }
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
 
 test {
     useJUnitPlatform()
