@@ -1,73 +1,163 @@
 plugins {
     id 'org.springframework.boot' version '2.6.1'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'org.asciidoctor.convert' version '1.5.8'
     id 'java'
+    id 'jacoco'
+    id 'org.sonarqube' version '3.0'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 group = 'com.study'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
-
 repositories {
     mavenCentral()
 }
 
-ext {
-    set('snippetsDir', file("build/generated-snippets"))
-    set('springCloudVersion', "2021.0.0")
+bootJar {
+    enabled = false
 }
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    implementation 'org.springframework.cloud:spring-cloud-bus'
-    implementation 'org.springframework.cloud:spring-cloud-config-server'
-    implementation 'org.springframework.cloud:spring-cloud-sleuth-zipkin'
-    implementation 'org.springframework.cloud:spring-cloud-starter'
-    implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j'
-    implementation 'org.springframework.cloud:spring-cloud-starter-config'
-    implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-    implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
-    implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka'
-    implementation 'org.springframework.kafka:spring-kafka'
-    compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'com.h2database:h2'
-    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
-    runtimeOnly 'mysql:mysql-connector-java'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'io.projectreactor:reactor-test'
-    testImplementation 'org.springframework.kafka:spring-kafka-test'
-    testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient'
+jar {
+    enabled = true
 }
 
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+subprojects {
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'java'
+    apply plugin: 'jacoco'
+    apply plugin: 'org.sonarqube'
+    apply plugin: 'org.asciidoctor.jvm.convert'
+
+    group = 'com.study'
+    version = '0.0.1-SNAPSHOT'
+    sourceCompatibility = '1.8'
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
     }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+//        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//        implementation 'org.springframework.boot:spring-boot-starter-actuator'
+//        implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+//        implementation 'org.springframework.boot:spring-boot-starter-mail'
+//        implementation 'org.springframework.boot:spring-boot-starter-validation'
+//        implementation 'org.springframework.boot:spring-boot-starter-webflux'
+//        implementation 'org.springframework.boot:spring-boot-starter-websocket'
+//        implementation 'org.springframework.cloud:spring-cloud-config-server'
+//        implementation 'org.springframework.cloud:spring-cloud-sleuth-zipkin'
+//        implementation 'org.springframework.cloud:spring-cloud-starter'
+//        implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j'
+//        implementation 'org.springframework.cloud:spring-cloud-starter-config'
+//        implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
+//        implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+//        implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+//        implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+//        implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+//        implementation 'org.springframework.cloud:spring-cloud-stream-binder-kafka'
+//        implementation 'org.springframework.kafka:spring-kafka'
+//        runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+//        runtimeOnly 'com.h2database:h2'
+//        runtimeOnly 'mysql:mysql-connector-java'
+
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        testCompileOnly 'org.projectlombok:lombok'
+        testAnnotationProcessor 'org.projectlombok:lombok'
+
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+//        testImplementation 'org.springframework.kafka:spring-kafka-test'
+//        testImplementation 'io.projectreactor:reactor-test'
+//        testImplementation 'org.springframework.restdocs:spring-restdocs-webtestclient'
+    }
+
+    test {
+        useJUnitPlatform()
+        finalizedBy 'jacocoTestReport'
+    }
+
+    jacoco {
+        toolVersion = '0.8.7'
+    }
+
+    jacocoTestReport {
+        reports {
+            html.enabled true
+            csv.enabled false
+            xml.enabled true
+        }
+
+        def Qdomains = []
+
+        for (qPattern in '**/QA'..'**/QZ') { // qPattern = '**/QA', '**/QB', ... '*.QZ'
+            Qdomains.add(qPattern + '*')
+        }
+
+        // 여기부터
+        afterEvaluate {
+            classDirectories.setFrom(
+                    files(classDirectories.files.collect {
+                        fileTree(dir: it, excludes: [] + Qdomains)
+                    })
+            )
+        }
+
+        finalizedBy 'jacocoTestCoverageVerification'
+    }
+
+    jacocoTestCoverageVerification {
+        def Qdomains = []
+
+        for (qPattern in '*.QA'..'*.QZ') { // qPattern = '*.QA', '*.QB', ... '*.QZ'
+            Qdomains.add(qPattern + '*')
+        }
+
+        violationRules {
+            rule {
+                enabled = true
+                element = 'CLASS'
+
+                limit {
+                    counter = 'LINE'
+                    value = 'COVEREDRATIO'
+                    minimum = 0.00
+                }
+
+                limit {
+                    counter = 'BRANCH'
+                    value = 'COVEREDRATIO'
+                    minimum = 0.00
+                }
+
+                excludes = [] + Qdomains
+            }
+        }
+    }
+
+    sonarqube {
+        properties {
+            property 'sonar.host.url', 'http://localhost:9000'
+            property 'sonar.login', '7068308d5ae55aa7e0efb227b6598723ecfcbd0b'
+            property 'sonar.sources', 'src'
+            property 'sonar.language', 'java'
+            property 'sonar.projectVersion', '1.1.0-SNAPSHOT'
+            property 'sonar.sourceEncoding', 'UTF-8'
+            property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+            property "sonar.java.binaries", "${buildDir}/classes"
+            property 'sonar.test.inclusions', '**/*Test.java'
+            property 'sonar.exclusions', '**/test/**, **/Q*.java, **/*Doc*.java, **/resources/**'
+        }
+    }
+
 }
 
-test {
-    outputs.dir snippetsDir
-    useJUnitPlatform()
-}
-
-asciidoctor {
-    inputs.dir snippetsDir
-    dependsOn test
-}
