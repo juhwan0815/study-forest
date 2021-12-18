@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: location-service
+    name: area-service
 
   zipkin:
     base-url: http://127.0.0.1:9411
@@ -24,8 +24,8 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        #        default_batch_fetch_size: 1000
-        #      show_sql: true
+        default_batch_fetch_size: 1000
+#        show_sql: true
         format_sql: true
     open-in-view: false
 
