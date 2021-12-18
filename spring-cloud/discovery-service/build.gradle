@@ -1,17 +1,15 @@
-plugins {
-    id 'java'
+ext {
+    set('springCloudVersion', "2021.0.0")
 }
 
-group 'com.study'
-version '0.0.1-SNAPSHOT'
-
-repositories {
-    mavenCentral()
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
 }
 
 test {
