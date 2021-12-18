@@ -159,5 +159,17 @@ subprojects {
         }
     }
 
+
+     project(':microservices') {
+         bootJar {
+             enabled = false
+         }
+    }
+
+    project(':spring-cloud') {
+        bootJar {
+            enabled = false
+        }
+    }
 }
 
