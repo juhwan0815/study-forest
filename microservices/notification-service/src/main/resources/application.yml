@@ -1,0 +1,86 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: notification-service
+
+  zipkin:
+    base-url: http://127.0.0.1:9411
+    enabled: true
+  sleuth:
+    sampler:
+      probability: 1.0
+
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+      path: /h2-console
+
+  jpa:
+    #    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        default_batch_fetch_size: 1000
+#        show_sql: false
+        format_sql: true
+    open-in-view: false
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://127.0.0.1:8761/eureka
+
+kafka:
+  server: 127.0.0.1:9092
+  topic:
+    user:
+      delete: user-delete-topic
+    study:
+      create: study-create-topic
+    studyApply:
+      success: study-apply-success-topic
+      fail: study-apply-fail-topic
+    gathering:
+      create: gathering-create-topic
+    chat:
+      create: chat-create-topic
+  consumer:
+    user:
+      delete: user-delete-consumer-group1
+    study:
+      create: study-create-consumer-group
+    studyApply:
+      success: study-apply-success-consumer-group1
+      fail: study-apply-fail-consumer-group1
+    gathering:
+      create: gathering-create-consumer-group
+    chat:
+      create: chat-create-consumer-group
+
+fcm:
+  tempFilePath: study-forest-firebase-adminsdk-fn2ez-6f5e36d81f.json
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans, busrefresh, info, metrics, prometheus
+
+logging:
+  level:
+    org.hibernate.SQL: debug
