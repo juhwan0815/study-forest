@@ -1,6 +1,5 @@
 package com.study.controller;
 
-import com.study.client.KakaoClient;
 import com.study.dto.TokenResponse;
 import com.study.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/login")
+    @PostMapping("/social/login")
     public ResponseEntity auth(@RequestHeader String kakaoToken, @RequestHeader String fcmToken) {
 
         TokenResponse token = authService.login(kakaoToken, fcmToken);
@@ -26,6 +25,7 @@ public class AuthController {
                 .header("refreshToken", token.getRefreshToken())
                 .build();
     }
+
 
 
 }
