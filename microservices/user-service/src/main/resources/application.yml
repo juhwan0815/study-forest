@@ -81,3 +81,8 @@ management:
 logging:
   level:
     org.hibernate.SQL: debug
+
+social:
+  kakao:
+    url:
+      profile: https://kapi.kakao.com/v2/user/me
