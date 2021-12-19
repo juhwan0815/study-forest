@@ -54,4 +54,7 @@ public class User extends BaseEntity {
     }
 
 
+    public void changeFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
 }

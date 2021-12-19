@@ -4,9 +4,7 @@ import com.study.dto.UserResponse;
 import com.study.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,4 +16,10 @@ public class UserController {
     public ResponseEntity<UserResponse> create(@RequestHeader String kakaoToken) {
         return ResponseEntity.ok(userService.create(kakaoToken));
     }
+
+    @PostMapping("/users/{kakaoId}")
+    public ResponseEntity<UserResponse> login(@PathVariable Long kakaoId, @RequestHeader String fcmToken) {
+        return ResponseEntity.ok(userService.findByKakaoId(kakaoId, fcmToken));
+    }
+
 }

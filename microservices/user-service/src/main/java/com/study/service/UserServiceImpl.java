@@ -25,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private final UserQueryRepository userQueryRepository;
 
     @Override
+    @Transactional
     public UserResponse create(String kakaoToken) {
         KakaoProfile kakaoProfile = kakaoClient.getKakaoProfile(kakaoToken);
 
@@ -38,5 +39,15 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         return UserResponse.from(user);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse findByKakaoId(Long kakaoId, String fcmToken) {
+        User findUser = userRepository.findByKakaoId(kakaoId)
+                .orElseThrow(() -> new RuntimeException(""));
+
+        findUser.changeFcmToken(fcmToken);
+        return UserResponse.from(findUser);
     }
 }
