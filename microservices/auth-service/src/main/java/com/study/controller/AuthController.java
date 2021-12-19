@@ -1,5 +1,6 @@
 package com.study.controller;
 
+import com.study.config.LoginUser;
 import com.study.dto.TokenResponse;
 import com.study.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/social/login")
-    public ResponseEntity auth(@RequestHeader String kakaoToken, @RequestHeader String fcmToken) {
+    public ResponseEntity socialLogin(@RequestHeader String kakaoToken, @RequestHeader String fcmToken) {
 
         TokenResponse token = authService.login(kakaoToken, fcmToken);
 
@@ -24,6 +25,17 @@ public class AuthController {
                 .header("accessToken", token.getAccessToken())
                 .header("refreshToken", token.getRefreshToken())
                 .build();
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity refresh(@LoginUser Long userId, @RequestHeader("Authorization") String refreshToken){
+        TokenResponse token = authService.refresh(userId, refreshToken.substring(7));
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("accessToken", token.getAccessToken())
+                .header("refreshToken", token.getRefreshToken())
+                .build();
+
     }
 
 
