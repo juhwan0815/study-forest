@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 
+import static com.study.client.KakaoClientImpl.KAKAO_PROFILE_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -36,18 +37,18 @@ class KakaoClientTest {
         // given
         KakaoProfile.Properties properties =
                 new KakaoProfile.Properties("황주환", "이미지", "이미지");
-
         KakaoProfile.KakaoAccount kakaoAccount =
                 new KakaoProfile.KakaoAccount("10~19", "male");
-
         KakaoProfile kakaoProfile = new KakaoProfile(1L, properties, kakaoAccount);
 
-        mockServer.expect(requestTo("https://kapi.kakao.com/v2/user/me"))
+        mockServer.expect(requestTo(KAKAO_PROFILE_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(objectMapper.writeValueAsString(kakaoProfile), MediaType.APPLICATION_JSON));
 
+        // when
         KakaoProfile result = kakaoClient.getKakaoProfile("kakaoToken");
 
+        // then
         assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getKakao_account().getAge_range()).isEqualTo(kakaoAccount.getAge_range());
         assertThat(result.getKakao_account().getGender()).isEqualTo(kakaoAccount.getGender());
@@ -59,9 +60,8 @@ class KakaoClientTest {
     @Test
     @DisplayName("예외 테스트 : 200 응답이 아닐 경우 예외가 발생한다.")
     void ifNotSuccessResponse() throws JsonProcessingException {
-
         // given
-        mockServer.expect(requestTo("https://kapi.kakao.com/v2/user/me"))
+        mockServer.expect(requestTo(KAKAO_PROFILE_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.CREATED));
 
