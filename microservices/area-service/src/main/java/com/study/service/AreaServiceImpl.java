@@ -2,6 +2,7 @@ package com.study.service;
 
 import com.study.domain.Area;
 import com.study.dto.AreaCreateRequest;
+import com.study.dto.AreaResponse;
 import com.study.repository.AreaQueryRepository;
 import com.study.repository.AreaRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,4 +29,13 @@ public class AreaServiceImpl implements AreaService{
             areaRepository.save(area);
         });
     }
+
+    @Override
+    public AreaResponse findById(Long areaId) {
+        Area area = areaRepository.findById(areaId)
+                .orElseThrow(() -> new RuntimeException(""));
+        return AreaResponse.from(area);
+    }
+
+
 }
