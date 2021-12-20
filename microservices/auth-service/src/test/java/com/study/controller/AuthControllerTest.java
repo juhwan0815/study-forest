@@ -41,6 +41,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(AuthController.class)
 class AuthControllerTest {
 
+    private static final String TEST_AUTHORIZATION = "bearer **" ;
+
     @MockBean
     private AuthService authService;
 
@@ -83,12 +85,12 @@ class AuthControllerTest {
                 .andExpect(header().string("refreshToken", "refreshToken"))
                 .andDo(document("auth/social/login",
                         requestHeaders(
-                                headerWithName("kakaoToken").description("카카오 토큰"),
-                                headerWithName("fcmToken").optional().description("FCM 토큰, 필수값 X")
+                                headerWithName("kakaoToken").description("kakaoToken"),
+                                headerWithName("fcmToken").description("fcmToken")
                         ),
                         responseHeaders(
-                                headerWithName("accessToken").description("Access 토큰"),
-                                headerWithName("refreshToken").description("Refresh 토큰")
+                                headerWithName("accessToken").description("AccessToken"),
+                                headerWithName("refreshToken").description("RefreshToken")
                         )));
 
         then(authService).should(times(1)).login(any(), any());
@@ -108,7 +110,7 @@ class AuthControllerTest {
 
 
         mockMvc.perform(post("/refresh")
-                        .header("Authorization", "refreshToken"))
+                        .header("Authorization", TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
                 .andExpect(header().string("accessToken", "accessToken"))
                 .andExpect(header().string("refreshToken", "refreshToken"))
@@ -117,8 +119,8 @@ class AuthControllerTest {
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("RefreshToken")
                         ),
                         responseHeaders(
-                                headerWithName("accessToken").description("Access 토큰"),
-                                headerWithName("refreshToken").description("Refresh 토큰")
+                                headerWithName("accessToken").description("AccessToken"),
+                                headerWithName("refreshToken").description("RefreshToken")
                         )));
 
         then(authService).should(times(1)).refresh(any(), any());
