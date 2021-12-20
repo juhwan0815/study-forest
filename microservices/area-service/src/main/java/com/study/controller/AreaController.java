@@ -1,10 +1,7 @@
 package com.study.controller;
 
 import com.study.domain.Area;
-import com.study.dto.AreaCodeRequest;
-import com.study.dto.AreaCreateRequest;
-import com.study.dto.AreaResponse;
-import com.study.dto.AreaSearchRequest;
+import com.study.dto.*;
 import com.study.service.AreaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -46,7 +43,9 @@ public class AreaController {
         return ResponseEntity.ok(areaService.findByCode(request));
     }
 
-
-
-
+    @GetMapping("/areas/{areaId}/around")
+    public ResponseEntity<List<AreaResponse>> findAroundById(@PathVariable Long areaId,
+                                                             @Valid AreaAroundRequest request) {
+        return ResponseEntity.ok(areaService.findAroundById(areaId, request));
+    }
 }

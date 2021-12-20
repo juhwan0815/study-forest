@@ -1,10 +1,7 @@
 package com.study.service;
 
 import com.study.domain.Area;
-import com.study.dto.AreaCodeRequest;
-import com.study.dto.AreaCreateRequest;
-import com.study.dto.AreaResponse;
-import com.study.dto.AreaSearchRequest;
+import com.study.dto.*;
 import com.study.repository.AreaQueryRepository;
 import com.study.repository.AreaRepository;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +50,16 @@ public class AreaServiceImpl implements AreaService {
         Area findArea = areaRepository.findByCode(request.getCode())
                 .orElseThrow(() -> new RuntimeException());
         return AreaResponse.from(findArea);
+    }
+
+    @Override
+    public List<AreaResponse> findAroundById(Long areaId, AreaAroundRequest request) {
+        Area findArea = areaRepository.findById(areaId)
+                .orElseThrow(() -> new RuntimeException(""));
+        List<Area> aroundAreas = areaQueryRepository.findAroundByArea(findArea, request.getSearchDistance());
+        return aroundAreas.stream()
+                .map(area -> AreaResponse.from(area))
+                .collect(Collectors.toList());
     }
 
 
