@@ -14,6 +14,8 @@ public class AreaResponse {
 
     private String code;
 
+    private String city;
+
     private String gu;
 
     private String dong;
@@ -27,7 +29,7 @@ public class AreaResponse {
     private String codeType;
 
     public static AreaResponse from(Area area){
-        return new AreaResponse(area.getId(), area.getCode(), area.getGu(), area.getDong(),
+        return new AreaResponse(area.getId(), area.getCode(), area.getCity(), area.getGu(), area.getDong(),
                                 area.getRi(), area.getLet(), area.getLen(), area.getCodeType());
     }
 }
