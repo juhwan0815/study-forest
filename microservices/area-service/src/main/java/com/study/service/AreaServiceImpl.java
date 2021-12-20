@@ -3,13 +3,17 @@ package com.study.service;
 import com.study.domain.Area;
 import com.study.dto.AreaCreateRequest;
 import com.study.dto.AreaResponse;
+import com.study.dto.AreaSearchRequest;
 import com.study.repository.AreaQueryRepository;
 import com.study.repository.AreaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +39,12 @@ public class AreaServiceImpl implements AreaService{
         Area area = areaRepository.findById(areaId)
                 .orElseThrow(() -> new RuntimeException(""));
         return AreaResponse.from(area);
+    }
+
+    @Override
+    public Slice<AreaResponse> findByDongOrRi(AreaSearchRequest request, Pageable pageable) {
+        Slice<Area> areas = areaRepository.findByDongContainsOrRiContainsOrderById(request.getSearchWord(), request.getSearchWord());
+        return areas.map(area -> AreaResponse.from(area));
     }
 
 

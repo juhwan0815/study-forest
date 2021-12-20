@@ -10,5 +10,4 @@ public class AreaQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-
 }
