@@ -86,8 +86,10 @@ class AuthServiceTest {
     @DisplayName("refresh 토큰으로 accessToken 과 refreshToken 을 갱신한다.")
     void refreshAccessTokenAndRefreshToken() {
         // given
+        Auth auth = Auth.createAuth(1L, "refreshToken", 5L);
+
         given(authRepository.findById(any()))
-                .willReturn(Optional.of(TEST_AUTH));
+                .willReturn(Optional.of(auth));
 
         given(jwtUtils.createToken(any(), any()))
                 .willReturn("accessToken")
@@ -138,9 +140,11 @@ class AuthServiceTest {
     @Test
     @DisplayName("예외 테스트 : refreshToken 이 일치하지 않을 경우 예외가 발생한다.")
     void ifNotMatchRefreshToken(){
+        Auth auth = Auth.createAuth(1L, "refreshToken1", 30L);
+
         // given
         given(authRepository.findById(any()))
-                .willReturn(Optional.of(TEST_AUTH));
+                .willReturn(Optional.of(auth));
 
         // when
         assertThrows(RuntimeException.class, () -> authService.refresh(1L, "refreshToken"));
