@@ -1,0 +1,81 @@
+:basedir: {docdir}
+:snippets: {basedir}/build/generated-snippets
+
+= 지역 서비스 API
+:doctype: area
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectnums:
+:sectlinks:
+:sectanchors:
+
+지역 서비스 요청 URL
+Gateway-service 주소 : 포트 + /area-service
+
+[[api]]
+==== 지역정보 저장 API - ADMIN
+
+===== 요청
+include::{snippets}/area/create/http-request.adoc[]
+====== Header
+include::{snippets}/area/create/request-headers.adoc[]
+====== Body
+include::{snippets}/area/create/request-fields.adoc[]
+
+===== 응답
+include::{snippets}/area/create/http-response.adoc[]
+
+==== 지역 ID 조회 API
+===== 요청
+include::{snippets}/area/findById/http-request.adoc[]
+====== Header
+include::{snippets}/area/findById/request-headers.adoc[]
+====== Path
+include::{snippets}/area/findById/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/area/findById/http-response.adoc[]
+====== Body
+include::{snippets}/area/findById/response-fields.adoc[]
+
+==== 지역 검색어 조회 API
+===== 요청
+include::{snippets}/area/findByDongOrRi/http-request.adoc[]
+====== Header
+include::{snippets}/area/findByDongOrRi/request-headers.adoc[]
+====== Param
+include::{snippets}/area/findByDongOrRi/request-parameters.adoc[]
+
+===== 응답
+include::{snippets}/area/findByDongOrRi/http-response.adoc[]
+====== Body
+include::{snippets}/area/findByDongOrRi/response-fields.adoc[]
+
+==== 지역 코드 조회 API
+===== 요청
+include::{snippets}/area/findByCode/http-request.adoc[]
+====== Header
+include::{snippets}/area/findByCode/request-headers.adoc[]
+====== Param
+include::{snippets}/area/findByCode/request-parameters.adoc[]
+
+===== 응답
+include::{snippets}/area/findByCode/http-response.adoc[]
+====== Body
+include::{snippets}/area/findByCode/response-fields.adoc[]
+
+==== 지역 ID 주변동네 조회 API
+===== 요청
+include::{snippets}/area/findAroundById/http-request.adoc[]
+====== Header
+include::{snippets}/area/findAroundById/request-headers.adoc[]
+====== Path
+include::{snippets}/area/findAroundById/path-parameters.adoc[]
+====== Param
+include::{snippets}/area/findAroundById/request-parameters.adoc[]
+===== 응답
+include::{snippets}/area/findAroundById/http-response.adoc[]
+====== Body
+include::{snippets}/area/findAroundById/response-fields.adoc[]
