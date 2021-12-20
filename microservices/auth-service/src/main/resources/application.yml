@@ -31,11 +31,6 @@ eureka:
     service-url:
       defaultZone: http://127.0.0.1:8761/eureka
 
-social:
-  kakao:
-    url:
-      profile: https://kapi.kakao.com/v2/user/me
-
 management:
   endpoints:
     web:

@@ -2,6 +2,7 @@ package com.study.service;
 
 import com.study.client.KakaoClient;
 import com.study.client.UserServiceClient;
+import com.study.domain.Auth;
 import com.study.dto.KakaoProfile;
 import com.study.dto.TokenResponse;
 import com.study.dto.UserResponse;
@@ -34,27 +35,31 @@ public class AuthServiceImpl implements AuthService {
 
         UserResponse user = userServiceClient.loginByKakaoId(kakaoProfile.getId(), fcmToken);
 
-        String accessToken = jwtUtils.createToken(user.getUserId(), user.getRole(), user.getNickName(), Long.valueOf(accessTokenExpirationTime));
-        String refreshToken = jwtUtils.createToken(user.getUserId(), user.getRole(), user.getNickName(), Long.valueOf(refreshTokenExpirationTime));
+        String accessToken = jwtUtils.createToken(user.getUserId(), user.getRole(), user.getNickName(), accessTokenExpirationTime);
+        String refreshToken = jwtUtils.createToken(user.getUserId(), user.getRole(), user.getNickName(), refreshTokenExpirationTime);
 
-        authRepository.saveRefreshToken(String.valueOf(user.getUserId()), refreshToken);
+        Auth auth = Auth.createAuth(user.getUserId(), refreshToken, 30L);
+        authRepository.save(auth);
         return new TokenResponse(accessToken, refreshToken);
     }
 
     @Override
     public TokenResponse refresh(Long userId, String refreshToken) {
-        String saveRefreshToken = authRepository.findRefreshTokenByUserId(String.valueOf(userId));
+        Auth findAuth = authRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException(""));
 
-        if(!refreshToken.equals(saveRefreshToken)){
+        if(!refreshToken.equals(findAuth.getRefreshToken())){
             throw new RuntimeException();
         }
 
-        String accessToken = jwtUtils.createToken(userId, jwtUtils.getRole(refreshToken), jwtUtils.getNickName(refreshToken), Long.valueOf(accessTokenExpirationTime));
+        String accessToken = jwtUtils.createToken(refreshToken, accessTokenExpirationTime);
 
         String newRefreshToken = null;
-        if (authRepository.getExpireIn7Days(String.valueOf(userId))){
-            newRefreshToken = jwtUtils.createToken(userId, jwtUtils.getRole(refreshToken), jwtUtils.getNickName(refreshToken), Long.valueOf(refreshTokenExpirationTime));
-            authRepository.saveRefreshToken(String.valueOf(userId), newRefreshToken);
+        if (findAuth.getExpiration() < 7) {
+            newRefreshToken = jwtUtils.createToken(refreshToken, refreshTokenExpirationTime);
+
+            Auth auth = Auth.createAuth(userId, newRefreshToken, 30L);
+            authRepository.save(auth);
         }
         return new TokenResponse(accessToken, newRefreshToken);
     }

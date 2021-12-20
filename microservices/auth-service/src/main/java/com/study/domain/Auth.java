@@ -1,0 +1,33 @@
+package com.study.domain;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.TimeToLive;
+
+import java.util.concurrent.TimeUnit;
+
+@RedisHash("auth")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Auth {
+
+    @Id
+    private Long userId;
+
+    private String refreshToken;
+
+    @TimeToLive(unit = TimeUnit.DAYS)
+    private Long expiration;
+
+    public static Auth createAuth(Long userId, String refreshToken, Long expiration){
+        Auth auth = new Auth();
+        auth.userId = userId;
+        auth.refreshToken = refreshToken;
+        auth.expiration = expiration;
+        return auth;
+    }
+
+}

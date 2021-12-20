@@ -1,11 +1,7 @@
 package com.study.repository;
 
-public interface AuthRepository {
+import com.study.domain.Auth;
+import org.springframework.data.repository.CrudRepository;
 
-    void saveRefreshToken(String userId, String refreshToken);
-
-    String findRefreshTokenByUserId(String userId);
-
-    boolean getExpireIn7Days(String userId);
-
+public interface AuthRepository extends CrudRepository<Auth, Long> {
 }
