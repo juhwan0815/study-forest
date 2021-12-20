@@ -1,0 +1,40 @@
+:basedir: {docdir}
+:snippets: {basedir}/build/generated-snippets
+
+= 인증 서비스 API
+:doctype: auth
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectnums:
+:sectlinks:
+:sectanchors:
+
+인증서비스 요청 URL
+Gateway-service 주소 : 포트 + /auth-service
+
+
+[[api]]
+==== 카카오 로그인 API
+===== 요청
+include::{snippets}/auth/social/login/http-request.adoc[]
+====== Header
+include::{snippets}/auth/social/login/request-headers.adoc[]
+
+===== 응답
+include::{snippets}/auth/social/login/http-response.adoc[]
+====== Header
+include::{snippets}/auth/social/login/response-headers.adoc[]
+
+==== 토큰 재발급 API
+===== 요청
+include::{snippets}/auth/refresh/http-request.adoc[]
+====== Header
+include::{snippets}/auth/refresh/request-headers.adoc[]
+
+===== 응답
+include::{snippets}/auth/refresh/http-response.adoc[]
+====== Header
+include::{snippets}/auth/refresh/response-headers.adoc[]
+
