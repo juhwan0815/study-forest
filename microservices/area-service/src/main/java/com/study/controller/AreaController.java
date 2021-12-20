@@ -1,6 +1,7 @@
 package com.study.controller;
 
 import com.study.domain.Area;
+import com.study.dto.AreaCodeRequest;
 import com.study.dto.AreaCreateRequest;
 import com.study.dto.AreaResponse;
 import com.study.dto.AreaSearchRequest;
@@ -39,6 +40,13 @@ public class AreaController {
                                                               @PageableDefault(size = 50) Pageable pageable) {
         return ResponseEntity.ok(areaService.findByDongOrRi(request, pageable));
     }
+
+    @GetMapping("/areas/code")
+    public ResponseEntity<AreaResponse> findByCode(@Valid AreaCodeRequest request) {
+        return ResponseEntity.ok(areaService.findByCode(request));
+    }
+
+
 
 
 }

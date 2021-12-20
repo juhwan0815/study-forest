@@ -1,5 +1,6 @@
 package com.study.service;
 
+import com.study.dto.AreaCodeRequest;
 import com.study.dto.AreaCreateRequest;
 import com.study.dto.AreaResponse;
 import com.study.dto.AreaSearchRequest;
@@ -16,4 +17,6 @@ public interface AreaService {
     AreaResponse findById(Long areaId);
 
     Slice<AreaResponse> findByDongOrRi(AreaSearchRequest request, Pageable pageable);
+
+    AreaResponse findByCode(AreaCodeRequest request);
 }
