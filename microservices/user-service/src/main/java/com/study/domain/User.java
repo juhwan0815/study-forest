@@ -24,6 +24,8 @@ public class User extends BaseEntity {
 
     private String ageRange; // 나이대
 
+    private String gender; // 성별
+
     @Enumerated(EnumType.STRING)
     private UserRole role; // 권한
 
@@ -39,11 +41,12 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserKeyword> userKeywords = new ArrayList<>(); // 회원의 키워드들
 
-    public static User createUser(Long kakaoId, String nickName, String ageRange, UserRole role) {
+    public static User createUser(Long kakaoId, String nickName, String ageRange, String gender, UserRole role) {
         User user = new User();
         user.kakaoId = kakaoId;
         user.nickName = nickName;
         user.ageRange = ageRange;
+        user.gender = ageRange;
         user.role = role;
         user.searchDistance = 3;
         return user;
@@ -53,8 +56,11 @@ public class User extends BaseEntity {
         this.image = image;
     }
 
-
     public void changeFcmToken(String fcmToken) {
         this.fcmToken = fcmToken;
+    }
+
+    public void changeProfile(String nickName) {
+        this.nickName = nickName;
     }
 }

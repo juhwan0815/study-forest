@@ -4,20 +4,24 @@ import com.google.gson.Gson;
 import com.study.dto.KakaoProfile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Component
-@RequiredArgsConstructor
 public class KakaoClientImpl implements KakaoClient {
 
     private final RestTemplate restTemplate;
     private final Gson gson;
 
-    @Value("${social.kakao.url.profile}")
-    private String kakaoProfileUrl;
+    private static final String KAKAO_PROFILE_URL = "https://kapi.kakao.com/v2/user/me";
+
+    public KakaoClientImpl(RestTemplateBuilder restTemplateBuilder, Gson gson) {
+        this.restTemplate = restTemplateBuilder.build();
+        this.gson = gson;
+    }
 
     @Override
     public KakaoProfile getKakaoProfile(String kakaoToken) {
@@ -28,7 +32,7 @@ public class KakaoClientImpl implements KakaoClient {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(null, headers);
 
-        ResponseEntity<String> response = restTemplate.postForEntity(kakaoProfileUrl, request, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(KAKAO_PROFILE_URL, request, String.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
             return gson.fromJson(response.getBody(), KakaoProfile.class);
