@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserUpdateRequest {
+public class UserUpdateDistanceRequest {
 
-    private String nickName;
+    private Integer distance;
 }

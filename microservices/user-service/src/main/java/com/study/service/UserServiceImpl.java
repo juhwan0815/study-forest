@@ -7,7 +7,8 @@ import com.study.domain.User;
 import com.study.domain.UserRole;
 import com.study.dto.KakaoProfile;
 import com.study.dto.UserResponse;
-import com.study.dto.UserUpdateRequest;
+import com.study.dto.UserUpdateDistanceRequest;
+import com.study.dto.UserUpdateNickNameRequest;
 import com.study.repository.UserQueryRepository;
 import com.study.repository.UserRepository;
 import com.study.util.ImageUtil;
@@ -76,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponse updateProfile(Long userId, UserUpdateRequest request) {
+    public UserResponse updateProfile(Long userId, UserUpdateNickNameRequest request) {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException(""));
 
@@ -92,6 +93,26 @@ public class UserServiceImpl implements UserService {
         userRepository.delete(findUser);
 
         // TODO 회원탈퇴 Kafka
+    }
+
+    @Override
+    @Transactional
+    public UserResponse updateArea(Long userId, Long areaId) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException(""));
+
+        findUser.changeArea(areaId);
+        return UserResponse.from(findUser);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse updateDistance(Long userId, UserUpdateDistanceRequest request) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException(""));
+
+        findUser.changeDistance(request.getDistance());
+        return UserResponse.from(findUser);
     }
 
 }

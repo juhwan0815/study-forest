@@ -1,7 +1,8 @@
 package com.study.service;
 
 import com.study.dto.UserResponse;
-import com.study.dto.UserUpdateRequest;
+import com.study.dto.UserUpdateDistanceRequest;
+import com.study.dto.UserUpdateNickNameRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
@@ -14,7 +15,11 @@ public interface UserService {
 
     UserResponse updateImage(Long userId, MultipartFile image);
 
-    UserResponse updateProfile(Long userId, UserUpdateRequest request);
+    UserResponse updateProfile(Long userId, UserUpdateNickNameRequest request);
 
     void delete(Long userId);
+
+    UserResponse updateArea(Long userId, Long areaId);
+
+    UserResponse updateDistance(Long userId, UserUpdateDistanceRequest request);
 }

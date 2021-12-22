@@ -36,7 +36,7 @@ public class User extends BaseEntity {
 
     private Long areaId; // 지역 ID
 
-    private Integer searchDistance; // 검색 거리
+    private Integer distance; // 검색 거리
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserKeyword> userKeywords = new ArrayList<>(); // 회원의 키워드들
@@ -48,7 +48,7 @@ public class User extends BaseEntity {
         user.ageRange = ageRange;
         user.gender = ageRange;
         user.role = role;
-        user.searchDistance = 3;
+        user.distance = 3;
         return user;
     }
 
@@ -62,5 +62,13 @@ public class User extends BaseEntity {
 
     public void changeProfile(String nickName) {
         this.nickName = nickName;
+    }
+
+    public void changeArea(Long areaId) {
+        this.areaId = areaId;
+    }
+
+    public void changeDistance(Integer distance) {
+        this.distance = distance;
     }
 }
