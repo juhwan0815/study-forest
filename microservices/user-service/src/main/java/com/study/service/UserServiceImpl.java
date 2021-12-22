@@ -2,13 +2,15 @@ package com.study.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.study.client.KakaoClient;
+import com.study.client.KakaoProfile;
 import com.study.domain.Image;
 import com.study.domain.User;
 import com.study.domain.UserRole;
-import com.study.dto.KakaoProfile;
-import com.study.dto.UserResponse;
-import com.study.dto.UserUpdateDistanceRequest;
-import com.study.dto.UserUpdateNickNameRequest;
+import com.study.dto.keyword.KeywordCreateRequest;
+import com.study.dto.keyword.KeywordResponse;
+import com.study.dto.user.UserResponse;
+import com.study.dto.user.UserUpdateDistanceRequest;
+import com.study.dto.user.UserUpdateNickNameRequest;
 import com.study.repository.UserQueryRepository;
 import com.study.repository.UserRepository;
 import com.study.util.ImageUtil;
@@ -17,12 +19,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
-    private final AmazonS3Client amazonS3Client;
     private final KakaoClient kakaoClient;
     private final UserRepository userRepository;
     private final UserQueryRepository userQueryRepository;
@@ -113,6 +117,28 @@ public class UserServiceImpl implements UserService {
 
         findUser.changeDistance(request.getDistance());
         return UserResponse.from(findUser);
+    }
+
+    @Override
+    @Transactional
+    public void addKeyword(Long userId, KeywordCreateRequest request) {
+        User findUser = userQueryRepository.findWithKeywordById(userId);
+        findUser.addKeyword(request.getContent());
+    }
+
+    @Override
+    @Transactional
+    public void deleteKeyword(Long userId, Long keywordId) {
+        User findUser = userQueryRepository.findWithKeywordById(userId);
+        findUser.deleteKeyword(keywordId);
+    }
+
+    @Override
+    public List<KeywordResponse> findKeywordById(Long userId) {
+        User findUser = userQueryRepository.findWithKeywordById(userId);
+        return findUser.getKeywords().stream()
+                .map(keyword -> KeywordResponse.from(keyword))
+                .collect(Collectors.toList());
     }
 
 }

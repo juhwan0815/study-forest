@@ -1,9 +1,8 @@
-package com.study.dto;
+package com.study.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.study.domain.User;
 import com.study.domain.UserRole;
-import com.study.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

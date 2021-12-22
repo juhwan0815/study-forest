@@ -39,14 +39,14 @@ public class User extends BaseEntity {
     private Integer distance; // 검색 거리
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserKeyword> userKeywords = new ArrayList<>(); // 회원의 키워드들
+    private List<Keyword> keywords = new ArrayList<>(); // 회원의 키워드들
 
     public static User createUser(Long kakaoId, String nickName, String ageRange, String gender, UserRole role) {
         User user = new User();
         user.kakaoId = kakaoId;
         user.nickName = nickName;
         user.ageRange = ageRange;
-        user.gender = ageRange;
+        user.gender = gender;
         user.role = role;
         user.distance = 3;
         return user;
@@ -71,4 +71,24 @@ public class User extends BaseEntity {
     public void changeDistance(Integer distance) {
         this.distance = distance;
     }
+
+    public void addKeyword(String content) {
+        boolean result = keywords.stream().anyMatch(keyword -> keyword.getContent().equals(content));
+        if (result) {
+            throw new RuntimeException("이미 관심 키워드로 추가한 키워드입니다.");
+        }
+
+        Keyword keyword = Keyword.createKeyword(content, this);
+        keywords.add(keyword);
+    }
+
+    public void deleteKeyword(Long keywordId) {
+        Keyword findKeyword = keywords.stream()
+                .filter(keyword -> keyword.getId().equals(keywordId))
+                .findFirst().orElseThrow(() -> new RuntimeException("존재하지 않는 키워드입니다."));
+
+        keywords.remove(findKeyword);
+    }
+
+
 }

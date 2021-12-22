@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class UserKeyword extends BaseEntity{
+public class Keyword extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,10 +22,10 @@ public class UserKeyword extends BaseEntity{
     @JoinColumn(name = "user_id")
     private User user;
 
-    public static UserKeyword createUserKeyword(String content, User user) {
-        UserKeyword userKeyword = new UserKeyword();
-        userKeyword.content = content;
-        userKeyword.user = user;
-        return userKeyword;
+    public static Keyword createKeyword(String content, User user) {
+        Keyword keyword = new Keyword();
+        keyword.content = content;
+        keyword.user = user;
+        return keyword;
     }
 }

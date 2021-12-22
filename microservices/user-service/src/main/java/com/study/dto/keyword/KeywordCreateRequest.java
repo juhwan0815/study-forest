@@ -1,4 +1,4 @@
-package com.study.dto;
+package com.study.dto.keyword;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserUpdateNickNameRequest {
+public class KeywordCreateRequest {
 
-    private String nickName;
+    private String content;
 }
