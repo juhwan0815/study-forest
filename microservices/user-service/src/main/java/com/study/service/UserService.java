@@ -15,4 +15,6 @@ public interface UserService {
     UserResponse updateImage(Long userId, MultipartFile image);
 
     UserResponse updateProfile(Long userId, UserUpdateRequest request);
+
+    void delete(Long userId);
 }

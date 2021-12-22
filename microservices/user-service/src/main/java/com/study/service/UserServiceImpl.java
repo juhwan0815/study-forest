@@ -1,11 +1,7 @@
 package com.study.service;
 
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.study.client.KakaoClient;
-import com.study.client.KakaoClientImpl;
 import com.study.domain.Image;
 import com.study.domain.User;
 import com.study.domain.UserRole;
@@ -14,15 +10,11 @@ import com.study.dto.UserResponse;
 import com.study.dto.UserUpdateRequest;
 import com.study.repository.UserQueryRepository;
 import com.study.repository.UserRepository;
+import com.study.util.ImageUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,9 +25,7 @@ public class UserServiceImpl implements UserService {
     private final KakaoClient kakaoClient;
     private final UserRepository userRepository;
     private final UserQueryRepository userQueryRepository;
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
+    private final ImageUtil imageUtil;
 
     @Override
     @Transactional
@@ -79,7 +69,7 @@ public class UserServiceImpl implements UserService {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException(""));
 
-        Image updateImage = uploadImage(image, findUser.getImage().getImageStoreName());
+        Image updateImage = imageUtil.uploadImage(image, findUser.getImage().getImageStoreName());
         findUser.changeImage(updateImage);
         return UserResponse.from(findUser);
     }
@@ -94,55 +84,14 @@ public class UserServiceImpl implements UserService {
         return UserResponse.from(findUser);
     }
 
-    private Image uploadImage(MultipartFile image, String imageStoreName) {
+    @Override
+    @Transactional
+    public void delete(Long userId) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException(""));
+        userRepository.delete(findUser);
 
-        Image returnImage = null;
-
-        if (image == null) {
-            deleteImageFromS3(imageStoreName);
-        } else {
-            if (!image.isEmpty()) {
-                deleteImageFromS3(imageStoreName);
-                validateImageType(image);
-                returnImage = uploadImageToS3(image);
-            }
-        }
-        return returnImage;
+        // TODO 회원탈퇴 Kafka
     }
 
-    private void deleteImageFromS3(String imageStoreName) {
-        if (imageStoreName == null) {
-            amazonS3Client.deleteObject(bucket, imageStoreName);
-        }
-    }
-
-    private void validateImageType(MultipartFile image) {
-        if (!image.getContentType().startsWith("image")) {
-            throw new RuntimeException("이미지의 파일타입이 잘못되었습니다.");
-        }
-    }
-
-    private Image uploadImageToS3(MultipartFile image) {
-        String ext = extractExt(image.getContentType());
-        String imageStoreName = UUID.randomUUID().toString() + "." + ext;
-
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(image.getSize());
-        objectMetadata.setContentType(image.getContentType());
-
-        Image uploadResult = null;
-        try {
-            amazonS3Client.putObject(new PutObjectRequest(bucket, imageStoreName, image.getInputStream(), objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
-            String imageUrl = amazonS3Client.getUrl(bucket, imageStoreName).toString();
-            uploadResult = Image.createImage(imageUrl, imageStoreName);
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
-        return uploadResult;
-    }
-
-    private String extractExt(String contentType) {
-        int pos = contentType.lastIndexOf("/");
-        return contentType.substring(pos + 1);
-    }
 }

@@ -5,6 +5,7 @@ import com.study.dto.UserResponse;
 import com.study.dto.UserUpdateRequest;
 import com.study.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,6 +43,12 @@ public class UserController {
     @GetMapping("/users/profile")
     public ResponseEntity<UserResponse> findByLoginId(@LoginUser Long userId) {
         return ResponseEntity.ok(userService.findById(userId));
+    }
+
+    @DeleteMapping("/users")
+    public ResponseEntity<Void> delete(@LoginUser Long userId) {
+        userService.delete(userId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 
