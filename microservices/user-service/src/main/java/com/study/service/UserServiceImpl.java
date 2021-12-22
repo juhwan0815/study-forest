@@ -11,6 +11,9 @@ import com.study.dto.keyword.KeywordResponse;
 import com.study.dto.user.UserResponse;
 import com.study.dto.user.UserUpdateDistanceRequest;
 import com.study.dto.user.UserUpdateNickNameRequest;
+import com.study.kafka.sender.UserDeleteMessageSender;
+import com.study.kafka.sender.UserDeleteMessageSenderImpl;
+import com.study.kakfa.UserDeleteMessage;
 import com.study.repository.UserQueryRepository;
 import com.study.repository.UserRepository;
 import com.study.util.ImageUtil;
@@ -31,6 +34,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserQueryRepository userQueryRepository;
     private final ImageUtil imageUtil;
+    private final UserDeleteMessageSender userDeleteMessageSender;
 
     @Override
     @Transactional
@@ -96,7 +100,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException(""));
         userRepository.delete(findUser);
 
-        // TODO 회원탈퇴 Kafka
+        userDeleteMessageSender.send(new UserDeleteMessage(findUser.getId()));
     }
 
     @Override
