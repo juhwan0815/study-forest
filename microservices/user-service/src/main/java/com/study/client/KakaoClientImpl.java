@@ -1,9 +1,6 @@
 package com.study.client;
 
 import com.google.gson.Gson;
-import com.study.dto.KakaoProfile;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
