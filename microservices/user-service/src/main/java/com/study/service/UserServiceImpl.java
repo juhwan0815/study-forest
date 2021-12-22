@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse create(String kakaoToken) {
         KakaoProfile kakaoProfile = kakaoClient.getKakaoProfile(kakaoToken);
 
-        if (userRepository.existsByKakaoId(kakaoProfile.getId())) {
+        if (userRepository.findByKakaoId(kakaoProfile.getId()).isPresent()) {
             throw new RuntimeException("");
         }
 
