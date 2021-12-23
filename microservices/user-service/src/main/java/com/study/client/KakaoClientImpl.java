@@ -13,7 +13,7 @@ public class KakaoClientImpl implements KakaoClient {
     private final RestTemplate restTemplate;
     private final Gson gson;
 
-    private static final String KAKAO_PROFILE_URL = "https://kapi.kakao.com/v2/user/me";
+    public static final String KAKAO_PROFILE_URL = "https://kapi.kakao.com/v2/user/me";
 
     public KakaoClientImpl(RestTemplateBuilder restTemplateBuilder, Gson gson) {
         this.restTemplate = restTemplateBuilder.build();

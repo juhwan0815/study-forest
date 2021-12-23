@@ -32,21 +32,6 @@ public class UserDeleteMessageSenderImpl implements UserDeleteMessageSender {
                 .setHeader(KafkaHeaders.TOPIC, topic)
                 .build();
 
-        ListenableFuture<SendResult<String, UserDeleteMessage>> future = kafkaTemplate.send(message);
-
-        future.addCallback(new ListenableFutureCallback<SendResult<String, UserDeleteMessage>>() {
-            @Override
-            public void onFailure(Throwable ex) {
-                log.info("Unable to send Message due to : {}", ex.getMessage());
-            }
-
-            @Override
-            public void onSuccess(SendResult<String, UserDeleteMessage> result) {
-                log.info("Send Message={} to topic {} with offset = {}",
-                        result.getProducerRecord().value().toString(),
-                        result.getRecordMetadata().topic(),
-                        result.getRecordMetadata().hasOffset());
-            }
-        });
+        kafkaTemplate.send(message);
     }
 }

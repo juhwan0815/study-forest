@@ -47,8 +47,8 @@ public class UserServiceImpl implements UserService {
 
         User user = User.createUser(kakaoProfile.getId(),
                 kakaoProfile.getProperties().getNickname(),
-                kakaoProfile.getKakao_account().getGender(),
-                kakaoProfile.getKakao_account().getAge_range(), UserRole.USER);
+                kakaoProfile.getKakao_account().getAge_range(),
+                kakaoProfile.getKakao_account().getGender(), UserRole.USER);
         user.changeImage(Image.createImage(kakaoProfile.getProperties().getThumbnail_image(), null));
         userRepository.save(user);
 
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException(""));
 
-        Image updateImage = imageUtil.uploadImage(image, findUser.getImage().getImageStoreName());
+        Image updateImage = imageUtil.uploadImage(image, findUser.getImage());
         findUser.changeImage(updateImage);
         return UserResponse.from(findUser);
     }
@@ -136,6 +136,7 @@ public class UserServiceImpl implements UserService {
         User findUser = userQueryRepository.findWithKeywordById(userId);
         findUser.deleteKeyword(keywordId);
     }
+
 
     @Override
     public List<KeywordResponse> findKeywordById(Long userId) {

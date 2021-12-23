@@ -22,7 +22,6 @@ public class UserResponse {
 
     private String gender; // 성별
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String imageUrl; // 이미지
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -34,8 +33,19 @@ public class UserResponse {
     private String fcmToken; // FCM 토큰
 
     public static UserResponse from(User user) {
-        return new UserResponse(user.getId(), user.getRole(), user.getNickName(),
-                                user.getAgeRange(), user.getGender(), user.getImage().getImageUrl(),
-                                user.getAreaId(), user.getDistance(), user.getFcmToken());
+        UserResponse userResponse = new UserResponse();
+        userResponse.userId = user.getId();
+        userResponse.role = user.getRole();
+        userResponse.nickName = user.getNickName();
+        userResponse.ageRange = user.getAgeRange();
+        userResponse.gender = user.getGender();
+        userResponse.areaId = user.getAreaId();
+        userResponse.distance = user.getDistance();
+        userResponse.fcmToken = user.getFcmToken();
+
+        if (user.getImage() != null) {
+            userResponse.imageUrl = user.getImage().getImageUrl();
+        }
+        return userResponse;
     }
 }
