@@ -127,17 +127,6 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("예외 테스트 : 저장된 Auth 가 없을 경우 예외가 발생한다.")
-    void ifNotMatchUserId() {
-        // given
-        given(authRepository.findById(any()))
-                .willReturn(Optional.empty());
-
-        // when
-        assertThrows(RuntimeException.class, () -> authService.refresh(1L, "refreshToken"));
-    }
-
-    @Test
     @DisplayName("예외 테스트 : refreshToken 이 일치하지 않을 경우 예외가 발생한다.")
     void ifNotMatchRefreshToken(){
         Auth auth = Auth.createAuth(1L, "refreshToken1", 30L);
