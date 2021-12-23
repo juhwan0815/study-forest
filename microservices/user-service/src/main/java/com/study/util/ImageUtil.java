@@ -21,25 +21,27 @@ public class ImageUtil {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public Image uploadImage(MultipartFile image, String imageStoreName) {
+    public Image uploadImage(MultipartFile file, Image userImage) {
 
         Image returnImage = null;
 
-        if (image == null) {
-            deleteImageFromS3(imageStoreName);
+        if (file == null) {
+            deleteImageFromS3(userImage);
         } else {
-            if (!image.isEmpty()) {
-                deleteImageFromS3(imageStoreName);
-                validateImageType(image);
-                returnImage = uploadImageToS3(image);
+            if (!file.isEmpty()) {
+                deleteImageFromS3(userImage);
+                validateImageType(file);
+                returnImage = uploadImageToS3(file);
             }
         }
         return returnImage;
     }
 
-    private void deleteImageFromS3(String imageStoreName) {
-        if (imageStoreName == null) {
-            amazonS3Client.deleteObject(bucket, imageStoreName);
+    private void deleteImageFromS3(Image image) {
+        if (image != null) {
+            if (image.getImageStoreName() != null) {
+                amazonS3Client.deleteObject(bucket, image.getImageStoreName());
+            }
         }
     }
 
