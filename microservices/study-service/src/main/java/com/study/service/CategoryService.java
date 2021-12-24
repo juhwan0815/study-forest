@@ -17,4 +17,6 @@ public interface CategoryService {
     void delete(Long categoryId);
 
     List<CategoryResponse> findParent();
+
+    List<CategoryResponse> findByParent(Long categoryId);
 }

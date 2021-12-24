@@ -46,4 +46,9 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.findParent());
     }
 
+    @GetMapping("/categories/{categoryId}/children")
+    public ResponseEntity<List<CategoryResponse>> findByParent(@PathVariable Long categoryId){
+        return ResponseEntity.ok(categoryService.findByParent(categoryId));
+    }
+
 }

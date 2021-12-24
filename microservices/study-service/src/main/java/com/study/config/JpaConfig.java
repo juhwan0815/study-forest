@@ -17,6 +17,6 @@ public class JpaConfig {
 
     @Bean
     public JPAQueryFactory queryFactory() {
-        new JPAQueryFactory(em);
+        return new JPAQueryFactory(em);
     }
 }

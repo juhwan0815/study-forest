@@ -80,4 +80,14 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(category -> CategoryResponse.from(category))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<CategoryResponse> findByParent(Long categoryId) {
+        Category findCategory = categoryRepository.findWithChildrenById(categoryId)
+                .orElseThrow(() -> new RuntimeException());
+
+        return findCategory.getChildren().stream()
+                .map(category -> CategoryResponse.from(category))
+                .collect(Collectors.toList());
+    }
 }
