@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.ws.rs.Path;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,6 +32,11 @@ public class CategoryController {
     public ResponseEntity<CategoryResponse> update(@PathVariable Long categoryId,
                                                    @RequestBody @Valid CategoryUpdateRequest request) {
         return ResponseEntity.ok(categoryService.update(categoryId, request));
+    }
+
+    @DeleteMapping("/categories/{categoryId}")
+    public ResponseEntity<Void> delete(@PathVariable Long categoryId) {
+        return ResponseEntity.ok(categoryService.delete(categoryId));
     }
 
 }

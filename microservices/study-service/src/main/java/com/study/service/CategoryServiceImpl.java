@@ -59,4 +59,14 @@ public class CategoryServiceImpl implements CategoryService {
 
         return CategoryResponse.from(findCategory);
     }
+
+    @Override
+    @Transactional
+    public void delete(Long categoryId) {
+
+        Category findCategory = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException());
+
+        categoryRepository.delete(findCategory);
+    }
 }
