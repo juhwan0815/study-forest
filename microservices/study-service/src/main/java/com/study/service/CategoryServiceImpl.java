@@ -29,4 +29,21 @@ public class CategoryServiceImpl implements CategoryService {
 
         return CategoryResponse.from(category);
     }
+
+    @Override
+    @Transactional
+    public CategoryResponse createChildren(Long categoryId, CategoryCreateRequest request) {
+
+        Category findCategory = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException());
+
+        if (categoryRepository.findByName(request.getName()).isPresent()) {
+            throw new RuntimeException();
+        }
+
+        Category category = Category.createCategory(request.getName(), findCategory);
+        categoryRepository.save(category);
+
+        return CategoryResponse.from(category);
+    }
 }
