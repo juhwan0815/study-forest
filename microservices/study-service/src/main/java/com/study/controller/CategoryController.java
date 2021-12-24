@@ -5,11 +5,12 @@ import com.study.dto.category.CategoryResponse;
 import com.study.dto.category.CategoryUpdateRequest;
 import com.study.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.ws.rs.Path;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,7 +37,13 @@ public class CategoryController {
 
     @DeleteMapping("/categories/{categoryId}")
     public ResponseEntity<Void> delete(@PathVariable Long categoryId) {
-        return ResponseEntity.ok(categoryService.delete(categoryId));
+        categoryService.delete(categoryId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<CategoryResponse>> findParentCategory(){
+        return ResponseEntity.ok(categoryService.findParent());
     }
 
 }

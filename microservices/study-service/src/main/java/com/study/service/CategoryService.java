@@ -4,6 +4,8 @@ import com.study.dto.category.CategoryCreateRequest;
 import com.study.dto.category.CategoryResponse;
 import com.study.dto.category.CategoryUpdateRequest;
 
+import java.util.List;
+
 public interface CategoryService {
 
     CategoryResponse create(CategoryCreateRequest request);
@@ -14,4 +16,5 @@ public interface CategoryService {
 
     void delete(Long categoryId);
 
+    List<CategoryResponse> findParent();
 }
