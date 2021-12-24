@@ -71,6 +71,7 @@ subprojects {
         }
 
         def Qdomains = []
+        def configs = ['**/*Config*']
 
         for (qPattern in '**/QA'..'**/QZ') { // qPattern = '**/QA', '**/QB', ... '*.QZ'
             Qdomains.add(qPattern + '*')
@@ -80,7 +81,7 @@ subprojects {
         afterEvaluate {
             classDirectories.setFrom(
                     files(classDirectories.files.collect {
-                        fileTree(dir: it, excludes: [] + Qdomains)
+                        fileTree(dir: it, excludes: [] + Qdomains + configs)
                     })
             )
         }
