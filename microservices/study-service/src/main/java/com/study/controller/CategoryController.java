@@ -2,13 +2,11 @@ package com.study.controller;
 
 import com.study.dto.category.CategoryCreateRequest;
 import com.study.dto.category.CategoryResponse;
+import com.study.dto.category.CategoryUpdateRequest;
 import com.study.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -27,6 +25,12 @@ public class CategoryController {
     public ResponseEntity<CategoryResponse> createChildren(@PathVariable Long categoryId,
                                                            @RequestBody @Valid CategoryCreateRequest request) {
         return ResponseEntity.ok(categoryService.createChildren(categoryId, request));
+    }
+
+    @PutMapping("/categories/{categoryId}")
+    public ResponseEntity<CategoryResponse> update(@PathVariable Long categoryId,
+                                                   @RequestBody @Valid CategoryUpdateRequest request) {
+        return ResponseEntity.ok(categoryService.update(categoryId, request));
     }
 
 }

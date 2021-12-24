@@ -4,6 +4,7 @@ package com.study.service;
 import com.study.domain.Category;
 import com.study.dto.category.CategoryCreateRequest;
 import com.study.dto.category.CategoryResponse;
+import com.study.dto.category.CategoryUpdateRequest;
 import com.study.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,5 +46,17 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.save(category);
 
         return CategoryResponse.from(category);
+    }
+
+    @Override
+    @Transactional
+    public CategoryResponse update(Long categoryId, CategoryUpdateRequest request) {
+
+        Category findCategory = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException());
+
+        findCategory.changeName(request.getName());
+
+        return CategoryResponse.from(findCategory);
     }
 }
