@@ -56,7 +56,7 @@ public class AreaServiceImpl implements AreaService {
     public List<AreaResponse> findAroundById(Long areaId, AreaAroundRequest request) {
         Area findArea = areaRepository.findById(areaId)
                 .orElseThrow(() -> new RuntimeException(""));
-        List<Area> aroundAreas = areaQueryRepository.findAroundByArea(findArea, request.getSearchDistance());
+        List<Area> aroundAreas = areaQueryRepository.findAroundByArea(findArea, request.getDistance());
         return aroundAreas.stream()
                 .map(area -> AreaResponse.from(area))
                 .collect(Collectors.toList());

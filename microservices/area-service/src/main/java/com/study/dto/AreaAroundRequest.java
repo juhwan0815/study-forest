@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AreaAroundRequest {
 
-    private Integer searchDistance;
+    private Integer distance;
 }

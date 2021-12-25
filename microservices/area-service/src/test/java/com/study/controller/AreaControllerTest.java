@@ -247,7 +247,7 @@ class AreaControllerTest {
         mockMvc.perform(get("/areas/{areaId}/around", 1)
                         .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
-                        .param("searchDistance", String.valueOf(TEST_AREA_AROUND_REQUEST.getSearchDistance())))
+                        .param("searchDistance", String.valueOf(TEST_AREA_AROUND_REQUEST.getDistance())))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
                 .andDo(document("area/findAroundById",
