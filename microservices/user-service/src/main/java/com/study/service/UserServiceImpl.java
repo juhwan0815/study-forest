@@ -8,6 +8,7 @@ import com.study.domain.User;
 import com.study.domain.UserRole;
 import com.study.dto.keyword.KeywordCreateRequest;
 import com.study.dto.keyword.KeywordResponse;
+import com.study.dto.user.UserFindRequest;
 import com.study.dto.user.UserResponse;
 import com.study.dto.user.UserUpdateDistanceRequest;
 import com.study.dto.user.UserUpdateNickNameRequest;
@@ -143,6 +144,14 @@ public class UserServiceImpl implements UserService {
         User findUser = userQueryRepository.findWithKeywordById(userId);
         return findUser.getKeywords().stream()
                 .map(keyword -> KeywordResponse.from(keyword))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserResponse> findByIdIn(UserFindRequest request) {
+        List<User> users = userRepository.findByIdIn(request.getUserIds());
+        return users.stream()
+                .map(user -> UserResponse.from(user))
                 .collect(Collectors.toList());
     }
 

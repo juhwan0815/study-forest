@@ -1,8 +1,10 @@
 package com.study.controller;
 
 import com.study.config.LoginUser;
+import com.study.domain.User;
 import com.study.dto.keyword.KeywordCreateRequest;
 import com.study.dto.keyword.KeywordResponse;
+import com.study.dto.user.UserFindRequest;
 import com.study.dto.user.UserResponse;
 import com.study.dto.user.UserUpdateDistanceRequest;
 import com.study.dto.user.UserUpdateNickNameRequest;
@@ -25,6 +27,11 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<UserResponse> create(@RequestHeader String kakaoToken) {
         return ResponseEntity.ok(userService.create(kakaoToken));
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<List<UserResponse>> findByIdIn(@Valid UserFindRequest request){
+        return ResponseEntity.ok(userService.findByIdIn(request));
     }
 
     @PostMapping("/users/{kakaoId}")

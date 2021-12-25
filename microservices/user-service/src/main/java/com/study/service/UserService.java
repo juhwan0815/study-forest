@@ -2,6 +2,7 @@ package com.study.service;
 
 import com.study.dto.keyword.KeywordCreateRequest;
 import com.study.dto.keyword.KeywordResponse;
+import com.study.dto.user.UserFindRequest;
 import com.study.dto.user.UserResponse;
 import com.study.dto.user.UserUpdateDistanceRequest;
 import com.study.dto.user.UserUpdateNickNameRequest;
@@ -32,4 +33,6 @@ public interface UserService {
     void deleteKeyword(Long userId, Long keywordId);
 
     List<KeywordResponse> findKeywordById(Long userId);
+
+    List<UserResponse> findByIdIn(UserFindRequest request);
 }
