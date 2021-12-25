@@ -1,10 +1,8 @@
 package com.study.controller;
 
-import com.study.domain.Area;
 import com.study.dto.*;
 import com.study.service.AreaService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
@@ -22,7 +20,7 @@ public class AreaController {
     private final AreaService areaService;
 
     @PostMapping("/areas")
-    private ResponseEntity<Void> create(@RequestBody List<AreaCreateRequest> requests) {
+    public ResponseEntity<Void> create(@RequestBody List<AreaCreateRequest> requests) {
         areaService.create(requests);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
