@@ -2,6 +2,8 @@ package com.study.service;
 
 import com.study.dto.study.StudyCreateRequest;
 import com.study.dto.study.StudyResponse;
+import com.study.dto.study.StudyUpdateAreaRequest;
+import com.study.dto.study.StudyUpdateRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface StudyService {
@@ -10,5 +12,7 @@ public interface StudyService {
 
     StudyResponse updateImage(Long userId, Long studyId, MultipartFile file);
 
+    StudyResponse updateArea(Long userId, Long studyId, StudyUpdateAreaRequest request);
 
+    StudyResponse update(Long userId, Long studyId, StudyUpdateRequest request);
 }

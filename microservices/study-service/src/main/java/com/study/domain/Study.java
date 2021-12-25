@@ -70,6 +70,30 @@ public class Study extends BaseEntity {
         return study;
     }
 
+    public void change(String name, String content, int numberOfPeople,
+                       boolean online, boolean offline, boolean open, Category category) {
+        this.name = name;
+        this.content = content;
+        this.numberOfPeople = numberOfPeople;
+
+        if (currentNumberOfPeople > numberOfPeople) {
+            throw new RuntimeException();
+        }
+
+        this.online = online;
+        if (offline) {
+            this.offline = offline;
+            this.areaId = null;
+        }
+
+        if (open) {
+            this.status = StudyStatus.OPEN;
+        } else {
+            this.status = StudyStatus.CLOSE;
+        }
+        this.category = category;
+    }
+
     public void addStudyUser(Long userId, StudyRole studyRole) {
         StudyUser studyUser = StudyUser.createStudyUser(userId, studyRole, this);
         studyUsers.add(studyUser);
@@ -95,8 +119,9 @@ public class Study extends BaseEntity {
     public void isStudyAdmin(Long userId) {
         boolean checkResult = studyUsers.stream()
                 .anyMatch(studyUser -> studyUser.getUserId().equals(userId) && studyUser.getStudyRole().equals(StudyRole.ADMIN));
-        if(!checkResult){
+        if (!checkResult) {
             throw new RuntimeException();
         }
     }
+
 }

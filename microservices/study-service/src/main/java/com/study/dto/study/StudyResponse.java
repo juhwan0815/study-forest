@@ -59,15 +59,20 @@ public class StudyResponse {
         studyResponse.currentNumberOfPeople = study.getCurrentNumberOfPeople();
         studyResponse.online = study.isOnline();
         studyResponse.offline = study.isOffline();
+        studyResponse.area = area;
+        // TODO 수정
         if (study.getImage() != null) {
             studyResponse.imageUrl = study.getImage().getImageUrl();
         }
-        studyResponse.area = area;
-        studyResponse.parentCategory = CategoryResponse.from(study.getCategory().getParent());
-        studyResponse.childCategory = CategoryResponse.from(study.getCategory());
-        studyResponse.tags = study.getTags().stream()
-                .map(tag -> TagResponse.from(tag))
-                .collect(Collectors.toList());
+        if (study.getCategory() != null) {
+            studyResponse.parentCategory = CategoryResponse.from(study.getCategory().getParent());
+            studyResponse.childCategory = CategoryResponse.from(study.getCategory());
+        }
+        if (study.getTags().size() != 0){
+            studyResponse.tags = study.getTags().stream()
+                    .map(tag -> TagResponse.from(tag))
+                    .collect(Collectors.toList());
+        }
         return studyResponse;
     }
 

@@ -8,6 +8,8 @@ import com.study.domain.Study;
 import com.study.domain.StudyRole;
 import com.study.dto.study.StudyCreateRequest;
 import com.study.dto.study.StudyResponse;
+import com.study.dto.study.StudyUpdateAreaRequest;
+import com.study.dto.study.StudyUpdateRequest;
 import com.study.kakfa.StudyCreateMessage;
 import com.study.kakfa.sender.StudyCreateMessageSender;
 import com.study.repository.CategoryRepository;
@@ -46,7 +48,7 @@ public class StudyServiceImpl implements StudyService {
         Image image = imageUtil.uploadImage(file, null);
 
         Study study = Study.createStudy(request.getName(), request.getContent(), request.getNumberOfPeople(),
-                                        request.getOnline(), request.getOffline(), findCategory);
+                request.getOnline(), request.getOffline(), findCategory);
         study.addStudyUser(userId, StudyRole.ADMIN);
         study.changeImage(image);
         study.addTags(request.getTags());
@@ -66,6 +68,34 @@ public class StudyServiceImpl implements StudyService {
 
         Image image = imageUtil.uploadImage(file, findStudy.getImage());
         findStudy.changeImage(image);
+        return StudyResponse.from(findStudy);
+    }
+
+    @Override
+    @Transactional
+    public StudyResponse updateArea(Long userId, Long studyId, StudyUpdateAreaRequest request) {
+        Study findStudy = studyRepository.findWithStudyUserById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+        findStudy.isStudyAdmin(userId);
+
+        AreaResponse area = areaServiceClient.findByCode(request.getAreaCode());
+        findStudy.changeArea(area.getId());
+        return StudyResponse.from(findStudy, area);
+    }
+
+    @Override
+    @Transactional
+    public StudyResponse update(Long userId, Long studyId, StudyUpdateRequest request) {
+        Study findStudy = studyRepository.findWithStudyUserById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+        findStudy.isStudyAdmin(userId);
+
+        Category findCategory = categoryRepository.findWithParentById(request.getCategoryId())
+                .orElseThrow(() -> new RuntimeException());
+
+        findStudy.change(request.getName(), request.getContent(), request.getNumberOfPeople(),
+                         request.getOnline(), request.getOffline(), request.getOpen(), findCategory);
+
         return StudyResponse.from(findStudy);
     }
 }

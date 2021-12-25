@@ -3,6 +3,8 @@ package com.study.controller;
 import com.study.config.LoginUser;
 import com.study.dto.study.StudyCreateRequest;
 import com.study.dto.study.StudyResponse;
+import com.study.dto.study.StudyUpdateAreaRequest;
+import com.study.dto.study.StudyUpdateRequest;
 import com.study.service.StudyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,20 @@ public class StudyController {
                                                      @PathVariable Long studyId,
                                                      @RequestPart(required = false) MultipartFile file) {
         return ResponseEntity.ok(studyService.updateImage(userId, studyId, file));
+    }
+
+    @PatchMapping("/studies/{studyId}/area")
+    public ResponseEntity<StudyResponse> updateArea(@LoginUser Long userId,
+                                                    @PathVariable Long studyId,
+                                                    @RequestBody @Valid StudyUpdateAreaRequest request) {
+        return ResponseEntity.ok(studyService.updateArea(userId, studyId, request));
+    }
+
+    @PatchMapping("/studies/{studyId}")
+    public ResponseEntity<StudyResponse> update(@LoginUser Long userId,
+                                                @PathVariable Long studyId,
+                                                @RequestBody @Valid StudyUpdateRequest request) {
+        return ResponseEntity.ok(studyService.update(userId, studyId, request));
     }
 
 }
