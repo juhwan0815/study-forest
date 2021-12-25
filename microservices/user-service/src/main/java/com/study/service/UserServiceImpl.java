@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException(""));
         userRepository.delete(findUser);
 
-        userDeleteMessageSender.send(new UserDeleteMessage(findUser.getId()));
+        userDeleteMessageSender.send(UserDeleteMessage.from(findUser.getId()));
     }
 
     @Override
