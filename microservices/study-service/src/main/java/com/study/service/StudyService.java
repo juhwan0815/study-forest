@@ -6,6 +6,7 @@ import com.study.dto.chatroom.ChatRoomResponse;
 import com.study.dto.chatroom.ChatRoomUpdateRequest;
 import com.study.dto.study.*;
 import com.study.dto.studyuser.StudyUserResponse;
+import com.study.kakfa.UserDeleteMessage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,5 +54,9 @@ public interface StudyService {
     List<ChatRoomResponse> findChatRoomsById(Long studyId);
 
     List<StudyResponse> findByUserId(Long userId);
+
     List<StudyResponse> findByWaitUserId(Long userId);
+
+    void deleteStudyUserAndWaitUser(UserDeleteMessage userDeleteMessage);
+
 }

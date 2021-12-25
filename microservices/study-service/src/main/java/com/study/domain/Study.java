@@ -182,10 +182,6 @@ public class Study extends BaseEntity {
                 .filter(studyUser -> studyUser.getUserId().equals(studyUserId))
                 .findFirst().orElseThrow(() -> new RuntimeException());
 
-        if (findStudyUser.getStudyRole().equals(StudyRole.ADMIN)) {
-            throw new RuntimeException();
-        }
-
         studyUsers.remove(findStudyUser);
         this.currentNumberOfPeople -= 1;
     }

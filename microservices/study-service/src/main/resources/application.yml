@@ -38,7 +38,7 @@ spring:
     properties:
       hibernate:
         default_batch_fetch_size: 1000
-#        show_sql: false
+        #        show_sql: false
         format_sql: true
     open-in-view: false
 
@@ -54,6 +54,8 @@ eureka:
 kafka:
   server: 127.0.0.1:9092
   topic:
+    user:
+      delete: user-delete-topic
     study:
       create: study-create-topic
       delete: study-delete-topic
@@ -61,7 +63,10 @@ kafka:
       create: study-apply-create-topic
       success: study-apply-success-topic
       fail: study-apply-fail-topic
-      cancel : study-apply-cancel-topic
+      cancel: study-apply-cancel-topic
+  consumer:
+    user:
+      delete: user-delete-consumer-group1
 
 management:
   endpoints:

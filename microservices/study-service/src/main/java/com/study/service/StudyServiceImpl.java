@@ -10,10 +10,7 @@ import com.study.dto.chatroom.ChatRoomResponse;
 import com.study.dto.chatroom.ChatRoomUpdateRequest;
 import com.study.dto.study.*;
 import com.study.dto.studyuser.StudyUserResponse;
-import com.study.kakfa.StudyApplyFailMessage;
-import com.study.kakfa.StudyApplySuccessMessage;
-import com.study.kakfa.StudyCreateMessage;
-import com.study.kakfa.StudyDeleteMessage;
+import com.study.kakfa.*;
 import com.study.kakfa.sender.StudyApplyFailMessageSender;
 import com.study.kakfa.sender.StudyApplySuccessMessageSender;
 import com.study.kakfa.sender.StudyCreateMessageSender;
@@ -287,5 +284,19 @@ public class StudyServiceImpl implements StudyService {
         return findStudies.stream()
                 .map(study -> StudyResponse.fromWithWaitUserAndTag(study))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteStudyUserAndWaitUser(UserDeleteMessage userDeleteMessage) {
+        List<Study> findStudies = studyQueryRepository.findWithWaitUserByUserId(userDeleteMessage.getUserId());
+        findStudies.forEach(study -> {
+            study.deleteWaitUser(userDeleteMessage.getUserId());
+        });
+
+        findStudies = studyQueryRepository.findWithStudyUsersByUserId(userDeleteMessage.getUserId());
+        findStudies.forEach(study -> {
+            study.deleteStudyUser(userDeleteMessage.getUserId());
+        });
     }
 }

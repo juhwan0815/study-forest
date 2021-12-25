@@ -37,7 +37,13 @@ public class StudyQueryRepository {
                 .fetch();
     }
 
-
+    public List<Study> findWithStudyUsersByUserId(Long userId){
+        return queryFactory
+                .selectFrom(study).distinct()
+                .join(study.studyUsers, studyUser)
+                .where(studyUser.userId.eq(userId))
+                .fetch();
+    }
 
     public Study findWithCategoryAndTagById(Long studyId) {
         Study findStudy = queryFactory
