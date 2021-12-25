@@ -145,6 +145,13 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @DeleteMapping("/studies/{studyId}/chatRooms/{chatRoomId}")
+    public ResponseEntity<Void> deleteChatRoom(@LoginUser Long userId,
+                                               @PathVariable Long studyId,
+                                               @PathVariable Long chatRoomId){
+        studyService.deleteChatRoom(userId, studyId, chatRoomId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
     // 회원의 참가 신청 내역 조회
     // 회원의 스터디 조회

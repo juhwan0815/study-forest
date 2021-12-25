@@ -251,4 +251,14 @@ public class StudyServiceImpl implements StudyService {
 
         findStudy.updateChatRoom(chatRoomId, request.getName());
     }
+
+    @Override
+    @Transactional
+    public void deleteChatRoom(Long userId, Long studyId, Long chatRoomId) {
+        Study findStudy = studyRepository.findWithChatRoomById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+        findStudy.isStudyAdmin(userId);
+
+        findStudy.deleteChatRoom(chatRoomId);
+    }
 }

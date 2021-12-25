@@ -221,4 +221,12 @@ public class Study extends BaseEntity {
 
         findChatRoom.changeName(name);
     }
+
+    public void deleteChatRoom(Long chatRoomId) {
+        ChatRoom findChatRoom = chatRooms.stream()
+                .filter(chatRoom -> chatRoom.getId().equals(chatRoomId))
+                .findFirst().orElseThrow(() -> new RuntimeException());
+
+        chatRooms.remove(findChatRoom);
+    }
 }

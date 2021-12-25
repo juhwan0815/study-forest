@@ -46,4 +46,6 @@ public interface StudyService {
     void createChatRoom(Long userId, Long studyId, ChatRoomCreateRequest request);
 
     void updateChatRoom(Long userId, Long studyId, Long chatRoomId, ChatRoomUpdateRequest request);
+
+    void deleteChatRoom(Long userId, Long studyId, Long chatRoomId);
 }
