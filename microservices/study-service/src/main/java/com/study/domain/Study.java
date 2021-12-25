@@ -190,7 +190,7 @@ public class Study extends BaseEntity {
         this.currentNumberOfPeople -= 1;
     }
 
-    public List<Long> getStudyUsersId(){
+    public List<Long> getStudyUsersId() {
         List<Long> userIds = studyUsers.stream()
                 .map(studyUser -> studyUser.getUserId())
                 .collect(Collectors.toList());
@@ -205,5 +205,20 @@ public class Study extends BaseEntity {
         }
         ChatRoom chatRoom = ChatRoom.createChatRoom(name, this);
         chatRooms.add(chatRoom);
+    }
+
+    public void updateChatRoom(Long chatRoomId, String name) {
+        ChatRoom findChatRoom = chatRooms.stream()
+                .filter(chatRoom -> chatRoom.getId().equals(chatRoomId))
+                .findFirst().orElseThrow(() -> new RuntimeException());
+
+        boolean chatRoomResult = chatRooms.stream()
+                .anyMatch(chatRoom -> chatRoom.getName().equals(name));
+
+        if (chatRoomResult) {
+            throw new RuntimeException();
+        }
+
+        findChatRoom.changeName(name);
     }
 }

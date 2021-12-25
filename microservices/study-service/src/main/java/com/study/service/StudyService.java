@@ -2,7 +2,7 @@ package com.study.service;
 
 import com.study.client.UserResponse;
 import com.study.dto.chatroom.ChatRoomCreateRequest;
-import com.study.dto.chatroom.ChatRoomResponse;
+import com.study.dto.chatroom.ChatRoomUpdateRequest;
 import com.study.dto.study.*;
 import com.study.dto.studyuser.StudyUserResponse;
 import org.springframework.data.domain.Pageable;
@@ -44,4 +44,6 @@ public interface StudyService {
     List<StudyUserResponse> findStudyUsersById(Long studyId);
 
     void createChatRoom(Long userId, Long studyId, ChatRoomCreateRequest request);
+
+    void updateChatRoom(Long userId, Long studyId, Long chatRoomId, ChatRoomUpdateRequest request);
 }

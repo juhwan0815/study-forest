@@ -6,7 +6,7 @@ import com.study.client.UserResponse;
 import com.study.client.UserServiceClient;
 import com.study.domain.*;
 import com.study.dto.chatroom.ChatRoomCreateRequest;
-import com.study.dto.chatroom.ChatRoomResponse;
+import com.study.dto.chatroom.ChatRoomUpdateRequest;
 import com.study.dto.study.*;
 import com.study.dto.studyuser.StudyUserResponse;
 import com.study.kakfa.StudyApplyFailMessage;
@@ -240,5 +240,15 @@ public class StudyServiceImpl implements StudyService {
         findStudy.isStudyAdmin(userId);
 
         findStudy.addChatRoom(request.getName());
+    }
+
+    @Override
+    @Transactional
+    public void updateChatRoom(Long userId, Long studyId, Long chatRoomId, ChatRoomUpdateRequest request) {
+        Study findStudy = studyRepository.findWithChatRoomById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+        findStudy.isStudyAdmin(userId);
+
+        findStudy.updateChatRoom(chatRoomId, request.getName());
     }
 }

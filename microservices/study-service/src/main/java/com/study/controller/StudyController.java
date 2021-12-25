@@ -3,7 +3,7 @@ package com.study.controller;
 import com.study.client.UserResponse;
 import com.study.config.LoginUser;
 import com.study.dto.chatroom.ChatRoomCreateRequest;
-import com.study.dto.chatroom.ChatRoomResponse;
+import com.study.dto.chatroom.ChatRoomUpdateRequest;
 import com.study.dto.study.*;
 import com.study.dto.studyuser.StudyUserResponse;
 import com.study.service.StudyService;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import javax.ws.rs.Path;
 import java.util.List;
 
 @RestController
@@ -134,6 +133,15 @@ public class StudyController {
                                                @PathVariable Long studyId,
                                                @RequestBody @Valid ChatRoomCreateRequest request) {
         studyService.createChatRoom(userId, studyId, request);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping("/studies/{studyId}/chatRooms/{chatRoomId}")
+    public ResponseEntity<Void> updateChatRoom(@LoginUser Long userId,
+                                               @PathVariable Long studyId,
+                                               @PathVariable Long chatRoomId,
+                                               @RequestBody @Valid ChatRoomUpdateRequest request) {
+        studyService.updateChatRoom(userId, studyId, chatRoomId, request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
