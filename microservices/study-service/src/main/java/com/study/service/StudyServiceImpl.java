@@ -209,4 +209,13 @@ public class StudyServiceImpl implements StudyService {
 
         findStudy.deleteStudyUser(studyUserId);
     }
+
+    @Override
+    @Transactional
+    public void deleteStudyUser(Long userId, Long studyId) {
+        Study findStudy = studyRepository.findWithStudyUserById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+
+        findStudy.deleteStudyUser(userId);
+    }
 }

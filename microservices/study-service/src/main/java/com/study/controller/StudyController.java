@@ -110,14 +110,19 @@ public class StudyController {
     @DeleteMapping("/studies/{studyId}/studyUsers/{studyUserId}")
     public ResponseEntity<Void> deleteStudyUser(@LoginUser Long userId,
                                                 @PathVariable Long studyId,
-                                                @PathVariable Long studyUserId){
+                                                @PathVariable Long studyUserId) {
         studyService.deleteStudyUser(userId, studyId, studyUserId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    // 회원 스터디 방출
+    @DeleteMapping("/studeis/{studyId}/studyUsers")
+    public ResponseEntity<Void> deleteStudyUser(@LoginUser Long userId,
+                                                @PathVariable Long studyId) {
 
-    // 회원 스터디 나가기
+        studyService.deleteStudyUser(userId, studyId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 
     // 스터디 회원 조회
 

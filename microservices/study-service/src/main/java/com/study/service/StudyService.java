@@ -35,4 +35,6 @@ public interface StudyService {
     void createStudyUser(Long userId, Long studyId, Long studyUserId);
 
     void deleteStudyUser(Long userId, Long studyId, Long studyUserId);
+
+    void deleteStudyUser(Long userId, Long studyId);
 }
