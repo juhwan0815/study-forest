@@ -17,4 +17,6 @@ public interface StudyService {
     StudyResponse update(Long userId, Long studyId, StudyUpdateRequest request);
 
     void delete(Long userId, Long studyId);
+
+    StudyResponse findById(Long userId, Long studyId);
 }

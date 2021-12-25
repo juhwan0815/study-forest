@@ -94,7 +94,7 @@ public class StudyServiceImpl implements StudyService {
                 .orElseThrow(() -> new RuntimeException());
 
         findStudy.change(request.getName(), request.getContent(), request.getNumberOfPeople(),
-                         request.getOnline(), request.getOffline(), request.getOpen(), findCategory);
+                request.getOnline(), request.getOffline(), request.getOpen(), findCategory);
 
         return StudyResponse.from(findStudy);
     }
@@ -107,5 +107,17 @@ public class StudyServiceImpl implements StudyService {
         findStudy.isStudyAdmin(userId);
 
         studyRepository.delete(findStudy);
+    }
+
+    @Override
+    public StudyResponse findById(Long userId, Long studyId) {
+        Study findStudy = studyQueryRepository.findWithCategoryAndTagById(studyId);
+
+        AreaResponse areaResponse = null;
+        if (findStudy.getAreaId() != null && findStudy.isOffline()) {
+            areaResponse = areaServiceClient.findById(findStudy.getAreaId());
+        }
+
+        return StudyResponse.from(findStudy, areaResponse);
     }
 }

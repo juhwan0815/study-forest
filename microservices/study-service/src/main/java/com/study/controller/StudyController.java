@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.ws.rs.Path;
 
 @RestController
 @RequiredArgsConstructor
@@ -54,6 +55,13 @@ public class StudyController {
         studyService.delete(userId, studyId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @GetMapping("/studies/{studyId}")
+    public ResponseEntity<StudyResponse> findById(@LoginUser Long userId, @PathVariable Long studyId) {
+        return ResponseEntity.ok(studyService.findById(userId, studyId));
+    }
+
+
 
 
 }
