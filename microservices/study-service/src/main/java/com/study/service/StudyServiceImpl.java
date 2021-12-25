@@ -71,7 +71,7 @@ public class StudyServiceImpl implements StudyService {
         study.changeArea(area.getId());
         studyRepository.save(study);
 
-        studyCreateMessageSender.send(new StudyCreateMessage(study.getId(), study.getName(), request.getTags()));
+        studyCreateMessageSender.send(StudyCreateMessage.from(study.getId(), study.getName(), request.getTags()));
         return StudyResponse.from(study, area);
     }
 
@@ -123,7 +123,7 @@ public class StudyServiceImpl implements StudyService {
         findStudy.isStudyAdmin(userId);
 
         studyRepository.delete(findStudy);
-        studyDeleteMessageSender.send(new StudyDeleteMessage(findStudy.getId()));
+        studyDeleteMessageSender.send(StudyDeleteMessage.from(findStudy.getId()));
     }
 
     @Override
@@ -177,7 +177,7 @@ public class StudyServiceImpl implements StudyService {
         findStudy.isStudyAdmin(userId);
         findStudy.failWaitUser(waitUserId);
 
-        studyApplyFailMessageSender.send(new StudyApplyFailMessage(waitUserId, findStudy.getId(), findStudy.getName()));
+        studyApplyFailMessageSender.send(StudyApplyFailMessage.from(waitUserId, findStudy.getId(), findStudy.getName()));
     }
 
     @Override
@@ -198,7 +198,7 @@ public class StudyServiceImpl implements StudyService {
 
         findStudy.successWaitUser(studyUserId);
         findStudy.addStudyUser(studyUserId, StudyRole.USER);
-        studyApplySuccessMessageSender.send(new StudyApplySuccessMessage(studyUserId, studyId, findStudy.getName()));
+        studyApplySuccessMessageSender.send(StudyApplySuccessMessage.from(studyUserId, studyId, findStudy.getName()));
     }
 
     @Override
