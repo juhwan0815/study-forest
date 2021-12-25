@@ -1,7 +1,7 @@
 package com.study.kakfa.producer;
 
-import com.study.studyservice.kafka.config.KafkaConfig;
-import com.study.studyservice.kafka.message.StudyCreateMessage;
+import com.study.kakfa.StudyCreateMessage;
+import com.study.kakfa.config.KafkaConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

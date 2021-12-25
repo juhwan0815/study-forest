@@ -15,6 +15,6 @@ public class TagResponse {
     private String content;
 
     public static TagResponse from(Tag tag){
-        return new TagResponse(tag.getId(), tag.getContent());1
+        return new TagResponse(tag.getId(), tag.getContent());
     }
 }

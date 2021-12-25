@@ -6,9 +6,7 @@ import com.study.dto.study.StudyResponse;
 import com.study.service.StudyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
@@ -24,5 +22,12 @@ public class StudyController {
                                                 @RequestPart(required = false) MultipartFile file,
                                                 @RequestPart @Valid StudyCreateRequest request) {
         return ResponseEntity.ok(studyService.create(userId, file, request));
+    }
+
+    @PatchMapping("/studies/{studyId}/images")
+    public ResponseEntity<StudyResponse> update(@LoginUser Long userId,
+                                                @PathVariable Long studyId,
+                                                @RequestPart(required = false) MultipartFile file) {
+        return ResponseEntity.ok(studyService.updateImage(userId, studyId, file));
     }
 }

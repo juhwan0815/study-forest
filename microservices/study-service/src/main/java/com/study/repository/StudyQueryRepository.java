@@ -11,4 +11,5 @@ public class StudyQueryRepository {
     private final JPAQueryFactory queryFactory;
 
 
+
 }

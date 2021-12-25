@@ -56,4 +56,15 @@ public class StudyServiceImpl implements StudyService {
         studyCreateMessageSender.send(new StudyCreateMessage(study.getId(), study.getName(), request.getTags()));
         return StudyResponse.from(study, area);
     }
+
+    @Override
+    @Transactional
+    public StudyResponse updateImage(Long userId, Long studyId, MultipartFile file) {
+        Study findStudy = studyRepository.findWithStudyUserById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+
+        Image image = imageUtil.uploadImage(file, findStudy.getImage());
+        findStudy.changeImage(image);
+        return StudyResponse.from(findStudy);
+    }
 }
