@@ -7,6 +7,7 @@ import com.study.dto.study.StudyUpdateAreaRequest;
 import com.study.dto.study.StudyUpdateRequest;
 import com.study.service.StudyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +27,13 @@ public class StudyController {
         return ResponseEntity.ok(studyService.create(userId, file, request));
     }
 
+    @PatchMapping("/studies/{studyId}")
+    public ResponseEntity<StudyResponse> update(@LoginUser Long userId,
+                                                @PathVariable Long studyId,
+                                                @RequestBody @Valid StudyUpdateRequest request) {
+        return ResponseEntity.ok(studyService.update(userId, studyId, request));
+    }
+
     @PatchMapping("/studies/{studyId}/images")
     public ResponseEntity<StudyResponse> updateImage(@LoginUser Long userId,
                                                      @PathVariable Long studyId,
@@ -40,11 +48,12 @@ public class StudyController {
         return ResponseEntity.ok(studyService.updateArea(userId, studyId, request));
     }
 
-    @PatchMapping("/studies/{studyId}")
-    public ResponseEntity<StudyResponse> update(@LoginUser Long userId,
-                                                @PathVariable Long studyId,
-                                                @RequestBody @Valid StudyUpdateRequest request) {
-        return ResponseEntity.ok(studyService.update(userId, studyId, request));
+    @DeleteMapping("/studies/{studyId}")
+    public ResponseEntity<Void> delete(@LoginUser Long userId,
+                                       @PathVariable Long studyId) {
+        studyService.delete(userId, studyId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
+
 
 }

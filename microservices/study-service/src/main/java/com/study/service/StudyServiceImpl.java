@@ -98,4 +98,14 @@ public class StudyServiceImpl implements StudyService {
 
         return StudyResponse.from(findStudy);
     }
+
+    @Override
+    @Transactional
+    public void delete(Long userId, Long studyId) {
+        Study findStudy = studyRepository.findWithStudyUserById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+        findStudy.isStudyAdmin(userId);
+
+        studyRepository.delete(findStudy);
+    }
 }

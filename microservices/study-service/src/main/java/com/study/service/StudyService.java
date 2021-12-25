@@ -15,4 +15,6 @@ public interface StudyService {
     StudyResponse updateArea(Long userId, Long studyId, StudyUpdateAreaRequest request);
 
     StudyResponse update(Long userId, Long studyId, StudyUpdateRequest request);
+
+    void delete(Long userId, Long studyId);
 }
