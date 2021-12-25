@@ -25,9 +25,10 @@ public class StudyController {
     }
 
     @PatchMapping("/studies/{studyId}/images")
-    public ResponseEntity<StudyResponse> update(@LoginUser Long userId,
-                                                @PathVariable Long studyId,
-                                                @RequestPart(required = false) MultipartFile file) {
+    public ResponseEntity<StudyResponse> updateImage(@LoginUser Long userId,
+                                                     @PathVariable Long studyId,
+                                                     @RequestPart(required = false) MultipartFile file) {
         return ResponseEntity.ok(studyService.updateImage(userId, studyId, file));
     }
+
 }

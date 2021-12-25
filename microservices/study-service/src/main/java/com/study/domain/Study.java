@@ -91,4 +91,12 @@ public class Study extends BaseEntity {
     public void changeArea(Long areaId) {
         this.areaId = areaId;
     }
+
+    public void isStudyAdmin(Long userId) {
+        boolean checkResult = studyUsers.stream()
+                .anyMatch(studyUser -> studyUser.getUserId().equals(userId) && studyUser.getStudyRole().equals(StudyRole.ADMIN));
+        if(!checkResult){
+            throw new RuntimeException();
+        }
+    }
 }

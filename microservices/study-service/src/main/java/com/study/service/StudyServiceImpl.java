@@ -62,6 +62,7 @@ public class StudyServiceImpl implements StudyService {
     public StudyResponse updateImage(Long userId, Long studyId, MultipartFile file) {
         Study findStudy = studyRepository.findWithStudyUserById(studyId)
                 .orElseThrow(() -> new RuntimeException());
+        findStudy.isStudyAdmin(userId);
 
         Image image = imageUtil.uploadImage(file, findStudy.getImage());
         findStudy.changeImage(image);
