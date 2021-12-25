@@ -3,6 +3,7 @@ package com.study.controller;
 import com.study.client.UserResponse;
 import com.study.config.LoginUser;
 import com.study.dto.chatroom.ChatRoomCreateRequest;
+import com.study.dto.chatroom.ChatRoomResponse;
 import com.study.dto.chatroom.ChatRoomUpdateRequest;
 import com.study.dto.study.*;
 import com.study.dto.studyuser.StudyUserResponse;
@@ -124,7 +125,7 @@ public class StudyController {
     }
 
     @GetMapping("/studies/{studyId}/studyUsers")
-    public ResponseEntity<List<StudyUserResponse>> findStudyUserById(@PathVariable Long studyId) {
+    public ResponseEntity<List<StudyUserResponse>> findStudyUsersById(@PathVariable Long studyId) {
         return ResponseEntity.ok(studyService.findStudyUsersById(studyId));
     }
 
@@ -151,6 +152,11 @@ public class StudyController {
                                                @PathVariable Long chatRoomId){
         studyService.deleteChatRoom(userId, studyId, chatRoomId);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/studies/{studyId}/chatRooms")
+    public ResponseEntity<List<ChatRoomResponse>> findChatRoomsById(@PathVariable Long studyId){
+        return ResponseEntity.ok(studyService.findChatRoomsById(studyId));
     }
 
     // 회원의 참가 신청 내역 조회

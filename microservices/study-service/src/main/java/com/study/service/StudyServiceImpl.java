@@ -6,6 +6,7 @@ import com.study.client.UserResponse;
 import com.study.client.UserServiceClient;
 import com.study.domain.*;
 import com.study.dto.chatroom.ChatRoomCreateRequest;
+import com.study.dto.chatroom.ChatRoomResponse;
 import com.study.dto.chatroom.ChatRoomUpdateRequest;
 import com.study.dto.study.*;
 import com.study.dto.studyuser.StudyUserResponse;
@@ -260,5 +261,15 @@ public class StudyServiceImpl implements StudyService {
         findStudy.isStudyAdmin(userId);
 
         findStudy.deleteChatRoom(chatRoomId);
+    }
+
+    @Override
+    public List<ChatRoomResponse> findChatRoomsById(Long studyId) {
+        Study findStudy = studyRepository.findWithChatRoomById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+
+        return findStudy.getChatRooms().stream()
+                .map(chatRoom -> ChatRoomResponse.from(chatRoom))
+                .collect(Collectors.toList());
     }
 }

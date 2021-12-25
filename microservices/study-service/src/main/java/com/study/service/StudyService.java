@@ -2,6 +2,7 @@ package com.study.service;
 
 import com.study.client.UserResponse;
 import com.study.dto.chatroom.ChatRoomCreateRequest;
+import com.study.dto.chatroom.ChatRoomResponse;
 import com.study.dto.chatroom.ChatRoomUpdateRequest;
 import com.study.dto.study.*;
 import com.study.dto.studyuser.StudyUserResponse;
@@ -48,4 +49,6 @@ public interface StudyService {
     void updateChatRoom(Long userId, Long studyId, Long chatRoomId, ChatRoomUpdateRequest request);
 
     void deleteChatRoom(Long userId, Long studyId, Long chatRoomId);
+
+    List<ChatRoomResponse> findChatRoomsById(Long studyId);
 }
