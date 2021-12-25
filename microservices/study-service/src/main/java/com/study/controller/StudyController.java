@@ -97,5 +97,31 @@ public class StudyController {
         return ResponseEntity.ok(studyService.findWaitUsersById(studyId));
     }
 
+    // 회원의 참가 신청 내역 조회
+
+    @PostMapping("/studies/{studyId}/studyUsers/{studyUserId}")
+    public ResponseEntity<Void> createStudyUser(@LoginUser Long userId,
+                                                @PathVariable Long studyId,
+                                                @PathVariable Long studyUserId) {
+        studyService.createStudyUser(userId, studyId, studyUserId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+
+    // 회원 스터디 방출
+
+    // 회원 스터디 나가기
+
+    // 스터디 회원 조회
+
+    // 회원의 스터디 조회
+
+    // 채팅방 생성
+
+    // 채팅방 수정
+
+    // 채팅방 삭제
+
+    // 채팅방 조회
 
 }

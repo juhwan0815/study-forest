@@ -18,6 +18,7 @@ public class WaitUser {
 
     private Long userId;
 
+    @Enumerated(EnumType.STRING)
     private WaitStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -34,5 +35,9 @@ public class WaitUser {
 
     public void fail() {
         this.status = WaitStatus.FAIL;
+    }
+
+    public void success() {
+        this.status = WaitStatus.SUCCESS;
     }
 }

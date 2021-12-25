@@ -22,11 +22,9 @@ public class UserResponse {
 
     private String imageUrl; // 이미지
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private Long areaId; // 지역 Id
 
     private Integer distance; // 검색거리
 
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String fcmToken; // FCM 토큰
 }

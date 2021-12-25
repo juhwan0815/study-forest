@@ -31,4 +31,6 @@ public interface StudyService {
     void deleteWaitUser(Long userId, Long studyId, Long waitUserId);
 
     List<UserResponse> findWaitUsersById(Long studyId);
+
+    void createStudyUser(Long userId, Long studyId, Long studyUserId);
 }

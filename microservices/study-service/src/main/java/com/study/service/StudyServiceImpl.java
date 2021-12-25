@@ -10,6 +10,7 @@ import com.study.domain.Study;
 import com.study.domain.StudyRole;
 import com.study.dto.study.*;
 import com.study.kakfa.StudyApplyFailMessage;
+import com.study.kakfa.StudyApplySuccessMessage;
 import com.study.kakfa.StudyCreateMessage;
 import com.study.kakfa.StudyDeleteMessage;
 import com.study.kakfa.sender.StudyApplyFailMessageSender;
@@ -185,5 +186,17 @@ public class StudyServiceImpl implements StudyService {
 
         List<Long> userIds = findStudy.getWaitUsersId();
         return userServiceClient.findByIdIn(userIds);
+    }
+
+    @Override
+    @Transactional
+    public void createStudyUser(Long userId, Long studyId, Long studyUserId) {
+        Study findStudy = studyRepository.findWithWaitUserById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+        findStudy.isStudyAdmin(userId);
+
+        findStudy.successWaitUser(studyUserId);
+        findStudy.addStudyUser(studyUserId, StudyRole.USER);
+        studyApplySuccessMessageSender.send(new StudyApplySuccessMessage(studyUserId, studyId, findStudy.getName()));
     }
 }

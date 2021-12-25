@@ -148,7 +148,6 @@ public class Study extends BaseEntity {
                 .findFirst().orElseThrow(() -> new RuntimeException());
 
         findWaitUser.fail();
-        waitUsers.remove(findWaitUser);
     }
 
     public void deleteWaitUser(Long userId) {
@@ -167,5 +166,13 @@ public class Study extends BaseEntity {
             }
         });
         return userIds;
+    }
+
+    public void successWaitUser(Long userId) {
+        WaitUser findWaitUser = waitUsers.stream()
+                .filter(waitUser -> waitUser.getUserId().equals(userId))
+                .findFirst().orElseThrow(() -> new RuntimeException());
+
+        findWaitUser.success();
     }
 }
