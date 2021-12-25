@@ -53,4 +53,5 @@ public interface StudyService {
     List<ChatRoomResponse> findChatRoomsById(Long studyId);
 
     List<StudyResponse> findByUserId(Long userId);
+    List<StudyResponse> findByWaitUserId(Long userId);
 }

@@ -164,7 +164,8 @@ public class StudyController {
         return ResponseEntity.ok(studyService.findByUserId(userId));
     }
 
-
-
-    // 회원의 참가 신청 내역 조회
+    @GetMapping("/studies/waitUsers")
+    public ResponseEntity<List<StudyResponse>> findByWaitUserId(@LoginUser Long userId){
+        return ResponseEntity.ok(studyService.findByWaitUserId(userId));
+    }
 }

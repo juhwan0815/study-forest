@@ -149,8 +149,8 @@ public class StudyServiceImpl implements StudyService {
                 areaIds = areas.stream().map(area -> area.getId()).collect(Collectors.toList());
             }
         }
-        Page<Study> studies = studyQueryRepository.findBySearchCondition(request, areaIds, pageable);
-        return studies.map(study -> StudyResponse.fromWithTag(study));
+        Page<Study> findStudies = studyQueryRepository.findBySearchCondition(request, areaIds, pageable);
+        return findStudies.map(study -> StudyResponse.fromWithTag(study));
     }
 
     @Override
@@ -275,9 +275,17 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     public List<StudyResponse> findByUserId(Long userId) {
-        List<Study> studies = studyQueryRepository.findByUserId(userId);
-        return studies.stream()
+        List<Study> findStudies = studyQueryRepository.findByUserId(userId);
+        return findStudies.stream()
                 .map(study -> StudyResponse.fromWithTag(study))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<StudyResponse> findByWaitUserId(Long userId) {
+        List<Study> findStudies = studyQueryRepository.findWithWaitUserByUserId(userId);
+        return findStudies.stream()
+                .map(study -> StudyResponse.fromWithWaitUserAndTag(study))
                 .collect(Collectors.toList());
     }
 }

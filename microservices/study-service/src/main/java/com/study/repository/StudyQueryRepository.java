@@ -3,10 +3,7 @@ package com.study.repository;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.study.domain.QStudy;
-import com.study.domain.QStudyUser;
-import com.study.domain.QTag;
-import com.study.domain.Study;
+import com.study.domain.*;
 import com.study.dto.study.StudySearchRequest;
 import lombok.RequiredArgsConstructor;
 import net.bytebuddy.agent.builder.AgentBuilder;
@@ -23,12 +20,24 @@ import static com.study.domain.QCategory.category;
 import static com.study.domain.QStudy.*;
 import static com.study.domain.QStudyUser.*;
 import static com.study.domain.QTag.tag;
+import static com.study.domain.QWaitUser.*;
 
 @Repository
 @RequiredArgsConstructor
 public class StudyQueryRepository {
 
     private final JPAQueryFactory queryFactory;
+
+    public List<Study> findWithWaitUserByUserId(Long userId){
+        return queryFactory
+                .selectFrom(study).distinct()
+                .join(study.waitUsers, waitUser)
+                .where(waitUser.userId.eq(userId))
+                .orderBy(study.id.desc())
+                .fetch();
+    }
+
+
 
     public Study findWithCategoryAndTagById(Long studyId) {
         Study findStudy = queryFactory

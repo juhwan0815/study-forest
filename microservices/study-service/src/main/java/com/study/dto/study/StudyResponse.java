@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.study.client.AreaResponse;
 import com.study.domain.Study;
 import com.study.domain.StudyStatus;
+import com.study.domain.WaitStatus;
 import com.study.dto.category.CategoryResponse;
 import com.study.dto.tag.TagResponse;
 import lombok.AllArgsConstructor;
@@ -11,7 +12,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Data
@@ -52,6 +52,8 @@ public class StudyResponse {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<TagResponse> tags; // 스터디 태그
 
+    private WaitStatus waitStatus;
+
     public static StudyResponse from(Study study, AreaResponse area) {
         StudyResponse studyResponse = new StudyResponse();
         studyResponse.name = study.getName();
@@ -69,7 +71,7 @@ public class StudyResponse {
             studyResponse.parentCategory = CategoryResponse.from(study.getCategory().getParent());
             studyResponse.childCategory = CategoryResponse.from(study.getCategory());
         }
-        if (study.getTags().size() != 0){
+        if (study.getTags().size() != 0) {
             studyResponse.tags = study.getTags().stream()
                     .map(tag -> TagResponse.from(tag))
                     .collect(Collectors.toList());
@@ -109,6 +111,26 @@ public class StudyResponse {
         studyResponse.tags = study.getTags().stream()
                 .map(tag -> TagResponse.from(tag))
                 .collect(Collectors.toList());
+        return studyResponse;
+    }
+
+    public static StudyResponse fromWithWaitUserAndTag(Study study) {
+        StudyResponse studyResponse = new StudyResponse();
+        studyResponse.studyId = study.getId();
+        studyResponse.name = study.getName();
+        studyResponse.content = study.getContent();
+        studyResponse.numberOfPeople = study.getNumberOfPeople();
+        studyResponse.currentNumberOfPeople = study.getCurrentNumberOfPeople();
+        studyResponse.online = study.isOnline();
+        studyResponse.offline = study.isOffline();
+        studyResponse.status = study.getStatus();
+        if (study.getImage() != null) {
+            studyResponse.imageUrl = study.getImage().getImageUrl();
+        }
+        studyResponse.tags = study.getTags().stream()
+                .map(tag -> TagResponse.from(tag))
+                .collect(Collectors.toList());
+        studyResponse.waitStatus = study.getWaitUsers().get(0).getStatus();
         return studyResponse;
     }
 }
