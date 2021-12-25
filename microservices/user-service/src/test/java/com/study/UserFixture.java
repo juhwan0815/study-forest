@@ -6,9 +6,12 @@ import com.study.domain.User;
 import com.study.domain.UserRole;
 import com.study.dto.keyword.KeywordCreateRequest;
 import com.study.dto.keyword.KeywordResponse;
+import com.study.dto.user.UserFindRequest;
 import com.study.dto.user.UserResponse;
 import com.study.dto.user.UserUpdateDistanceRequest;
 import com.study.dto.user.UserUpdateNickNameRequest;
+
+import java.util.Arrays;
 
 public class UserFixture {
 
@@ -19,6 +22,8 @@ public class UserFixture {
     public static final UserUpdateDistanceRequest TEST_USER_UPDATE_DISTANCE_REQUEST = new UserUpdateDistanceRequest(6);
 
     public static final UserUpdateNickNameRequest TEST_USER_UPDATE_NICKNAME_REQUEST= new UserUpdateNickNameRequest("황철원");
+
+    public static final UserFindRequest TEST_USER_FIND_REQUEST = new UserFindRequest(Arrays.asList(1L));
 
     public static final KeywordCreateRequest TEST_KEYWORD_CREATE_REQUEST = new KeywordCreateRequest("스프링");
 

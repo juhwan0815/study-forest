@@ -3,6 +3,7 @@ package com.study.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.config.LoginUserArgumentResolver;
 import com.study.dto.keyword.KeywordResponse;
+import com.study.dto.user.UserResponse;
 import com.study.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -147,6 +148,41 @@ class UserControllerTest {
 
         // then
         then(userService).should(times(1)).findByKakaoId(any(), any());
+    }
+
+    @Test
+    @DisplayName("회원 ID 리스트 조회 API")
+    void findByIdIn() throws Exception {
+        // given
+        List<UserResponse> result = Arrays.asList(TEST_USER_RESPONSE2);
+
+        given(userService.findByIdIn(any()))
+                .willReturn(result);
+
+        // when
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/users")
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .param("userIds", "1", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(result)))
+                .andDo(document("user/findByIdIn",
+                        requestParameters(
+                                parameterWithName("userIds").description("회원 ID 리스트")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].userId").type(JsonFieldType.NUMBER).description("회원 ID"),
+                                fieldWithPath("[].role").type(JsonFieldType.STRING).description("회원 권한"),
+                                fieldWithPath("[].nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                fieldWithPath("[].gender").type(JsonFieldType.STRING).description("회원 성별"),
+                                fieldWithPath("[].imageUrl").type(JsonFieldType.STRING).description("회원 프로필 이미지"),
+                                fieldWithPath("[].ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
+                                fieldWithPath("[].distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
+                                fieldWithPath("[].areaId").type(JsonFieldType.NUMBER).description("회원 지역 ID"),
+                                fieldWithPath("[].fcmToken").type(JsonFieldType.STRING).description("회원 FCM 토큰")
+                        )));
+
+        // then
+        then(userService).should(times(1)).findByIdIn(any());
     }
 
     @Test

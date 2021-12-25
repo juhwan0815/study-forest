@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -293,10 +294,10 @@ class UserServiceTest {
         User user = User.createUser(1L, "황주환", "10~19", "male", UserRole.USER);
         user.getKeywords().add(TEST_KEYWORD);
 
-        // when
         given(userQueryRepository.findWithKeywordById(any()))
                 .willReturn(user);
 
+        // when
         List<KeywordResponse> result = userService.findKeywordById(1L);
 
         // then
@@ -304,5 +305,20 @@ class UserServiceTest {
         assertThat(result.get(0).getKeywordId()).isEqualTo(TEST_KEYWORD.getId());
         assertThat(result.get(0).getContent()).isEqualTo(TEST_KEYWORD.getContent());
         then(userQueryRepository).should(times(1)).findWithKeywordById(any());
+    }
+
+    @Test
+    @DisplayName("회원 ID 리스트로 조회한다.")
+    void findByIdIn() {
+        // given
+        given(userRepository.findByIdIn(any()))
+                .willReturn(Arrays.asList(TEST_USER));
+
+        // when
+        List<UserResponse> result = userService.findByIdIn(TEST_USER_FIND_REQUEST);
+
+        // then
+        assertThat(result.size()).isEqualTo(1);
+        then(userRepository).should(times(1)).findByIdIn(any());
     }
 }

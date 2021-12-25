@@ -11,6 +11,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import javax.persistence.EntityManager;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -26,7 +29,7 @@ public class UserRepositoryTest {
 
     @Test
     @DisplayName("카카오 ID로 조회한다.")
-    void findByKakaoId(){
+    void findByKakaoId() {
         // given
         User user = User.createUser(1L, "황주환", "10~19", "male", UserRole.USER);
         userRepository.save(user);
@@ -39,5 +42,22 @@ public class UserRepositoryTest {
 
         // then
         assertThat(result.getKakaoId()).isEqualTo(user.getKakaoId());
+    }
+
+    @Test
+    @DisplayName("회원 ID 리스트로 조회한다.")
+    void findByIdIn() {
+        // given
+        User user = User.createUser(1L, "황주환", "10~19", "male", UserRole.USER);
+        userRepository.save(user);
+
+        em.flush();
+        em.clear();
+
+        // when
+        List<User> result = userRepository.findByIdIn(Arrays.asList(user.getId()));
+
+        // then
+        assertThat(result.size()).isEqualTo(1);
     }
 }

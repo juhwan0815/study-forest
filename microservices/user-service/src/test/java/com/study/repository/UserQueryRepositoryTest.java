@@ -47,7 +47,7 @@ class UserQueryRepositoryTest {
         em.clear();
 
         // when
-        User findUser = userQueryRepository.findWithKeywordById(1L);
+        User findUser = userQueryRepository.findWithKeywordById(user.getId());
 
         // then
         assertThat(findUser.getId()).isEqualTo(1L);
