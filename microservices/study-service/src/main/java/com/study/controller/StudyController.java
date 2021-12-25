@@ -2,6 +2,8 @@ package com.study.controller;
 
 import com.study.client.UserResponse;
 import com.study.config.LoginUser;
+import com.study.dto.chatroom.ChatRoomCreateRequest;
+import com.study.dto.chatroom.ChatRoomResponse;
 import com.study.dto.study.*;
 import com.study.dto.studyuser.StudyUserResponse;
 import com.study.service.StudyService;
@@ -127,6 +129,13 @@ public class StudyController {
         return ResponseEntity.ok(studyService.findStudyUsersById(studyId));
     }
 
+    @PostMapping("/studies/{studyId}/chatRooms")
+    public ResponseEntity<Void> createChatRoom(@LoginUser Long userId,
+                                               @PathVariable Long studyId,
+                                               @RequestBody @Valid ChatRoomCreateRequest request) {
+        studyService.createChatRoom(userId, studyId, request);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
 
     // 회원의 참가 신청 내역 조회

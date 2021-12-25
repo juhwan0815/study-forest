@@ -1,5 +1,6 @@
 package com.study.domain;
 
+import com.study.dto.chatroom.ChatRoomCreateRequest;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -194,5 +195,15 @@ public class Study extends BaseEntity {
                 .map(studyUser -> studyUser.getUserId())
                 .collect(Collectors.toList());
         return userIds;
+    }
+
+    public void addChatRoom(String name) {
+        boolean chatRoomResult = chatRooms.stream()
+                .anyMatch(chatRoom -> chatRoom.getName().equals(name));
+        if (chatRoomResult) {
+            throw new RuntimeException();
+        }
+        ChatRoom chatRoom = ChatRoom.createChatRoom(name, this);
+        chatRooms.add(chatRoom);
     }
 }

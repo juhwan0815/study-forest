@@ -1,6 +1,8 @@
 package com.study.service;
 
 import com.study.client.UserResponse;
+import com.study.dto.chatroom.ChatRoomCreateRequest;
+import com.study.dto.chatroom.ChatRoomResponse;
 import com.study.dto.study.*;
 import com.study.dto.studyuser.StudyUserResponse;
 import org.springframework.data.domain.Pageable;
@@ -40,4 +42,6 @@ public interface StudyService {
     void deleteStudyUser(Long userId, Long studyId);
 
     List<StudyUserResponse> findStudyUsersById(Long studyId);
+
+    void createChatRoom(Long userId, Long studyId, ChatRoomCreateRequest request);
 }

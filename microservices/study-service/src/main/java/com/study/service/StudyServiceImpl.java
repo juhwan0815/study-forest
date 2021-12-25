@@ -4,10 +4,9 @@ import com.study.client.AreaResponse;
 import com.study.client.AreaServiceClient;
 import com.study.client.UserResponse;
 import com.study.client.UserServiceClient;
-import com.study.domain.Category;
-import com.study.domain.Image;
-import com.study.domain.Study;
-import com.study.domain.StudyRole;
+import com.study.domain.*;
+import com.study.dto.chatroom.ChatRoomCreateRequest;
+import com.study.dto.chatroom.ChatRoomResponse;
 import com.study.dto.study.*;
 import com.study.dto.studyuser.StudyUserResponse;
 import com.study.kakfa.StudyApplyFailMessage;
@@ -30,7 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -232,5 +230,15 @@ public class StudyServiceImpl implements StudyService {
         return findStudy.getStudyUsers().stream()
                 .map(studyUser -> StudyUserResponse.from(studyUser, users))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void createChatRoom(Long userId, Long studyId, ChatRoomCreateRequest request) {
+        Study findStudy = studyRepository.findWithChatRoomById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+        findStudy.isStudyAdmin(userId);
+
+        findStudy.addChatRoom(request.getName());
     }
 }

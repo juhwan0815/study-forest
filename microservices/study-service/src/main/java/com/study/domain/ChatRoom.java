@@ -24,7 +24,7 @@ public class ChatRoom extends BaseEntity{
     @JoinColumn(name = "study_id")
     private Study study;
 
-    public static ChatRoom createChatRoom(String name,Long studyId, Study study){
+    public static ChatRoom createChatRoom(String name, Study study){
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.name = name;
         chatRoom.study = study;

@@ -14,4 +14,7 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
 
     @Query("select distinct s from Study s left join fetch s.waitUsers where s.id =:studyId")
     Optional<Study> findWithWaitUserById(@Param("studyId") Long studyId);
+
+    @Query("select distinct s from Study s left join fetch s.chatRooms where s.id =:studyId")
+    Optional<Study> findWithChatRoomById(@Param("studyId") Long studyId);
 }
