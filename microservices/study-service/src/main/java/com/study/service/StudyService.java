@@ -51,4 +51,6 @@ public interface StudyService {
     void deleteChatRoom(Long userId, Long studyId, Long chatRoomId);
 
     List<ChatRoomResponse> findChatRoomsById(Long studyId);
+
+    List<StudyResponse> findByUserId(Long userId);
 }

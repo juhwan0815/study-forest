@@ -272,4 +272,12 @@ public class StudyServiceImpl implements StudyService {
                 .map(chatRoom -> ChatRoomResponse.from(chatRoom))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<StudyResponse> findByUserId(Long userId) {
+        List<Study> studies = studyQueryRepository.findByUserId(userId);
+        return studies.stream()
+                .map(study -> StudyResponse.fromWithTag(study))
+                .collect(Collectors.toList());
+    }
 }

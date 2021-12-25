@@ -149,25 +149,22 @@ public class StudyController {
     @DeleteMapping("/studies/{studyId}/chatRooms/{chatRoomId}")
     public ResponseEntity<Void> deleteChatRoom(@LoginUser Long userId,
                                                @PathVariable Long studyId,
-                                               @PathVariable Long chatRoomId){
+                                               @PathVariable Long chatRoomId) {
         studyService.deleteChatRoom(userId, studyId, chatRoomId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/studies/{studyId}/chatRooms")
-    public ResponseEntity<List<ChatRoomResponse>> findChatRoomsById(@PathVariable Long studyId){
+    public ResponseEntity<List<ChatRoomResponse>> findChatRoomsById(@PathVariable Long studyId) {
         return ResponseEntity.ok(studyService.findChatRoomsById(studyId));
     }
 
+    @GetMapping("/users/studies")
+    public ResponseEntity<List<StudyResponse>> findByUserId(@LoginUser Long userId) {
+        return ResponseEntity.ok(studyService.findByUserId(userId));
+    }
+
+
+
     // 회원의 참가 신청 내역 조회
-    // 회원의 스터디 조회
-
-    // 채팅방 생성
-
-    // 채팅방 수정
-
-    // 채팅방 삭제
-
-    // 채팅방 조회
-
 }

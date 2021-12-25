@@ -4,6 +4,8 @@ import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.study.domain.QStudy;
+import com.study.domain.QStudyUser;
+import com.study.domain.QTag;
 import com.study.domain.Study;
 import com.study.dto.study.StudySearchRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.List;
 
 import static com.study.domain.QCategory.category;
 import static com.study.domain.QStudy.*;
+import static com.study.domain.QStudyUser.*;
 import static com.study.domain.QTag.tag;
 
 @Repository
@@ -77,4 +80,12 @@ public class StudyQueryRepository {
         return offline != null ? study.offline.eq(offline) : null;
     }
 
+    public List<Study> findByUserId(Long userId) {
+        return queryFactory
+                .selectFrom(study).distinct()
+                .leftJoin(study.studyUsers, studyUser)
+                .leftJoin(study.tags, tag).fetchJoin()
+                .where(studyUser.userId.eq(userId))
+                .fetch();
+    }
 }
