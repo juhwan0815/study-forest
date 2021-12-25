@@ -149,4 +149,12 @@ public class StudyServiceImpl implements StudyService {
                 .orElseThrow(() -> new RuntimeException());
         findStudy.addWaitUser(userId);
     }
+
+    @Override
+    @Transactional
+    public void deleteWaitUser(Long userId, Long studyId) {
+        Study findStudy = studyRepository.findWithWaitUserById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+        findStudy.deleteWaitUser(userId);
+    }
 }

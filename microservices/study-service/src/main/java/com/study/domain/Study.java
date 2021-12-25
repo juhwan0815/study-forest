@@ -128,17 +128,25 @@ public class Study extends BaseEntity {
 
         boolean waitUserResult = waitUsers.stream()
                 .anyMatch(waitUser -> waitUser.getUserId().equals(userId));
-        if(waitUserResult){
+        if (waitUserResult) {
             throw new RuntimeException();
         }
 
         boolean studyUserResult = studyUsers.stream()
                 .anyMatch(studyUser -> studyUser.getUserId().equals(userId));
-        if(studyUserResult){
+        if (studyUserResult) {
             throw new RuntimeException();
         }
 
         WaitUser waitUser = WaitUser.createWaitUser(userId, this);
         waitUsers.add(waitUser);
+    }
+
+    public void deleteWaitUser(Long userId) {
+        WaitUser findWaitUser = waitUsers.stream()
+                .filter(waitUser -> waitUser.getUserId().equals(userId))
+                .findFirst().orElseThrow(() -> new RuntimeException());
+
+        waitUsers.remove(findWaitUser);
     }
 }

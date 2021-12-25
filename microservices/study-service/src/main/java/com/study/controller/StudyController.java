@@ -75,5 +75,12 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @DeleteMapping("/studies/{studyId}/waitUsers")
+    public ResponseEntity<Void> deleteWaitUser(@LoginUser Long userId,
+                                               @PathVariable Long studyId) {
+        studyService.deleteWaitUser(userId,studyId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 
 }

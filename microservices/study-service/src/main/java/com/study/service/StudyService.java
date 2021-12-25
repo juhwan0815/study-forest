@@ -22,4 +22,6 @@ public interface StudyService {
     Slice<StudyResponse> search(Long userId, Pageable pageable, StudySearchRequest request);
 
     void createWaitUser(Long userId, Long studyId);
+
+    void deleteWaitUser(Long userId, Long studyId);
 }
