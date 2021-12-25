@@ -9,6 +9,7 @@ import com.study.domain.Image;
 import com.study.domain.Study;
 import com.study.domain.StudyRole;
 import com.study.dto.study.*;
+import com.study.dto.studyuser.StudyUserResponse;
 import com.study.kakfa.StudyApplyFailMessage;
 import com.study.kakfa.StudyApplySuccessMessage;
 import com.study.kakfa.StudyCreateMessage;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -217,5 +219,18 @@ public class StudyServiceImpl implements StudyService {
                 .orElseThrow(() -> new RuntimeException());
 
         findStudy.deleteStudyUser(userId);
+    }
+
+    @Override
+    public List<StudyUserResponse> findStudyUsersById(Long studyId) {
+        Study findStudy = studyRepository.findWithStudyUserById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+        List<Long> userIds = findStudy.getStudyUsersId();
+
+        List<UserResponse> users = userServiceClient.findByIdIn(userIds);
+
+        return findStudy.getStudyUsers().stream()
+                .map(studyUser -> StudyUserResponse.from(studyUser, users))
+                .collect(Collectors.toList());
     }
 }

@@ -188,4 +188,11 @@ public class Study extends BaseEntity {
         studyUsers.remove(findStudyUser);
         this.currentNumberOfPeople -= 1;
     }
+
+    public List<Long> getStudyUsersId(){
+        List<Long> userIds = studyUsers.stream()
+                .map(studyUser -> studyUser.getUserId())
+                .collect(Collectors.toList());
+        return userIds;
+    }
 }

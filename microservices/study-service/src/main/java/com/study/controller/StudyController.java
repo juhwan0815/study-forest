@@ -3,6 +3,7 @@ package com.study.controller;
 import com.study.client.UserResponse;
 import com.study.config.LoginUser;
 import com.study.dto.study.*;
+import com.study.dto.studyuser.StudyUserResponse;
 import com.study.service.StudyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -97,8 +98,6 @@ public class StudyController {
         return ResponseEntity.ok(studyService.findWaitUsersById(studyId));
     }
 
-    // 회원의 참가 신청 내역 조회
-
     @PostMapping("/studies/{studyId}/studyUsers/{studyUserId}")
     public ResponseEntity<Void> createStudyUser(@LoginUser Long userId,
                                                 @PathVariable Long studyId,
@@ -123,9 +122,14 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @GetMapping("/studies/{studyId}/studyUsers")
+    public ResponseEntity<List<StudyUserResponse>> findStudyUserById(@PathVariable Long studyId) {
+        return ResponseEntity.ok(studyService.findStudyUsersById(studyId));
+    }
 
-    // 스터디 회원 조회
 
+
+    // 회원의 참가 신청 내역 조회
     // 회원의 스터디 조회
 
     // 채팅방 생성

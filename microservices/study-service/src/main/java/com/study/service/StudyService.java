@@ -2,6 +2,7 @@ package com.study.service;
 
 import com.study.client.UserResponse;
 import com.study.dto.study.*;
+import com.study.dto.studyuser.StudyUserResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,4 +38,6 @@ public interface StudyService {
     void deleteStudyUser(Long userId, Long studyId, Long studyUserId);
 
     void deleteStudyUser(Long userId, Long studyId);
+
+    List<StudyUserResponse> findStudyUsersById(Long studyId);
 }
