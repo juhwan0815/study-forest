@@ -1,9 +1,12 @@
 package com.study.service;
 
+import com.study.client.UserResponse;
 import com.study.dto.study.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface StudyService {
 
@@ -24,4 +27,8 @@ public interface StudyService {
     void createWaitUser(Long userId, Long studyId);
 
     void deleteWaitUser(Long userId, Long studyId);
+
+    void deleteWaitUser(Long userId, Long studyId, Long waitUserId);
+
+    List<UserResponse> findWaitUsersById(Long studyId);
 }

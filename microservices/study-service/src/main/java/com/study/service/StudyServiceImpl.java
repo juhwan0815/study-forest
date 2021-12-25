@@ -9,8 +9,13 @@ import com.study.domain.Image;
 import com.study.domain.Study;
 import com.study.domain.StudyRole;
 import com.study.dto.study.*;
+import com.study.kakfa.StudyApplyFailMessage;
 import com.study.kakfa.StudyCreateMessage;
+import com.study.kakfa.StudyDeleteMessage;
+import com.study.kakfa.sender.StudyApplyFailMessageSender;
+import com.study.kakfa.sender.StudyApplySuccessMessageSender;
 import com.study.kakfa.sender.StudyCreateMessageSender;
+import com.study.kakfa.sender.StudyDeleteMessageSender;
 import com.study.repository.CategoryRepository;
 import com.study.repository.StudyQueryRepository;
 import com.study.repository.StudyRepository;
@@ -39,6 +44,9 @@ public class StudyServiceImpl implements StudyService {
     private final ImageUtil imageUtil;
 
     private final StudyCreateMessageSender studyCreateMessageSender;
+    private final StudyDeleteMessageSender studyDeleteMessageSender;
+    private final StudyApplyFailMessageSender studyApplyFailMessageSender;
+    private final StudyApplySuccessMessageSender studyApplySuccessMessageSender;
 
     @Override
     @Transactional
@@ -113,6 +121,7 @@ public class StudyServiceImpl implements StudyService {
         findStudy.isStudyAdmin(userId);
 
         studyRepository.delete(findStudy);
+        studyDeleteMessageSender.send(new StudyDeleteMessage(findStudy.getId()));
     }
 
     @Override
@@ -156,5 +165,25 @@ public class StudyServiceImpl implements StudyService {
         Study findStudy = studyRepository.findWithWaitUserById(studyId)
                 .orElseThrow(() -> new RuntimeException());
         findStudy.deleteWaitUser(userId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteWaitUser(Long userId, Long studyId, Long waitUserId) {
+        Study findStudy = studyRepository.findWithWaitUserById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+        findStudy.isStudyAdmin(userId);
+        findStudy.failWaitUser(waitUserId);
+
+        studyApplyFailMessageSender.send(new StudyApplyFailMessage(waitUserId, findStudy.getId(), findStudy.getName()));
+    }
+
+    @Override
+    public List<UserResponse> findWaitUsersById(Long studyId) {
+        Study findStudy = studyRepository.findWithWaitUserById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+
+        List<Long> userIds = findStudy.getWaitUsersId();
+        return userServiceClient.findByIdIn(userIds);
     }
 }

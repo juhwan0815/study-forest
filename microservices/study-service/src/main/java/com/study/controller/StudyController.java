@@ -1,5 +1,6 @@
 package com.study.controller;
 
+import com.study.client.UserResponse;
 import com.study.config.LoginUser;
 import com.study.dto.study.*;
 import com.study.service.StudyService;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.ws.rs.Path;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -78,8 +80,21 @@ public class StudyController {
     @DeleteMapping("/studies/{studyId}/waitUsers")
     public ResponseEntity<Void> deleteWaitUser(@LoginUser Long userId,
                                                @PathVariable Long studyId) {
-        studyService.deleteWaitUser(userId,studyId);
+        studyService.deleteWaitUser(userId, studyId);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/studies/{studyId}/waitUsers/{waitUserId}")
+    public ResponseEntity<Void> deleteWaitUser(@LoginUser Long userId,
+                                               @PathVariable Long studyId,
+                                               @PathVariable Long waitUserId) {
+        studyService.deleteWaitUser(userId, studyId, waitUserId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/studies/{studyId}/waitUsers")
+    public ResponseEntity<List<UserResponse>> findWaitUsersById(@PathVariable Long studyId) {
+        return ResponseEntity.ok(studyService.findWaitUsersById(studyId));
     }
 
 

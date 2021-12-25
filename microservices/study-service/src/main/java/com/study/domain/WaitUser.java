@@ -18,6 +18,8 @@ public class WaitUser {
 
     private Long userId;
 
+    private WaitStatus status;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "study_id")
     private Study study;
@@ -26,6 +28,11 @@ public class WaitUser {
         WaitUser studyUser = new WaitUser();
         studyUser.userId = userId;
         studyUser.study = study;
+        studyUser.status = WaitStatus.WAIT;
         return studyUser;
+    }
+
+    public void fail() {
+        this.status = WaitStatus.FAIL;
     }
 }

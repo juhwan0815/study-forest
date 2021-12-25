@@ -11,7 +11,7 @@ import java.util.List;
 public interface UserServiceClient {
 
     @GetMapping("/users")
-    List<UserResponse> findByIdIn(@RequestParam List<Long> userIdList);
+    List<UserResponse> findByIdIn(@RequestParam List<Long> userIds);
 
     @GetMapping("/users/{userId}")
     UserResponse findById(@PathVariable Long userId);

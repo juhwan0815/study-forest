@@ -142,11 +142,30 @@ public class Study extends BaseEntity {
         waitUsers.add(waitUser);
     }
 
+    public void failWaitUser(Long userId) {
+        WaitUser findWaitUser = waitUsers.stream()
+                .filter(waitUser -> waitUser.getUserId().equals(userId))
+                .findFirst().orElseThrow(() -> new RuntimeException());
+
+        findWaitUser.fail();
+        waitUsers.remove(findWaitUser);
+    }
+
     public void deleteWaitUser(Long userId) {
         WaitUser findWaitUser = waitUsers.stream()
                 .filter(waitUser -> waitUser.getUserId().equals(userId))
                 .findFirst().orElseThrow(() -> new RuntimeException());
 
         waitUsers.remove(findWaitUser);
+    }
+
+    public List<Long> getWaitUsersId() {
+        List<Long> userIds = new ArrayList<>();
+        waitUsers.stream().forEach(waitUser -> {
+            if(waitUser.getStatus().equals(WaitStatus.WAIT)){
+                userIds.add(waitUser.getUserId());
+            }
+        });
+        return userIds;
     }
 }
