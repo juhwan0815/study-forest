@@ -63,9 +63,16 @@ public class StudyController {
 
     @GetMapping("/studies")
     public ResponseEntity<Slice<StudyResponse>> search(@LoginUser Long userId,
-                                                      @PageableDefault(size = 25,page = 0) Pageable pageable,
-                                                      @Valid StudySearchRequest request){
+                                                       @PageableDefault(size = 25, page = 0) Pageable pageable,
+                                                       @Valid StudySearchRequest request) {
         return ResponseEntity.ok(studyService.search(userId, pageable, request));
+    }
+
+    @PostMapping("/studies/{studyId}/waitUsers")
+    public ResponseEntity<Void> createWaitUser(@LoginUser Long userId,
+                                               @PathVariable Long studyId) {
+        studyService.createWaitUser(userId, studyId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 

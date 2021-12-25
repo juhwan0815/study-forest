@@ -141,4 +141,12 @@ public class StudyServiceImpl implements StudyService {
         Page<Study> studies = studyQueryRepository.findBySearchCondition(request, areaIds, pageable);
         return studies.map(study -> StudyResponse.fromWithTag(study));
     }
+
+    @Override
+    @Transactional
+    public void createWaitUser(Long userId, Long studyId) {
+        Study findStudy = studyRepository.findWithWaitUserById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+        findStudy.addWaitUser(userId);
+    }
 }

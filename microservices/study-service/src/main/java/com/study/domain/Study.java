@@ -124,4 +124,21 @@ public class Study extends BaseEntity {
         }
     }
 
+    public void addWaitUser(Long userId) {
+
+        boolean waitUserResult = waitUsers.stream()
+                .anyMatch(waitUser -> waitUser.getUserId().equals(userId));
+        if(waitUserResult){
+            throw new RuntimeException();
+        }
+
+        boolean studyUserResult = studyUsers.stream()
+                .anyMatch(studyUser -> studyUser.getUserId().equals(userId));
+        if(studyUserResult){
+            throw new RuntimeException();
+        }
+
+        WaitUser waitUser = WaitUser.createWaitUser(userId, this);
+        waitUsers.add(waitUser);
+    }
 }
