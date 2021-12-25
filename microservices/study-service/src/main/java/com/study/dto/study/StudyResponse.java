@@ -93,4 +93,22 @@ public class StudyResponse {
         return studyResponse;
     }
 
+    public static StudyResponse fromWithTag(Study study) {
+        StudyResponse studyResponse = new StudyResponse();
+        studyResponse.studyId = study.getId();
+        studyResponse.name = study.getName();
+        studyResponse.content = study.getContent();
+        studyResponse.numberOfPeople = study.getNumberOfPeople();
+        studyResponse.currentNumberOfPeople = study.getCurrentNumberOfPeople();
+        studyResponse.online = study.isOnline();
+        studyResponse.offline = study.isOffline();
+        studyResponse.status = study.getStatus();
+        if (study.getImage() != null) {
+            studyResponse.imageUrl = study.getImage().getImageUrl();
+        }
+        studyResponse.tags = study.getTags().stream()
+                .map(tag -> TagResponse.from(tag))
+                .collect(Collectors.toList());
+        return studyResponse;
+    }
 }

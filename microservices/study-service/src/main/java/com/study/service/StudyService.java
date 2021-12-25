@@ -1,9 +1,8 @@
 package com.study.service;
 
-import com.study.dto.study.StudyCreateRequest;
-import com.study.dto.study.StudyResponse;
-import com.study.dto.study.StudyUpdateAreaRequest;
-import com.study.dto.study.StudyUpdateRequest;
+import com.study.dto.study.*;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface StudyService {
@@ -18,5 +17,7 @@ public interface StudyService {
 
     void delete(Long userId, Long studyId);
 
-    StudyResponse findById(Long userId, Long studyId);
+    StudyResponse findById(Long studyId);
+
+    Slice<StudyResponse> search(Long userId, Pageable pageable, StudySearchRequest request);
 }

@@ -1,12 +1,12 @@
 package com.study.controller;
 
 import com.study.config.LoginUser;
-import com.study.dto.study.StudyCreateRequest;
-import com.study.dto.study.StudyResponse;
-import com.study.dto.study.StudyUpdateAreaRequest;
-import com.study.dto.study.StudyUpdateRequest;
+import com.study.dto.study.*;
 import com.study.service.StudyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -57,11 +57,16 @@ public class StudyController {
     }
 
     @GetMapping("/studies/{studyId}")
-    public ResponseEntity<StudyResponse> findById(@LoginUser Long userId, @PathVariable Long studyId) {
-        return ResponseEntity.ok(studyService.findById(userId, studyId));
+    public ResponseEntity<StudyResponse> findById(@PathVariable Long studyId) {
+        return ResponseEntity.ok(studyService.findById(studyId));
     }
 
-
+    @GetMapping("/studies")
+    public ResponseEntity<Slice<StudyResponse>> search(@LoginUser Long userId,
+                                                      @PageableDefault(size = 25,page = 0) Pageable pageable,
+                                                      @Valid StudySearchRequest request){
+        return ResponseEntity.ok(studyService.search(userId, pageable, request));
+    }
 
 
 }

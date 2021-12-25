@@ -2,14 +2,13 @@ package com.study.service;
 
 import com.study.client.AreaResponse;
 import com.study.client.AreaServiceClient;
+import com.study.client.UserResponse;
+import com.study.client.UserServiceClient;
 import com.study.domain.Category;
 import com.study.domain.Image;
 import com.study.domain.Study;
 import com.study.domain.StudyRole;
-import com.study.dto.study.StudyCreateRequest;
-import com.study.dto.study.StudyResponse;
-import com.study.dto.study.StudyUpdateAreaRequest;
-import com.study.dto.study.StudyUpdateRequest;
+import com.study.dto.study.*;
 import com.study.kakfa.StudyCreateMessage;
 import com.study.kakfa.sender.StudyCreateMessageSender;
 import com.study.repository.CategoryRepository;
@@ -17,9 +16,15 @@ import com.study.repository.StudyQueryRepository;
 import com.study.repository.StudyRepository;
 import com.study.util.ImageUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +35,7 @@ public class StudyServiceImpl implements StudyService {
     private final StudyQueryRepository studyQueryRepository;
     private final CategoryRepository categoryRepository;
     private final AreaServiceClient areaServiceClient;
+    private final UserServiceClient userServiceClient;
     private final ImageUtil imageUtil;
 
     private final StudyCreateMessageSender studyCreateMessageSender;
@@ -110,7 +116,7 @@ public class StudyServiceImpl implements StudyService {
     }
 
     @Override
-    public StudyResponse findById(Long userId, Long studyId) {
+    public StudyResponse findById(Long studyId) {
         Study findStudy = studyQueryRepository.findWithCategoryAndTagById(studyId);
 
         AreaResponse areaResponse = null;
@@ -119,5 +125,20 @@ public class StudyServiceImpl implements StudyService {
         }
 
         return StudyResponse.from(findStudy, areaResponse);
+    }
+
+    @Override
+    public Slice<StudyResponse> search(Long userId, Pageable pageable, StudySearchRequest request) {
+
+        List<Long> areaIds = null;
+        if (request.getOffline() == true && userId != null) {
+            UserResponse user = userServiceClient.findById(userId);
+            if (user.getAreaId() != null) {
+                List<AreaResponse> areas = areaServiceClient.findAroundById(user.getAreaId(), user.getDistance());
+                areaIds = areas.stream().map(area -> area.getId()).collect(Collectors.toList());
+            }
+        }
+        Page<Study> studies = studyQueryRepository.findBySearchCondition(request, areaIds, pageable);
+        return studies.map(study -> StudyResponse.fromWithTag(study));
     }
 }
