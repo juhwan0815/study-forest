@@ -199,4 +199,14 @@ public class StudyServiceImpl implements StudyService {
         findStudy.addStudyUser(studyUserId, StudyRole.USER);
         studyApplySuccessMessageSender.send(new StudyApplySuccessMessage(studyUserId, studyId, findStudy.getName()));
     }
+
+    @Override
+    @Transactional
+    public void deleteStudyUser(Long userId, Long studyId, Long studyUserId) {
+        Study findStudy = studyRepository.findWithStudyUserById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+        findStudy.isStudyAdmin(userId);
+
+        findStudy.deleteStudyUser(studyUserId);
+    }
 }

@@ -161,7 +161,7 @@ public class Study extends BaseEntity {
     public List<Long> getWaitUsersId() {
         List<Long> userIds = new ArrayList<>();
         waitUsers.stream().forEach(waitUser -> {
-            if(waitUser.getStatus().equals(WaitStatus.WAIT)){
+            if (waitUser.getStatus().equals(WaitStatus.WAIT)) {
                 userIds.add(waitUser.getUserId());
             }
         });
@@ -174,5 +174,18 @@ public class Study extends BaseEntity {
                 .findFirst().orElseThrow(() -> new RuntimeException());
 
         findWaitUser.success();
+    }
+
+    public void deleteStudyUser(Long studyUserId) {
+        StudyUser findStudyUser = studyUsers.stream()
+                .filter(studyUser -> studyUser.getUserId().equals(studyUserId))
+                .findFirst().orElseThrow(() -> new RuntimeException());
+
+        if (findStudyUser.getStudyRole().equals(StudyRole.ADMIN)) {
+            throw new RuntimeException();
+        }
+
+        studyUsers.remove(findStudyUser);
+        this.currentNumberOfPeople -= 1;
     }
 }

@@ -107,6 +107,13 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @DeleteMapping("/studies/{studyId}/studyUsers/{studyUserId}")
+    public ResponseEntity<Void> deleteStudyUser(@LoginUser Long userId,
+                                                @PathVariable Long studyId,
+                                                @PathVariable Long studyUserId){
+        studyService.deleteStudyUser(userId, studyId, studyUserId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
     // 회원 스터디 방출
 
