@@ -309,4 +309,13 @@ public class StudyServiceImpl implements StudyService {
         findStudy.isStudyAdmin(userId);
         findStudy.addTag(request.getContent());
     }
+
+    @Override
+    public void deleteTag(Long userId, Long studyId, Long tagId) {
+        Study findStudy = studyRepository.findWithStudyUserById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+
+        findStudy.isStudyAdmin(userId);
+        findStudy.deleteTag(tagId);
+    }
 }

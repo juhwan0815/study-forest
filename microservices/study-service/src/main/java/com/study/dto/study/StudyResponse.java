@@ -52,6 +52,7 @@ public class StudyResponse {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<TagResponse> tags; // 스터디 태그
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private WaitStatus waitStatus;
 
     public static StudyResponse from(Study study, AreaResponse area) {

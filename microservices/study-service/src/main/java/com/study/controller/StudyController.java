@@ -168,6 +168,14 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @DeleteMapping("/studies/{studyId}/tags/{tagId}")
+    public ResponseEntity<Void> deleteTag(@LoginUser Long userId,
+                                          @PathVariable Long studyId,
+                                          @PathVariable Long tagId) {
+        studyService.deleteTag(userId, studyId, tagId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @GetMapping("/users/studies")
     public ResponseEntity<List<StudyResponse>> findByUserId(@LoginUser Long userId) {
         return ResponseEntity.ok(studyService.findByUserId(userId));

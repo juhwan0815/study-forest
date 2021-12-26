@@ -61,4 +61,6 @@ public interface StudyService {
     void deleteStudyUserAndWaitUser(UserDeleteMessage userDeleteMessage);
 
     void addTag(Long userId, Long studyId, TagCreateRequest request);
+
+    void deleteTag(Long userId, Long studyId, Long tagId);
 }

@@ -236,4 +236,11 @@ public class Study extends BaseEntity {
         Tag tag = Tag.createTag(content, this);
         tags.add(tag);
     }
+
+    public void deleteTag(Long tagId) {
+        Tag findTag = tags.stream()
+                .filter(tag -> tag.getId().equals(tagId))
+                .findFirst().orElseThrow(() -> new RuntimeException());
+        tags.remove(findTag);
+    }
 }
