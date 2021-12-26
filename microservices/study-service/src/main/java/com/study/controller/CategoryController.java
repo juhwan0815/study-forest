@@ -42,7 +42,7 @@ public class CategoryController {
     }
 
     @GetMapping("/categories")
-    public ResponseEntity<List<CategoryResponse>> findParentCategory(){
+    public ResponseEntity<List<CategoryResponse>> findParent(){
         return ResponseEntity.ok(categoryService.findParent());
     }
 

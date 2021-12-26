@@ -32,6 +32,7 @@ public class Category extends BaseEntity {
         Category category = new Category();
         category.name = name;
         category.parent = parent;
+        category.getChildren().add(category);
         return category;
     }
 

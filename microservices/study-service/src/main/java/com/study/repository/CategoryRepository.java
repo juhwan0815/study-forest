@@ -8,7 +8,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface CategoryRepository extends JpaRepository<Category, Long> {
+public interface
+CategoryRepository extends JpaRepository<Category, Long> {
 
     Optional<Category> findByName(String name);
 
@@ -17,6 +18,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query("select distinct c from Category c left join fetch c.children where c.id =:categoryId")
     Optional<Category> findWithChildrenById(@Param("categoryId") Long categoryId);
 
-    @Query("select distinct c from Category c left join fetch c.parent where c.id =:categoryId")
+    @Query("select c from Category c left join fetch c.parent where c.id =:categoryId")
     Optional<Category> findWithParentById(@Param("categoryId") Long categoryId);
 }

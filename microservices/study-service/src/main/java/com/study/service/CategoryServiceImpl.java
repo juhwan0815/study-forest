@@ -58,6 +58,10 @@ public class CategoryServiceImpl implements CategoryService {
         Category findCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new RuntimeException());
 
+        if (categoryRepository.findByName(request.getName()).isPresent()) {
+            throw new RuntimeException();
+        }
+
         findCategory.changeName(request.getName());
 
         return CategoryResponse.from(findCategory);
