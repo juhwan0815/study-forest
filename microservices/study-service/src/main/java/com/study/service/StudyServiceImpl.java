@@ -10,6 +10,7 @@ import com.study.dto.chatroom.ChatRoomResponse;
 import com.study.dto.chatroom.ChatRoomUpdateRequest;
 import com.study.dto.study.*;
 import com.study.dto.studyuser.StudyUserResponse;
+import com.study.dto.tag.TagCreateRequest;
 import com.study.kakfa.*;
 import com.study.kakfa.sender.StudyApplyFailMessageSender;
 import com.study.kakfa.sender.StudyApplySuccessMessageSender;
@@ -298,5 +299,14 @@ public class StudyServiceImpl implements StudyService {
         findStudies.forEach(study -> {
             study.deleteStudyUser(userDeleteMessage.getUserId());
         });
+    }
+
+    @Override
+    @Transactional
+    public void addTag(Long userId, Long studyId, TagCreateRequest request) {
+        Study findStudy = studyRepository.findWithStudyUserById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+        findStudy.isStudyAdmin(userId);
+        findStudy.addTag(request.getContent());
     }
 }

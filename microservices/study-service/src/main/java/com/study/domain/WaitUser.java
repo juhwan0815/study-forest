@@ -26,11 +26,11 @@ public class WaitUser {
     private Study study;
 
     public static WaitUser createWaitUser(Long userId, Study study) {
-        WaitUser studyUser = new WaitUser();
-        studyUser.userId = userId;
-        studyUser.study = study;
-        studyUser.status = WaitStatus.WAIT;
-        return studyUser;
+        WaitUser waitUser = new WaitUser();
+        waitUser.userId = userId;
+        waitUser.study = study;
+        waitUser.status = WaitStatus.WAIT;
+        return waitUser;
     }
 
     public void fail() {

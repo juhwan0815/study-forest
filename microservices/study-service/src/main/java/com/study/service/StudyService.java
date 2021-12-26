@@ -6,6 +6,7 @@ import com.study.dto.chatroom.ChatRoomResponse;
 import com.study.dto.chatroom.ChatRoomUpdateRequest;
 import com.study.dto.study.*;
 import com.study.dto.studyuser.StudyUserResponse;
+import com.study.dto.tag.TagCreateRequest;
 import com.study.kakfa.UserDeleteMessage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -59,4 +60,5 @@ public interface StudyService {
 
     void deleteStudyUserAndWaitUser(UserDeleteMessage userDeleteMessage);
 
+    void addTag(Long userId, Long studyId, TagCreateRequest request);
 }

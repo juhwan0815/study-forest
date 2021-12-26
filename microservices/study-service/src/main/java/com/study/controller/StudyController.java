@@ -7,6 +7,7 @@ import com.study.dto.chatroom.ChatRoomResponse;
 import com.study.dto.chatroom.ChatRoomUpdateRequest;
 import com.study.dto.study.*;
 import com.study.dto.studyuser.StudyUserResponse;
+import com.study.dto.tag.TagCreateRequest;
 import com.study.service.StudyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -159,13 +160,21 @@ public class StudyController {
         return ResponseEntity.ok(studyService.findChatRoomsById(studyId));
     }
 
+    @PostMapping("/studies/{studyId}/tags")
+    public ResponseEntity<Void> addTag(@LoginUser Long userId,
+                                       @PathVariable Long studyId,
+                                       @RequestBody @Valid TagCreateRequest request) {
+        studyService.addTag(userId, studyId, request);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @GetMapping("/users/studies")
     public ResponseEntity<List<StudyResponse>> findByUserId(@LoginUser Long userId) {
         return ResponseEntity.ok(studyService.findByUserId(userId));
     }
 
     @GetMapping("/studies/waitUsers")
-    public ResponseEntity<List<StudyResponse>> findByWaitUserId(@LoginUser Long userId){
+    public ResponseEntity<List<StudyResponse>> findByWaitUserId(@LoginUser Long userId) {
         return ResponseEntity.ok(studyService.findByWaitUserId(userId));
     }
 }

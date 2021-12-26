@@ -31,16 +31,15 @@ public class StudyQueryRepository {
     public List<Study> findWithWaitUserByUserId(Long userId){
         return queryFactory
                 .selectFrom(study).distinct()
-                .join(study.waitUsers, waitUser)
+                .join(study.waitUsers, waitUser).fetchJoin()
                 .where(waitUser.userId.eq(userId))
-                .orderBy(study.id.desc())
                 .fetch();
     }
 
     public List<Study> findWithStudyUsersByUserId(Long userId){
         return queryFactory
                 .selectFrom(study).distinct()
-                .join(study.studyUsers, studyUser)
+                .join(study.studyUsers, studyUser).fetchJoin()
                 .where(studyUser.userId.eq(userId))
                 .fetch();
     }
@@ -59,6 +58,15 @@ public class StudyQueryRepository {
         return findStudy;
     }
 
+    public List<Study> findByUserId(Long userId) {
+        return queryFactory
+                .selectFrom(study).distinct()
+                .leftJoin(study.studyUsers, studyUser)
+                .leftJoin(study.tags, tag).fetchJoin()
+                .where(studyUser.userId.eq(userId))
+                .fetch();
+    }
+
     public Page<Study> findBySearchCondition(StudySearchRequest request, List<Long> areaIds,
                                              Pageable pageable) {
         QueryResults<Study> result = queryFactory
@@ -66,7 +74,8 @@ public class StudyQueryRepository {
                 .where(nameLike(request.getKeyword()),
                         areaIn(areaIds),
                         categoryEq(request.getCategoryId()),
-                        online(request.getOnline()).or(offline(request.getOffline())))
+                        online(request.getOnline()),
+                        offline(request.getOffline()))
                 .orderBy(study.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -95,12 +104,4 @@ public class StudyQueryRepository {
         return offline != null ? study.offline.eq(offline) : null;
     }
 
-    public List<Study> findByUserId(Long userId) {
-        return queryFactory
-                .selectFrom(study).distinct()
-                .leftJoin(study.studyUsers, studyUser)
-                .leftJoin(study.tags, tag).fetchJoin()
-                .where(studyUser.userId.eq(userId))
-                .fetch();
-    }
 }

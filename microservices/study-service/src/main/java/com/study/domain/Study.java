@@ -225,4 +225,15 @@ public class Study extends BaseEntity {
 
         chatRooms.remove(findChatRoom);
     }
+
+    public void addTag(String content) {
+        boolean tagResult = tags.stream()
+                .anyMatch(tag -> tag.getContent().equals(content));
+        if (tagResult) {
+            throw new RuntimeException();
+        }
+
+        Tag tag = Tag.createTag(content, this);
+        tags.add(tag);
+    }
 }
