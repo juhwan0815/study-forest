@@ -40,19 +40,19 @@ public class Gathering extends BaseEntity {
     @OneToMany(mappedBy = "gathering", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GatheringUser> gatheringUsers = new ArrayList<>();
 
-    public static Gathering createGathering(Long studyId, LocalDateTime gatheringTime, boolean status, String content) {
+    public static Gathering createGathering(Long studyId, LocalDateTime gatheringTime, boolean offline, String content) {
         Gathering gathering = new Gathering();
         gathering.studyId = studyId;
         gathering.gatheringTime = gatheringTime;
-        gathering.status = status;
+        gathering.offline = offline;
         gathering.content = content;
         gathering.numberOfPeople = 0;
         return gathering;
     }
 
-    public void update(LocalDateTime gatheringTime, boolean status, String content) {
+    public void update(LocalDateTime gatheringTime, boolean offline, String content) {
         this.gatheringTime = gatheringTime;
-        this.status = status;
+        this.offline = offline;
         this.content = content;
     }
 

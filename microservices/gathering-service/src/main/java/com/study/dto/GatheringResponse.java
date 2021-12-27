@@ -23,7 +23,7 @@ public class GatheringResponse {
 
     private Integer numberOfPeople;
 
-    private Boolean status;
+    private Boolean offline;
 
     private String content;
 
@@ -35,7 +35,7 @@ public class GatheringResponse {
         gatheringResponse.studyId = gathering.getStudyId();
         gatheringResponse.gatheringTime = gathering.getGatheringTime();
         gatheringResponse.numberOfPeople = gathering.getNumberOfPeople();
-        gatheringResponse.status = gathering.isStatus();
+        gatheringResponse.offline = gathering.isOffline();
         gatheringResponse.content = gathering.getContent();
         gatheringResponse.place = gathering.getPlace();
         return gatheringResponse;
