@@ -1,5 +1,7 @@
 package com.study.service;
 
+import com.study.client.UserResponse;
+import com.study.client.UserServiceClient;
 import com.study.domain.Gathering;
 import com.study.domain.Place;
 import com.study.dto.GatheringCreateRequest;
@@ -10,21 +12,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class GatheringServiceImpl implements GatheringService {
 
     private final GatheringRepository gatheringRepository;
+    private final UserServiceClient userServiceClient;
 
     @Override
     @Transactional
     public GatheringResponse create(Long userId, Long studyId, GatheringCreateRequest request) {
 
-        Gathering gathering = Gathering.createGathering(studyId, request.getGatheringTime(), request.getStatus(), request.getContent());
+        Gathering gathering = Gathering.createGathering(studyId, request.getGatheringTime(), request.getOffline(), request.getContent());
         gathering.addGatheringUser(userId, true);
 
-        if (request.getStatus()) {
+        if (request.getOffline()) {
             Place place = Place.createPlace(request.getPlaceName(), request.getLet(), request.getLen());
             gathering.changePlace(place);
         }
@@ -40,9 +45,9 @@ public class GatheringServiceImpl implements GatheringService {
                 .orElseThrow(() -> new RuntimeException());
         findGathering.isRegister(userId);
 
-        findGathering.update(request.getGatheringTime(), request.getStatus(), request.getContent());
+        findGathering.update(request.getGatheringTime(), request.getOffline(), request.getContent());
 
-        if (request.getStatus()) {
+        if (request.getOffline()) {
             Place place = Place.createPlace(request.getPlaceName(), request.getLet(), request.getLen());
             findGathering.changePlace(place);
         }
@@ -73,7 +78,7 @@ public class GatheringServiceImpl implements GatheringService {
         Gathering findGathering = gatheringRepository.findWithGatheringUserById(gatheringId)
                 .orElseThrow(() -> new RuntimeException());
 
-        findGathering.addGatheringUser(userId,false);
+        findGathering.addGatheringUser(userId, false);
     }
 
     @Override
@@ -85,7 +90,14 @@ public class GatheringServiceImpl implements GatheringService {
         findGathering.deleteGatheringUser(userId);
     }
 
+    @Override
+    public List<UserResponse> findGatheringUserById(Long gatheringId) {
+        Gathering findGathering = gatheringRepository.findWithGatheringUserById(gatheringId)
+                .orElseThrow(() -> new RuntimeException());
 
+        List<Long> userIds = findGathering.getGatheringUserId();
+        return userServiceClient.findByIdIn(userIds);
+    }
 
 
 }

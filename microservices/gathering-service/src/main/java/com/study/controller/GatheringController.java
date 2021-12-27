@@ -1,5 +1,6 @@
 package com.study.controller;
 
+import com.study.client.UserResponse;
 import com.study.config.LoginUser;
 import com.study.dto.GatheringCreateRequest;
 import com.study.dto.GatheringResponse;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -59,5 +61,9 @@ public class GatheringController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @GetMapping("/gatherings/{gatheringId}/gatheringUser")
+    public ResponseEntity<List<UserResponse>> findGatheringUsersById(@PathVariable Long gatheringId) {
+        return ResponseEntity.ok(gatheringService.findGatheringUserById(gatheringId));
+    }
 
 }

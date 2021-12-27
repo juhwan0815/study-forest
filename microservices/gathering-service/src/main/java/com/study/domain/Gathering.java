@@ -28,7 +28,7 @@ public class Gathering extends BaseEntity {
 
     private LocalDateTime gatheringTime;
 
-    private boolean status;
+    private boolean offline;
 
     private String content;
 

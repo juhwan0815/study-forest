@@ -18,11 +18,10 @@ public class GatheringUpdateRequest {
     private LocalDateTime gatheringTime; // 모임 시간
 
     @NotNull(message = "스터디 오프라인/오프라인 여부는 필수입니다.")
-    private Boolean status; // 온라인/오프라인 여부
+    private Boolean offline; // 온라인/오프라인 여부
 
     @NotBlank(message = "스터디 내용은 필수입니다.")
     private String content; // 내용
-
 
     private String placeName; // 장소 이름
 

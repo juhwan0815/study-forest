@@ -19,7 +19,7 @@ public class GatheringCreateRequest {
     private LocalDateTime gatheringTime; // 모임 시간
 
     @NotNull(message = "온라인/오프라인 여부는 필수입니다.")
-    private Boolean status; // 온라인/오프라인 여부
+    private Boolean offline; // 온라인/오프라인 여부
 
     @NotBlank(message = "모임 내용은 필수입니다.")
     private String content; // 내용

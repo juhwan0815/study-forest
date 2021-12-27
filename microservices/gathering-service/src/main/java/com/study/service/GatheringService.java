@@ -1,9 +1,12 @@
 package com.study.service;
 
+import com.study.client.UserResponse;
 import com.study.domain.Gathering;
 import com.study.dto.GatheringCreateRequest;
 import com.study.dto.GatheringResponse;
 import com.study.dto.GatheringUpdateRequest;
+
+import java.util.List;
 
 public interface GatheringService {
 
@@ -18,4 +21,6 @@ public interface GatheringService {
     void addGatheringUser(Long userId, Long gatheringId);
 
     void deleteGatheringUser(Long userId, Long gatheringId);
+
+    List<UserResponse> findGatheringUserById(Long gatheringId);
 }
