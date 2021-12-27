@@ -38,9 +38,6 @@ public class StudyResponse {
     private String imageUrl;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    private Boolean apply; // 신청 여부
-
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private AreaResponse area; // 지역 정보
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -57,6 +54,7 @@ public class StudyResponse {
 
     public static StudyResponse from(Study study, AreaResponse area) {
         StudyResponse studyResponse = new StudyResponse();
+        studyResponse.studyId = study.getId();
         studyResponse.name = study.getName();
         studyResponse.content = study.getContent();
         studyResponse.numberOfPeople = study.getNumberOfPeople();
@@ -64,6 +62,7 @@ public class StudyResponse {
         studyResponse.online = study.isOnline();
         studyResponse.offline = study.isOffline();
         studyResponse.area = area;
+        studyResponse.status = study.getStatus();
         // TODO 수정
         if (study.getImage() != null) {
             studyResponse.imageUrl = study.getImage().getImageUrl();

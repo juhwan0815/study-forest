@@ -17,9 +17,9 @@ public class StudyUpdateRequest {
 
     private Boolean online;
 
-    private Boolean open;
-
     private Boolean offline;
+
+    private Boolean open;
 
     private Long categoryId;
 }
