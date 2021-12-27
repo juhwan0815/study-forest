@@ -1,0 +1,299 @@
+:basedir: {docdir}
+:snippets: {basedir}/build/generated-snippets
+
+= 스터디 서비스 - 카테고리 API
+:doctype: study
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectnums:
+:sectlinks:
+:sectanchors:
+
+스터디 서비스 요청 URL
+
+Gateway-service 주소 : 포트 + /study-service
+
+[[api]]
+==== 스터디 생성 API
+===== 요청
+include::{snippets}/study/create/http-request.adoc[]
+====== Header
+include::{snippets}/study/create/request-headers.adoc[]
+====== Part
+include::{snippets}/study/create/request-parts.adoc[]
+====== Body
+include::{snippets}/study/create/request-part-request-fields.adoc[]
+
+===== 응답
+include::{snippets}/study/create/http-response.adoc[]
+====== Body
+include::{snippets}/study/create/response-fields.adoc[]
+
+==== 스터디 수정 API
+===== 요청
+include::{snippets}/study/update/http-request.adoc[]
+====== Header
+include::{snippets}/study/update/request-headers.adoc[]
+====== Path
+include::{snippets}/study/update/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/study/update/http-response.adoc[]
+====== Body
+include::{snippets}/study/update/response-fields.adoc[]
+
+==== 스터디 이미지 수정 API
+===== 요청
+include::{snippets}/study/updateImage/http-request.adoc[]
+====== Header
+include::{snippets}/study/updateImage/request-headers.adoc[]
+====== Path
+include::{snippets}/study/updateImage/path-parameters.adoc[]
+====== Part
+include::{snippets}/study/updateImage/request-parts.adoc[]
+
+===== 응답
+include::{snippets}/study/updateImage/http-response.adoc[]
+====== Body
+include::{snippets}/study/updateImage/response-fields.adoc[]
+
+==== 스터디 지역 수정 API
+===== 요청
+include::{snippets}/study/updateArea/http-request.adoc[]
+====== Header
+include::{snippets}/study/updateArea/request-headers.adoc[]
+====== Path
+include::{snippets}/study/updateArea/path-parameters.adoc[]
+====== Body
+include::{snippets}/study/updateArea/request-fields.adoc[]
+
+===== 응답
+include::{snippets}/study/updateArea/http-response.adoc[]
+====== Body
+include::{snippets}/study/updateArea/response-fields.adoc[]
+
+==== 스터디 삭제 API
+===== 요청
+include::{snippets}/study/delete/http-request.adoc[]
+====== Header
+include::{snippets}/study/delete/request-headers.adoc[]
+====== Path
+include::{snippets}/study/delete/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/study/delete/http-response.adoc[]
+
+==== 스터디 단건 조회 API
+===== 요청
+include::{snippets}/study/findById/http-request.adoc[]
+====== Path
+include::{snippets}/study/findById/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/study/findById/http-response.adoc[]
+====== Body
+include::{snippets}/study/findById/response-fields.adoc[]
+
+
+==== 스터디 검색 API
+===== 요청
+include::{snippets}/study/search/http-request.adoc[]
+====== Header
+include::{snippets}/study/search/request-headers.adoc[]
+====== Param
+include::{snippets}/study/search/request-parameters.adoc[]
+
+===== 응답
+include::{snippets}/study/search/http-response.adoc[]
+====== Body
+include::{snippets}/study/search/response-fields.adoc[]
+
+==== 스터디 참가 신청 API
+===== 요청
+include::{snippets}/study/waitUsers/create/http-request.adoc[]
+====== Header
+include::{snippets}/study/waitUsers/create/request-headers.adoc[]
+====== Path
+include::{snippets}/study/waitUsers/create/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/study/waitUsers/create/http-response.adoc[]
+
+==== 스터디 참가 신청 취소 API
+===== 요청
+include::{snippets}/study/waitUsers/delete/http-request.adoc[]
+====== Header
+include::{snippets}/study/waitUsers/delete/request-headers.adoc[]
+====== Path
+include::{snippets}/study/waitUsers/delete/path-parameters.adoc[]
+===== 응답
+include::{snippets}/study/waitUsers/delete/http-response.adoc[]
+
+==== 스터디 참가 거부 API
+===== 요청
+include::{snippets}/study/waitUsers/fail/http-request.adoc[]
+====== Header
+include::{snippets}/study/waitUsers/fail/request-headers.adoc[]
+====== Path
+include::{snippets}/study/waitUsers/fail/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/study/waitUsers/fail/http-response.adoc[]
+
+==== 스터디 참가 대기자 조회 API
+===== 요청
+include::{snippets}/study/waitUsers/find/http-request.adoc[]
+====== Header
+include::{snippets}/study/waitUsers/find/request-headers.adoc[]
+====== Path
+include::{snippets}/study/waitUsers/find/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/study/waitUsers/find/http-response.adoc[]
+====== Body
+include::{snippets}/study/waitUsers/find/response-fields.adoc[]
+
+==== 스터디 참가자 추가 API
+===== 요청
+include::{snippets}/study/studyUsers/create/http-request.adoc[]
+====== Header
+include::{snippets}/study/studyUsers/create/request-headers.adoc[]
+====== Path
+include::{snippets}/study/studyUsers/create/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/study/studyUsers/create/http-response.adoc[]
+
+==== 스터디 참가자 방출 API
+===== 요청
+include::{snippets}/study/studyUsers/delete/http-request.adoc[]
+====== Header
+include::{snippets}/study/studyUsers/delete/request-headers.adoc[]
+====== Path
+include::{snippets}/study/studyUsers/delete/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/study/studyUsers/delete/http-response.adoc[]
+
+==== 스터디 탈퇴 API
+===== 요청
+include::{snippets}/study/studyUsers/deleteSelf/http-request.adoc[]
+====== Header
+include::{snippets}/study/studyUsers/deleteSelf/request-headers.adoc[]
+====== Path
+include::{snippets}/study/studyUsers/deleteSelf/path-parameters.adoc[]
+===== 응답
+include::{snippets}/study/studyUsers/deleteSelf/http-response.adoc[]
+
+==== 스터디 참가자 조회 API
+===== 요청
+include::{snippets}/study/studyUsers/find/http-request.adoc[]
+====== Header
+include::{snippets}/study/studyUsers/find/request-headers.adoc[]
+====== Path
+include::{snippets}/study/studyUsers/find/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/study/studyUsers/find/http-response.adoc[]
+====== Body
+include::{snippets}/study/studyUsers/find/response-fields.adoc[]
+
+==== 스터디 채팅방 생성 API
+===== 요청
+include::{snippets}/study/chatRooms/create/http-request.adoc[]
+====== Header
+include::{snippets}/study/chatRooms/create/request-headers.adoc[]
+====== Path
+include::{snippets}/study/chatRooms/create/path-parameters.adoc[]
+====== Body
+include::{snippets}/study/chatRooms/create/request-fields.adoc[]
+
+===== 응답
+include::{snippets}/study/chatRooms/create/http-response.adoc[]
+
+==== 스터디 채팅방 수정 API
+===== 요청
+include::{snippets}/study/chatRooms/update/http-request.adoc[]
+====== Header
+include::{snippets}/study/chatRooms/update/request-headers.adoc[]
+====== Path
+include::{snippets}/study/chatRooms/update/path-parameters.adoc[]
+====== Body
+include::{snippets}/study/chatRooms/update/request-fields.adoc[]
+
+===== 응답
+include::{snippets}/study/chatRooms/update/http-response.adoc[]
+
+==== 스터디 채팅방 삭제 API
+===== 요청
+include::{snippets}/study/chatRooms/delete/http-request.adoc[]
+====== Header
+include::{snippets}/study/chatRooms/delete/request-headers.adoc[]
+====== Path
+include::{snippets}/study/chatRooms/delete/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/study/chatRooms/delete/http-response.adoc[]
+
+
+==== 스터디 채팅방 조회 API
+===== 요청
+include::{snippets}/study/chatRooms/find/http-request.adoc[]
+====== Header
+include::{snippets}/study/chatRooms/find/request-headers.adoc[]
+====== Path
+include::{snippets}/study/chatRooms/find/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/study/chatRooms/find/http-response.adoc[]
+====== Body
+include::{snippets}/study/chatRooms/find/response-fields.adoc[]
+
+==== 스터디 태그 추가 API
+===== 요청
+include::{snippets}/study/tags/create/http-request.adoc[]
+====== Header
+include::{snippets}/study/tags/create/request-headers.adoc[]
+====== Path
+include::{snippets}/study/tags/create/path-parameters.adoc[]
+====== Body
+include::{snippets}/study/tags/create/request-fields.adoc[]
+
+===== 응답
+include::{snippets}/study/tags/create/http-response.adoc[]
+
+==== 스터디 태그 삭제 API
+===== 요청
+include::{snippets}/study/tags/delete/http-request.adoc[]
+====== Header
+include::{snippets}/study/tags/delete/request-headers.adoc[]
+====== Path
+include::{snippets}/study/tags/delete/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/study/tags/delete/http-response.adoc[]
+
+==== 회원의 스터디 조회 API
+===== 요청
+include::{snippets}/study/users/http-request.adoc[]
+====== Header
+include::{snippets}/study/users/request-headers.adoc[]
+
+===== 응답
+include::{snippets}/study/users/http-response.adoc[]
+====== Body
+include::{snippets}/study/users/response-fields.adoc[]
+
+==== 회원의 스터디 참가 신청 조회 API
+===== 요청
+include::{snippets}/study/waitUsers/http-request.adoc[]
+====== Header
+include::{snippets}/study/waitUsers/request-headers.adoc[]
+
+===== 응답
+include::{snippets}/study/waitUsers/http-response.adoc[]
+====== Body
+include::{snippets}/study/waitUsers/response-fields.adoc[]
+
