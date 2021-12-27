@@ -49,38 +49,28 @@ public class Gathering extends BaseEntity {
         return gathering;
     }
 
+    public void update(LocalDateTime gatheringTime, boolean status, String content) {
+        this.gatheringTime = gatheringTime;
+        this.status = status;
+        this.content = content;
+    }
+
     public void changePlace(Place place) {
         this.place = place;
     }
 
-    public void addGatheringUser(Long userId,Boolean register){
+    public void addGatheringUser(Long userId, Boolean register) {
         Optional<GatheringUser> optionalGatheringUser = gatheringUsers.stream()
                 .filter(gatheringUser -> gatheringUser.getUserId().equals(userId))
                 .findAny();
 
-        if(optionalGatheringUser.isPresent()){
+        if (optionalGatheringUser.isPresent()) {
             throw new RuntimeException("이미 모임에 참가한 유저입니다.");
         }
 
         GatheringUser gatheringUser = GatheringUser.createGatheringUser(userId, register, this);
         gatheringUsers.add(gatheringUser);
         numberOfPeople += 1;
-    }
-
-    public void checkRegister(Long userId) {
-        boolean checkResult = gatheringUsers.stream()
-                .anyMatch(gatheringUser ->
-                        gatheringUser.getUserId().equals(userId) && gatheringUser.getRegister().equals(true));
-
-        if(!checkResult){
-            throw new RuntimeException("모임을 수정할 권한이 없습니다.");
-        }
-    }
-
-    public void update(LocalDateTime gatheringTime, boolean status, String content) {
-        this.gatheringTime = gatheringTime;
-        this.status = status;
-        this.content = content;
     }
 
     public void deleteGatheringUser(Long userId) {
@@ -91,4 +81,15 @@ public class Gathering extends BaseEntity {
         gatheringUsers.remove(findGatheringUser);
         this.numberOfPeople -= 1;
     }
+
+    public void isRegister(Long userId) {
+        boolean result = gatheringUsers.stream()
+                .anyMatch(gatheringUser ->
+                        gatheringUser.getUserId().equals(userId) && gatheringUser.getRegister().equals(true));
+
+        if (!result) {
+            throw new RuntimeException("모임을 수정할 권한이 없습니다.");
+        }
+    }
+
 }

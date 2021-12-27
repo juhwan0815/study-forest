@@ -4,6 +4,7 @@ import com.study.domain.Gathering;
 import com.study.domain.Place;
 import com.study.dto.GatheringCreateRequest;
 import com.study.dto.GatheringResponse;
+import com.study.dto.GatheringUpdateRequest;
 import com.study.repository.GatheringRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,23 @@ public class GatheringServiceImpl implements GatheringService {
 
         gatheringRepository.save(gathering);
         return GatheringResponse.from(gathering);
+    }
+
+    @Override
+    @Transactional
+    public GatheringResponse update(Long userId, Long gatheringId, GatheringUpdateRequest request) {
+        Gathering findGathering = gatheringRepository.findById(gatheringId)
+                .orElseThrow(() -> new RuntimeException());
+
+
+        findGathering.update(request.getGatheringTime(), request.getStatus(), request.getContent());
+
+        if (request.getStatus()) {
+            Place place = Place.createPlace(request.getPlaceName(), request.getLet(), request.getLen());
+            findGathering.changePlace(place);
+        }
+
+        return GatheringResponse.from(findGathering);
     }
 
 
