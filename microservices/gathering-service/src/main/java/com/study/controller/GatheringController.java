@@ -45,5 +45,12 @@ public class GatheringController {
         return ResponseEntity.ok(gatheringService.findById(userId,gatheringId));
     }
 
+    @PostMapping("/gatherings/{gatheringId}/gatheringUser")
+    public ResponseEntity<Void> addGatheringUser(@LoginUser Long userId,
+                                                 @PathVariable Long gatheringId){
+        gatheringService.addGatheringUser(userId,gatheringId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 
 }
