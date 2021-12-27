@@ -91,8 +91,7 @@ class UserControllerTest {
         // when
         mockMvc.perform(post("/users")
                         .accept(MediaType.APPLICATION_JSON_VALUE)
-                        .header("kakaoToken", TEST_KAKAO_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                        .header("kakaoToken", TEST_KAKAO_TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE1)))
                 .andDo(document("user/create",
@@ -123,8 +122,7 @@ class UserControllerTest {
         // when
         mockMvc.perform(post("/users/{kakaoId}", 1L)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
-                        .header("fcmToken", TEST_FCM_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                        .header("fcmToken", TEST_FCM_TOKEN))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE2)))
                 .andDo(document("user/login",
@@ -253,6 +251,10 @@ class UserControllerTest {
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("AccessToken")
                         ),
+
+                        requestFields(
+                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("회원 닉네임")
+                        ),
                         responseFields(
                                 fieldWithPath("userId").type(JsonFieldType.NUMBER).description("회원 ID"),
                                 fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한"),
@@ -334,11 +336,11 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE2)))
                 .andDo(document("user/update/area",
-                        pathParameters(
-                                parameterWithName("areaId").description("지역 ID")
-                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("AccessToken")
+                        ),
+                        pathParameters(
+                                parameterWithName("areaId").description("지역 ID")
                         ),
                         responseFields(
                                 fieldWithPath("userId").type(JsonFieldType.NUMBER).description("회원 ID"),
@@ -470,6 +472,5 @@ class UserControllerTest {
         // then
         then(userService).should(times(1)).findKeywordById(any());
     }
-
 
 }
