@@ -10,8 +10,8 @@ import com.study.dto.studyuser.StudyUserResponse;
 import com.study.dto.tag.TagCreateRequest;
 import com.study.service.StudyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +48,7 @@ public class StudyController {
         return ResponseEntity.ok(studyService.updateImage(userId, studyId, file));
     }
 
-    @PatchMapping("/studies/{studyId}/area")
+    @PatchMapping("/studies/{studyId}/areas")
     public ResponseEntity<StudyResponse> updateArea(@LoginUser Long userId,
                                                     @PathVariable Long studyId,
                                                     @RequestBody @Valid StudyUpdateAreaRequest request) {
@@ -68,9 +68,9 @@ public class StudyController {
     }
 
     @GetMapping("/studies")
-    public ResponseEntity<Slice<StudyResponse>> search(@LoginUser Long userId,
-                                                       @PageableDefault(size = 25, page = 0) Pageable pageable,
-                                                       @Valid StudySearchRequest request) {
+    public ResponseEntity<Page<StudyResponse>> search(@LoginUser Long userId,
+                                                      @PageableDefault(size = 25, page = 0) Pageable pageable,
+                                                      @Valid StudySearchRequest request) {
         return ResponseEntity.ok(studyService.search(userId, pageable, request));
     }
 
@@ -89,10 +89,10 @@ public class StudyController {
     }
 
     @DeleteMapping("/studies/{studyId}/waitUsers/{waitUserId}")
-    public ResponseEntity<Void> deleteWaitUser(@LoginUser Long userId,
+    public ResponseEntity<Void> failWaitUser(@LoginUser Long userId,
                                                @PathVariable Long studyId,
                                                @PathVariable Long waitUserId) {
-        studyService.deleteWaitUser(userId, studyId, waitUserId);
+        studyService.failWaitUser(userId, studyId, waitUserId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -117,7 +117,7 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @DeleteMapping("/studeis/{studyId}/studyUsers")
+    @DeleteMapping("/studies/{studyId}/studyUsers")
     public ResponseEntity<Void> deleteStudyUser(@LoginUser Long userId,
                                                 @PathVariable Long studyId) {
 

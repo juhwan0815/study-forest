@@ -1,7 +1,6 @@
 package com.study.kakfa.listener;
 
 
-import com.study.kakfa.StudyDeleteMessage;
 import com.study.kakfa.UserDeleteMessage;
 import com.study.service.StudyService;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +19,8 @@ public class UserDeleteListener {
     @KafkaListener(topics = "${kafka.topic.user.delete}",
             groupId = "${kafka.consumer.user.delete}",
             containerFactory = "userDeleteListenerContainerFactory")
-    public void studyDeleteListen(@Payload UserDeleteMessage userDeleteMessage,
-                                  @Headers MessageHeaders messageHeaders) {
+    public void userDeleteListen(@Payload UserDeleteMessage userDeleteMessage,
+                                 @Headers MessageHeaders messageHeaders) {
         studyService.deleteStudyUserAndWaitUser(userDeleteMessage);
     }
 }

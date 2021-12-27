@@ -8,6 +8,7 @@ import com.study.dto.study.*;
 import com.study.dto.studyuser.StudyUserResponse;
 import com.study.dto.tag.TagCreateRequest;
 import com.study.kakfa.UserDeleteMessage;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,13 +29,13 @@ public interface StudyService {
 
     StudyResponse findById(Long studyId);
 
-    Slice<StudyResponse> search(Long userId, Pageable pageable, StudySearchRequest request);
+    Page<StudyResponse> search(Long userId, Pageable pageable, StudySearchRequest request);
 
     void createWaitUser(Long userId, Long studyId);
 
     void deleteWaitUser(Long userId, Long studyId);
 
-    void deleteWaitUser(Long userId, Long studyId, Long waitUserId);
+    void failWaitUser(Long userId, Long studyId, Long waitUserId);
 
     List<UserResponse> findWaitUsersById(Long studyId);
 

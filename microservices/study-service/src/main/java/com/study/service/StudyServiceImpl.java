@@ -110,7 +110,7 @@ public class StudyServiceImpl implements StudyService {
         findStudy.change(request.getName(), request.getContent(), request.getNumberOfPeople(),
                 request.getOnline(), request.getOffline(), request.getOpen(), findCategory);
 
-        return StudyResponse.from(findStudy);
+        return StudyResponse.from(findStudy,null);
     }
 
     @Override
@@ -129,7 +129,7 @@ public class StudyServiceImpl implements StudyService {
         Study findStudy = studyQueryRepository.findWithCategoryAndTagById(studyId);
 
         AreaResponse areaResponse = null;
-        if (findStudy.getAreaId() != null && findStudy.isOffline()) {
+        if (findStudy.isOffline()) {
             areaResponse = areaServiceClient.findById(findStudy.getAreaId());
         }
 
@@ -137,10 +137,10 @@ public class StudyServiceImpl implements StudyService {
     }
 
     @Override
-    public Slice<StudyResponse> search(Long userId, Pageable pageable, StudySearchRequest request) {
+    public Page<StudyResponse> search(Long userId, Pageable pageable, StudySearchRequest request) {
 
         List<Long> areaIds = null;
-        if (request.getOffline() == true && userId != null) {
+        if (request.getOffline() && userId != null) {
             UserResponse user = userServiceClient.findById(userId);
             if (user.getAreaId() != null) {
                 List<AreaResponse> areas = areaServiceClient.findAroundById(user.getAreaId(), user.getDistance());
@@ -169,7 +169,7 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     @Transactional
-    public void deleteWaitUser(Long userId, Long studyId, Long waitUserId) {
+    public void failWaitUser(Long userId, Long studyId, Long waitUserId) {
         Study findStudy = studyRepository.findWithWaitUserById(studyId)
                 .orElseThrow(() -> new RuntimeException());
         findStudy.isStudyAdmin(userId);
@@ -283,6 +283,7 @@ public class StudyServiceImpl implements StudyService {
     public List<StudyResponse> findByWaitUserId(Long userId) {
         List<Study> findStudies = studyQueryRepository.findWithWaitUserByUserId(userId);
         return findStudies.stream()
+
                 .map(study -> StudyResponse.fromWithWaitUserAndTag(study))
                 .collect(Collectors.toList());
     }
