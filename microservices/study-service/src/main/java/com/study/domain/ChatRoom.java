@@ -10,6 +10,7 @@ import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Getter
 public class ChatRoom extends BaseEntity{
 

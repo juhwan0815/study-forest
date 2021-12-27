@@ -82,8 +82,8 @@ public class Study extends BaseEntity {
         }
 
         this.online = online;
+        this.offline = offline;
         if (offline) {
-            this.offline = offline;
             this.areaId = null;
         }
 
