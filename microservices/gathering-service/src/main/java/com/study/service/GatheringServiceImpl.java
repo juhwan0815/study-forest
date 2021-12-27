@@ -38,7 +38,7 @@ public class GatheringServiceImpl implements GatheringService {
     public GatheringResponse update(Long userId, Long gatheringId, GatheringUpdateRequest request) {
         Gathering findGathering = gatheringRepository.findById(gatheringId)
                 .orElseThrow(() -> new RuntimeException());
-
+        findGathering.isRegister(userId);
 
         findGathering.update(request.getGatheringTime(), request.getStatus(), request.getContent());
 
@@ -48,6 +48,16 @@ public class GatheringServiceImpl implements GatheringService {
         }
 
         return GatheringResponse.from(findGathering);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long userId, Long gatheringId) {
+        Gathering findGathering = gatheringRepository.findById(gatheringId)
+                .orElseThrow(() -> new RuntimeException());
+        findGathering.isRegister(userId);
+
+        gatheringRepository.delete(findGathering);
     }
 
 

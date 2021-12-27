@@ -6,6 +6,7 @@ import com.study.dto.GatheringResponse;
 import com.study.dto.GatheringUpdateRequest;
 import com.study.service.GatheringService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,13 @@ public class GatheringController {
                                                     @PathVariable Long gatheringId,
                                                     @RequestBody @Valid GatheringUpdateRequest request) {
         return ResponseEntity.ok(gatheringService.update(userId, gatheringId, request));
+    }
+
+    @DeleteMapping("/gatherings/{gatheringId}")
+    public ResponseEntity<GatheringResponse> delete(@LoginUser Long userId,
+                                                    @PathVariable Long gatheringId) {
+        gatheringService.delete(userId, gatheringId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

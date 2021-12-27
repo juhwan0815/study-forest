@@ -10,4 +10,6 @@ public interface GatheringService {
     GatheringResponse create(Long userId, Long studyId, GatheringCreateRequest request);
 
     GatheringResponse update(Long userId, Long gatheringId, GatheringUpdateRequest request);
+
+    void delete(Long userId, Long gatheringId);
 }
