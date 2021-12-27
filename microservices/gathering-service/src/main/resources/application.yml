@@ -48,11 +48,15 @@ eureka:
 kafka:
   server: 127.0.0.1:9092
   topic:
+    user:
+      delete: user-delete-topic
     study:
       delete: study-delete-topic
     gathering:
       create: gathering-create-topic
   consumer:
+    user:
+      delete: user-delete-consumer-group2
     study:
       delete: study-delete-consumer-group
 
