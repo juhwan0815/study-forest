@@ -5,6 +5,9 @@ import com.study.domain.Gathering;
 import com.study.dto.GatheringCreateRequest;
 import com.study.dto.GatheringResponse;
 import com.study.dto.GatheringUpdateRequest;
+import com.study.kakfa.StudyDeleteMessage;
+import com.study.kakfa.UserDeleteMessage;
+import com.study.kakfa.listener.UserDeleteListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -24,7 +27,11 @@ public interface GatheringService {
 
     void deleteGatheringUser(Long userId, Long gatheringId);
 
+    void deleteGatheringUser(UserDeleteMessage userDeleteMessage);
+
     List<UserResponse> findGatheringUserById(Long gatheringId);
 
     Page<GatheringResponse> findByStudyId(Long studyId, Pageable pageable);
+
+    void deleteByStudyId(StudyDeleteMessage studyDeleteMessage);
 }

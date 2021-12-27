@@ -7,6 +7,11 @@ import com.study.domain.Place;
 import com.study.dto.GatheringCreateRequest;
 import com.study.dto.GatheringResponse;
 import com.study.dto.GatheringUpdateRequest;
+import com.study.kakfa.GatheringCreateMessage;
+import com.study.kakfa.StudyDeleteMessage;
+import com.study.kakfa.UserDeleteMessage;
+import com.study.kakfa.sender.GatheringCreateMessageSender;
+import com.study.repository.GatheringQueryRepository;
 import com.study.repository.GatheringRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,7 +27,9 @@ import java.util.List;
 public class GatheringServiceImpl implements GatheringService {
 
     private final GatheringRepository gatheringRepository;
+    private final GatheringQueryRepository gatheringQueryRepository;
     private final UserServiceClient userServiceClient;
+    private final GatheringCreateMessageSender gatheringCreateMessageSender;
 
     @Override
     @Transactional
@@ -37,6 +44,8 @@ public class GatheringServiceImpl implements GatheringService {
         }
 
         gatheringRepository.save(gathering);
+        gatheringCreateMessageSender.send(GatheringCreateMessage.from(gathering.getStudyId(), gathering.getGatheringTime(),
+                request.getOffline(), gathering.getContent()));
         return GatheringResponse.from(gathering);
     }
 
@@ -44,6 +53,13 @@ public class GatheringServiceImpl implements GatheringService {
     public Page<GatheringResponse> findByStudyId(Long studyId, Pageable pageable) {
         Page<Gathering> gatherings = gatheringRepository.findByStudyIdOrderByIdDesc(studyId, pageable);
         return gatherings.map(gathering -> GatheringResponse.from(gathering));
+    }
+
+    @Override
+    @Transactional
+    public void deleteByStudyId(StudyDeleteMessage studyDeleteMessage) {
+        List<Gathering> gatherings = gatheringRepository.findWithGatheringUserByStudyId(studyDeleteMessage.getStudyId());
+        gatheringRepository.deleteAll(gatherings);
     }
 
     @Override
@@ -96,6 +112,13 @@ public class GatheringServiceImpl implements GatheringService {
                 .orElseThrow(() -> new RuntimeException());
 
         findGathering.deleteGatheringUser(userId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteGatheringUser(UserDeleteMessage userDeleteMessage) {
+        List<Gathering> gatherings = gatheringQueryRepository.findWithGatheringUserByUserId(userDeleteMessage.getUserId());
+        gatherings.forEach(gathering -> gathering.deleteGatheringUser(userDeleteMessage.getUserId()));
     }
 
     @Override
