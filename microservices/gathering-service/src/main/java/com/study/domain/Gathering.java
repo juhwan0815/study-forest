@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -90,6 +91,13 @@ public class Gathering extends BaseEntity {
         if (!result) {
             throw new RuntimeException("모임을 수정할 권한이 없습니다.");
         }
+    }
+
+    public List<Long> getGatheringUserId(){
+        List<Long> userIds = gatheringUsers.stream()
+                .map(gatheringUser -> gatheringUser.getUserId())
+                .collect(Collectors.toList());
+        return userIds;
     }
 
 }

@@ -39,4 +39,11 @@ public class GatheringController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @GetMapping("/gatherings/{gatheringId}")
+    public ResponseEntity<GatheringResponse> findById(@LoginUser Long userId,
+                                                      @PathVariable Long gatheringId){
+        return ResponseEntity.ok(gatheringService.findById(userId,gatheringId));
+    }
+
+
 }
