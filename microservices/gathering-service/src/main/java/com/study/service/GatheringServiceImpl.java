@@ -76,5 +76,16 @@ public class GatheringServiceImpl implements GatheringService {
         findGathering.addGatheringUser(userId,false);
     }
 
+    @Override
+    @Transactional
+    public void deleteGatheringUser(Long userId, Long gatheringId) {
+        Gathering findGathering = gatheringRepository.findWithGatheringUserById(gatheringId)
+                .orElseThrow(() -> new RuntimeException());
+
+        findGathering.deleteGatheringUser(userId);
+    }
+
+
+
 
 }

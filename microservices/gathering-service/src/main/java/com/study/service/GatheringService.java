@@ -17,4 +17,5 @@ public interface GatheringService {
 
     void addGatheringUser(Long userId, Long gatheringId);
 
+    void deleteGatheringUser(Long userId, Long gatheringId);
 }

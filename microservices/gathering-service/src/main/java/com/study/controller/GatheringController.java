@@ -41,14 +41,21 @@ public class GatheringController {
 
     @GetMapping("/gatherings/{gatheringId}")
     public ResponseEntity<GatheringResponse> findById(@LoginUser Long userId,
-                                                      @PathVariable Long gatheringId){
-        return ResponseEntity.ok(gatheringService.findById(userId,gatheringId));
+                                                      @PathVariable Long gatheringId) {
+        return ResponseEntity.ok(gatheringService.findById(userId, gatheringId));
     }
 
     @PostMapping("/gatherings/{gatheringId}/gatheringUser")
     public ResponseEntity<Void> addGatheringUser(@LoginUser Long userId,
-                                                 @PathVariable Long gatheringId){
-        gatheringService.addGatheringUser(userId,gatheringId);
+                                                 @PathVariable Long gatheringId) {
+        gatheringService.addGatheringUser(userId, gatheringId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/gatherings/{gatheringId}/gatheringUser")
+    public ResponseEntity<Void> deleteGatheringUser(@LoginUser Long userId,
+                                                    @PathVariable Long gatheringId) {
+        gatheringService.deleteGatheringUser(userId, gatheringId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
