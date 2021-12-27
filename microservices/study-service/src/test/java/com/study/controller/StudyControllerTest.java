@@ -574,7 +574,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @DisplayName("스터디 참가자 추가")
+    @DisplayName("스터디 참가자 추가 API")
     void createStudyUser() throws Exception {
         // given
         willDoNothing()
@@ -600,7 +600,7 @@ class StudyControllerTest {
     }
 
     @Test
-    @DisplayName("스터디 회원 방출 API")
+    @DisplayName("스터디 참가자 방출 API")
     void deleteStudyUser() throws Exception {
         // given
         willDoNothing()
