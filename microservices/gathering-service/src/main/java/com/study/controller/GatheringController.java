@@ -7,6 +7,9 @@ import com.study.dto.GatheringResponse;
 import com.study.dto.GatheringUpdateRequest;
 import com.study.service.GatheringService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +28,12 @@ public class GatheringController {
                                                     @PathVariable Long studyId,
                                                     @RequestBody @Valid GatheringCreateRequest request) {
         return ResponseEntity.ok(gatheringService.create(userId, studyId, request));
+    }
+
+    @GetMapping("/studies/{studyId}/gatherings")
+    public ResponseEntity<Page<GatheringResponse>> findByStudyId(@PathVariable Long studyId,
+                                                                 @PageableDefault(size = 20, page = 0) Pageable pageable) {
+        return ResponseEntity.ok(gatheringService.findByStudyId(studyId, pageable));
     }
 
     @PatchMapping("/gatherings/{gatheringId}")
