@@ -1,0 +1,159 @@
+:basedir: {docdir}
+:snippets: {basedir}/build/generated-snippets
+
+= 지역 서비스 API
+:doctype: user
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectnums:
+:sectlinks:
+:sectanchors:
+
+회원 서비스 요청 URL
+Gateway-service 주소 : 포트 + /user-service
+
+[[api]]
+==== 회원 가입 API
+===== 요청
+include::{snippets}/user/create/http-request.adoc[]
+====== Header
+include::{snippets}/user/create/request-headers.adoc[]
+
+===== 응답
+include::{snippets}/user/create/http-response.adoc[]
+====== Body
+include::{snippets}/user/create/response-fields.adoc[]
+
+==== 회원 로그인 API
+===== 요청
+include::{snippets}/user/login/http-request.adoc[]
+====== Header
+include::{snippets}/user/login/request-headers.adoc[]
+
+===== 응답
+include::{snippets}/user/login/http-response.adoc[]
+====== Body
+include::{snippets}/user/login/response-fields.adoc[]
+
+
+==== 회원 ID 리스트 조회 API
+===== 요청
+include::{snippets}/user/findByIdIn/http-request.adoc[]
+====== Param
+include::{snippets}/user/findByIdIn/request-parameters.adoc[]
+
+===== 응답
+include::{snippets}/user/findByIdIn/http-response.adoc[]
+====== Body
+include::{snippets}/user/findByIdIn/response-fields.adoc[]
+
+==== 회원 이미지 수정 API
+===== 요청
+include::{snippets}/user/update/image/http-request.adoc[]
+====== Header
+include::{snippets}/user/update/image/request-headers.adoc[]
+====== Part
+include::{snippets}/user/update/image/request-parts.adoc[]
+
+===== 응답
+include::{snippets}/user/update/image/http-response.adoc[]
+====== Body
+include::{snippets}/user/update/image/response-fields.adoc[]
+
+
+==== 회원 프로필 수정 API
+===== 요청
+include::{snippets}/user/update/profile/http-request.adoc[]
+====== Header
+include::{snippets}/user/update/profile/request-headers.adoc[]
+====== Body
+include::{snippets}/user/update/profile/request-fields.adoc[]
+
+===== 응답
+include::{snippets}/user/update/profile/http-response.adoc[]
+====== Body
+include::{snippets}/user/update/profile/response-fields.adoc[]
+
+==== 회원 프로필 조회 API
+===== 요청
+include::{snippets}/user/findByLoginId/http-request.adoc[]
+===== Header
+include::{snippets}/user/findByLoginId/request-headers.adoc[]
+
+===== 응답
+include::{snippets}/user/findByLoginId/http-response.adoc[]
+====== Body
+include::{snippets}/user/findByLoginId/response-fields.adoc[]
+
+==== 회원 탈퇴 API
+===== 요청
+include::{snippets}/user/delete/http-request.adoc[]
+===== Header
+include::{snippets}/user/delete/request-headers.adoc[]
+
+===== 응답
+include::{snippets}/user/delete/http-response.adoc[]
+
+==== 회원 지역 수정 API
+===== 요청
+include::{snippets}/user/update/area/http-request.adoc[]
+====== Header
+include::{snippets}/user/update/area/request-headers.adoc[]
+====== Path
+include::{snippets}/user/update/area/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/user/update/area/http-response.adoc[]
+====== Body
+include::{snippets}/user/update/area/response-fields.adoc[]
+
+==== 회원 검색 거리 수정 API
+===== 요청
+include::{snippets}/user/update/distance/http-request.adoc[]
+====== Header
+include::{snippets}/user/update/distance/request-headers.adoc[]
+====== Body
+include::{snippets}/user/update/distance/request-fields.adoc[]
+
+===== 응답
+include::{snippets}/user/update/distance/http-response.adoc[]
+====== Body
+include::{snippets}/user/update/distance/response-fields.adoc[]
+
+==== 회원 관심 키워드 추가 API
+===== 요청
+include::{snippets}/user/keyword/create/http-request.adoc[]
+====== Header
+include::{snippets}/user/keyword/create/request-headers.adoc[]
+====== Body
+include::{snippets}/user/keyword/create/request-fields.adoc[]
+
+===== 응답
+include::{snippets}/user/keyword/create/http-response.adoc[]
+
+==== 회원 관심 키워드 삭제 API
+===== 요청
+include::{snippets}/user/keyword/delete/http-request.adoc[]
+====== Header
+include::{snippets}/user/keyword/delete/request-headers.adoc[]
+====== Path
+include::{snippets}/user/keyword/delete/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/user/keyword/delete/http-response.adoc[]
+
+
+==== 회원 관심 키워드 조회 API
+===== 요청
+include::{snippets}/user/keyword/find/http-request.adoc[]
+====== Header
+include::{snippets}/user/keyword/find/request-headers.adoc[]
+
+===== 응답
+include::{snippets}/user/keyword/find/http-response.adoc[]
+====== Body
+include::{snippets}/user/keyword/find/response-fields.adoc[]
+
+
