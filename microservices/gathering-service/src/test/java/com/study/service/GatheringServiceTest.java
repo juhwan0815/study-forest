@@ -296,7 +296,7 @@ class GatheringServiceTest {
                 .deleteAll(any());
 
         // when
-        gatheringService.deleteByStudyId(StudyDeleteMessage.from(1L));
+        gatheringService.deleteByStudyId(StudyDeleteMessage.from(1L, Arrays.asList(1L)));
 
         // then
         then(gatheringRepository).should(times(1)).findWithGatheringUserByStudyId(any());
