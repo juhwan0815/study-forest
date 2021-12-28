@@ -86,7 +86,7 @@ public class Gathering extends BaseEntity {
     public void isRegister(Long userId) {
         boolean result = gatheringUsers.stream()
                 .anyMatch(gatheringUser ->
-                        gatheringUser.getUserId().equals(userId) && gatheringUser.getRegister().equals(true));
+                        gatheringUser.getUserId().equals(userId) && gatheringUser.isRegister());
 
         if (!result) {
             throw new RuntimeException("모임을 수정할 권한이 없습니다.");

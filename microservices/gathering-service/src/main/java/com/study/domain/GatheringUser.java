@@ -20,7 +20,7 @@ public class GatheringUser extends BaseEntity{
 
     private Long userId;
 
-    private Boolean register;
+    private boolean register;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "gathering_id")
