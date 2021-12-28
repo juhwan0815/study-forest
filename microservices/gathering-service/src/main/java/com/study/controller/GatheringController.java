@@ -51,26 +51,25 @@ public class GatheringController {
     }
 
     @GetMapping("/gatherings/{gatheringId}")
-    public ResponseEntity<GatheringResponse> findById(@LoginUser Long userId,
-                                                      @PathVariable Long gatheringId) {
-        return ResponseEntity.ok(gatheringService.findById(userId, gatheringId));
+    public ResponseEntity<GatheringResponse> findById(@PathVariable Long gatheringId) {
+        return ResponseEntity.ok(gatheringService.findById(gatheringId));
     }
 
-    @PostMapping("/gatherings/{gatheringId}/gatheringUser")
+    @PostMapping("/gatherings/{gatheringId}/gatheringUsers")
     public ResponseEntity<Void> addGatheringUser(@LoginUser Long userId,
                                                  @PathVariable Long gatheringId) {
         gatheringService.addGatheringUser(userId, gatheringId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @DeleteMapping("/gatherings/{gatheringId}/gatheringUser")
+    @DeleteMapping("/gatherings/{gatheringId}/gatheringUsers")
     public ResponseEntity<Void> deleteGatheringUser(@LoginUser Long userId,
                                                     @PathVariable Long gatheringId) {
         gatheringService.deleteGatheringUser(userId, gatheringId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GetMapping("/gatherings/{gatheringId}/gatheringUser")
+    @GetMapping("/gatherings/{gatheringId}/gatheringUsers")
     public ResponseEntity<List<UserResponse>> findGatheringUsersById(@PathVariable Long gatheringId) {
         return ResponseEntity.ok(gatheringService.findGatheringUserById(gatheringId));
     }
