@@ -52,11 +52,15 @@ eureka:
 kafka:
   server: 127.0.0.1:9092
   topic:
+    chatRoom:
+      delete: chatRoom-delete-topic
     study:
       delete: study-delete-topic
     message:
       create: message-create-topic
   consumer:
+    chatRoom:
+      delete: chatRoom-delete-consumer-group
     study:
       delete: study-delete-consumer-group2
 

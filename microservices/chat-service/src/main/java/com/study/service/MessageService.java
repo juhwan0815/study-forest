@@ -3,6 +3,7 @@ package com.study.service;
 import com.study.domain.Message;
 import com.study.dto.MessageRequest;
 import com.study.dto.MessageResponse;
+import com.study.kakfa.ChatRoomDeleteMessage;
 import com.study.kakfa.StudyDeleteMessage;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,4 +16,6 @@ public interface MessageService {
     MessageResponse sendMessage(Long userId, String sender, MessageRequest request);
 
     void deleteMessage(StudyDeleteMessage studyDeleteMessage);
+
+    void deleteMessage(ChatRoomDeleteMessage chatRoomDeleteMessage);
 }

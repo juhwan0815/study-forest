@@ -4,12 +4,12 @@ import com.study.domain.Message;
 import com.study.dto.MessageRequest;
 import com.study.dto.MessageResponse;
 import com.study.kafka.sender.MessageCreateSender;
+import com.study.kakfa.ChatRoomDeleteMessage;
 import com.study.kakfa.MessageCreateMessage;
 import com.study.kakfa.StudyDeleteMessage;
 import com.study.repository.ChatRoomRepository;
 import com.study.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -49,5 +49,11 @@ public class MessageServiceImpl implements MessageService {
     public void deleteMessage(StudyDeleteMessage studyDeleteMessage) {
         chatRoomRepository.deleteChatRoomUsers(studyDeleteMessage.getChatRoomIds());
         messageRepository.deleteByRoomIds(studyDeleteMessage.getChatRoomIds());
+    }
+
+    @Override
+    @Transactional
+    public void deleteMessage(ChatRoomDeleteMessage chatRoomDeleteMessage) {
+        messageRepository.deleteByRoomId(chatRoomDeleteMessage.getChatRoomId());
     }
 }
