@@ -21,6 +21,10 @@ public class ChatRoomRepository {
         users.remove(sessionId);
     }
 
+    public void deleteChatRoomUsers(List<Long> roomIds){
+        roomIds.forEach(roomId -> chatRoomUsers.remove(roomId));
+    }
+
     public void addSessionRoom(String sessionId, Long roomId) {
         sessionRooms.put(sessionId, roomId);
     }

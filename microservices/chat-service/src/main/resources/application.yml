@@ -54,8 +54,8 @@ kafka:
   topic:
     study:
       delete: study-delete-topic
-    chat:
-      create: chat-create-topic
+    message:
+      create: message-create-topic
   consumer:
     study:
       delete: study-delete-consumer-group2

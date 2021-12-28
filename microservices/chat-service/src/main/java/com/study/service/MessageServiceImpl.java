@@ -5,6 +5,7 @@ import com.study.dto.MessageRequest;
 import com.study.dto.MessageResponse;
 import com.study.kafka.sender.MessageCreateSender;
 import com.study.kakfa.MessageCreateMessage;
+import com.study.kakfa.StudyDeleteMessage;
 import com.study.repository.ChatRoomRepository;
 import com.study.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +42,12 @@ public class MessageServiceImpl implements MessageService {
         List<Long> userIds = chatRoomRepository.getChatRoomUsers(request.getRoomId(), userId);
         messageCreateSender.send(MessageCreateMessage.from(request.getRoomId(), sender, request.getContent(), userIds));
         return MessageResponse.from(message);
+    }
+
+    @Override
+    @Transactional
+    public void deleteMessage(StudyDeleteMessage studyDeleteMessage) {
+        chatRoomRepository.deleteChatRoomUsers(studyDeleteMessage.getChatRoomIds());
+        messageRepository.deleteByRoomIds(studyDeleteMessage.getChatRoomIds());
     }
 }
