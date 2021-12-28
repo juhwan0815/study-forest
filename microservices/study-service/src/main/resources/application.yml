@@ -54,6 +54,8 @@ eureka:
 kafka:
   server: 127.0.0.1:9092
   topic:
+    chatRoom:
+      delete: chatRoom-delete-topic
     user:
       delete: user-delete-topic
     study:

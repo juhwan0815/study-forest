@@ -12,10 +12,7 @@ import com.study.dto.study.*;
 import com.study.dto.studyuser.StudyUserResponse;
 import com.study.dto.tag.TagCreateRequest;
 import com.study.kakfa.*;
-import com.study.kakfa.sender.StudyApplyFailMessageSender;
-import com.study.kakfa.sender.StudyApplySuccessMessageSender;
-import com.study.kakfa.sender.StudyCreateMessageSender;
-import com.study.kakfa.sender.StudyDeleteMessageSender;
+import com.study.kakfa.sender.*;
 import com.study.repository.CategoryRepository;
 import com.study.repository.StudyQueryRepository;
 import com.study.repository.StudyRepository;
@@ -47,6 +44,7 @@ public class StudyServiceImpl implements StudyService {
     private final StudyDeleteMessageSender studyDeleteMessageSender;
     private final StudyApplyFailMessageSender studyApplyFailMessageSender;
     private final StudyApplySuccessMessageSender studyApplySuccessMessageSender;
+    private final ChatRoomDeleteMessageSender chatRoomDeleteMessageSender;
 
     @Override
     @Transactional
@@ -110,7 +108,7 @@ public class StudyServiceImpl implements StudyService {
         findStudy.change(request.getName(), request.getContent(), request.getNumberOfPeople(),
                 request.getOnline(), request.getOffline(), request.getOpen(), findCategory);
 
-        return StudyResponse.from(findStudy,null);
+        return StudyResponse.from(findStudy, null);
     }
 
     @Override
@@ -119,9 +117,10 @@ public class StudyServiceImpl implements StudyService {
         Study findStudy = studyRepository.findWithStudyUserById(studyId)
                 .orElseThrow(() -> new RuntimeException());
         findStudy.isStudyAdmin(userId);
+        List<Long> chatRoomIds = findStudy.getChatRoomsId();
 
         studyRepository.delete(findStudy);
-        studyDeleteMessageSender.send(StudyDeleteMessage.from(findStudy.getId()));
+        studyDeleteMessageSender.send(StudyDeleteMessage.from(findStudy.getId(), chatRoomIds));
     }
 
     @Override
@@ -259,6 +258,7 @@ public class StudyServiceImpl implements StudyService {
         findStudy.isStudyAdmin(userId);
 
         findStudy.deleteChatRoom(chatRoomId);
+        chatRoomDeleteMessageSender.send(ChatRoomDeleteMessage.from(chatRoomId));
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.study.kakfa.sender;
 
-import com.study.kakfa.StudyApplyFailMessage;
+import com.study.kakfa.ChatRoomDeleteMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,19 +12,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class StudyApplyFailMessageSenderImpl implements StudyApplyFailMessageSender {
+public class ChatRoomDeleteMessageSenderImpl implements ChatRoomDeleteMessageSender{
 
+    @Qualifier("chatRoomDeleteKafkaTemplate")
+    private final KafkaTemplate<String, ChatRoomDeleteMessage> kafkaTemplate;
 
-    @Qualifier("studyApplyFailKafkaTemplate")
-    private final KafkaTemplate<String, StudyApplyFailMessage> kafkaTemplate;
-
-    @Value("${kafka.topic.studyApply.fail}")
+    @Value("${kafka.topic.chatRoom.delete}")
     private String topic;
 
     @Override
-    public void send(StudyApplyFailMessage studyApplyFailMessage) {
-        Message<StudyApplyFailMessage> message = MessageBuilder
-                .withPayload(studyApplyFailMessage)
+    public void send(ChatRoomDeleteMessage chatRoomDeleteMessage) {
+        Message<ChatRoomDeleteMessage> message = MessageBuilder
+                .withPayload(chatRoomDeleteMessage)
                 .setHeader(KafkaHeaders.TOPIC, topic)
                 .build();
 

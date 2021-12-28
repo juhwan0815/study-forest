@@ -10,10 +10,7 @@ import com.study.dto.study.StudyResponse;
 import com.study.dto.study.StudySearchRequest;
 import com.study.dto.studyuser.StudyUserResponse;
 import com.study.kakfa.UserDeleteMessage;
-import com.study.kakfa.sender.StudyApplyFailMessageSender;
-import com.study.kakfa.sender.StudyApplySuccessMessageSender;
-import com.study.kakfa.sender.StudyCreateMessageSender;
-import com.study.kakfa.sender.StudyDeleteMessageSender;
+import com.study.kakfa.sender.*;
 import com.study.repository.CategoryRepository;
 import com.study.repository.StudyQueryRepository;
 import com.study.repository.StudyRepository;
@@ -74,6 +71,9 @@ class StudyServiceTest {
 
     @Mock
     private StudyApplySuccessMessageSender studyApplySuccessMessageSender;
+
+    @Mock
+    private ChatRoomDeleteMessageSender chatRoomDeleteMessageSender;
 
     @Test
     @DisplayName("온라인/오프라인을 지원하는 스터디를 생성한다.")
@@ -618,11 +618,15 @@ class StudyServiceTest {
         given(studyRepository.findWithChatRoomById(any()))
                 .willReturn(Optional.of(study));
 
+        willDoNothing()
+                .given(chatRoomDeleteMessageSender)
+                .send(any());
         // when
         studyService.deleteChatRoom(1L, 1L, 1L);
 
         // then
         then(studyRepository).should(times(1)).findWithChatRoomById(any());
+        then(chatRoomDeleteMessageSender).should(times(1)).send(any());
     }
 
     @Test

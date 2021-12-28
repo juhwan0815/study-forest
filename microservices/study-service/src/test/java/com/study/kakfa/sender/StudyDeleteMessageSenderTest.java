@@ -8,6 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.Arrays;
+
 @SpringBootTest
 @DirtiesContext // 컨텍스트가 다른 테스트 간에 정리되고 재설정
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"}) // 내장 카프카를 테스트에 삽입
@@ -19,7 +21,7 @@ class StudyDeleteMessageSenderTest {
     @Test
     @DisplayName("스터디 삭제 메세지를 보낸다.")
     void send() {
-        studyDeleteMessageSender.send(StudyDeleteMessage.from(1L));
+        studyDeleteMessageSender.send(StudyDeleteMessage.from(1L, Arrays.asList(1L)));
     }
 
 }
