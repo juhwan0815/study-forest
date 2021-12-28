@@ -10,9 +10,11 @@ import com.study.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -25,8 +27,9 @@ public class MessageServiceImpl implements MessageService {
     private final MessageCreateSender messageCreateSender;
 
     @Override
-    public Page<MessageResponse> findByRoomId(Long roomId, Pageable pageable, String lastMessageDate) {
-        return null;
+    public Slice<MessageResponse> findByRoomId(Long roomId, Pageable pageable, String lastMessageDate) {
+        Slice<Message> messages = messageRepository.findByRoomIdAndCreatedAtBeforeOrOrderByIdDesc(pageable, roomId, LocalDateTime.parse(lastMessageDate));
+        return messages.map(message -> MessageResponse.from(message));
     }
 
     @Override
