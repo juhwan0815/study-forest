@@ -243,4 +243,10 @@ public class Study extends BaseEntity {
                 .findFirst().orElseThrow(() -> new RuntimeException());
         tags.remove(findTag);
     }
+
+    public List<Long> getChatRoomsId(){
+        return chatRooms.stream()
+                .map(ChatRoom::getId)
+                .collect(Collectors.toList());
+    }
 }

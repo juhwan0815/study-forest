@@ -456,4 +456,17 @@ class StudyTest {
         assertThrows(RuntimeException.class, ()-> study.deleteTag(1L));
     }
 
+    @Test
+    @DisplayName("스터디 채팅방 Id 리스트를 반환한다.")
+    void getChatRoomsId(){
+        // given
+        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, false, false, null);
+        study.getChatRooms().add(new ChatRoom(1L, "공지사항", study));
+
+        // when
+        List<Long> result = study.getChatRoomsId();
+
+        // then
+        assertThat(result.size()).isEqualTo(1);
+    }
 }
