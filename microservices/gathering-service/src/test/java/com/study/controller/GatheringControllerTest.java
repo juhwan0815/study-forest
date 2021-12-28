@@ -359,7 +359,7 @@ class GatheringControllerTest {
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
-                .andDo(document("gathering/waitUsers/find",
+                .andDo(document("gathering/gatheringUser/find",
                         requestHeaders(
                                 headerWithName("Authorization").description("AccessToken")
                         ),
