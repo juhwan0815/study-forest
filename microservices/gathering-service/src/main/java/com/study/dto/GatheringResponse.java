@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class GatheringResponse {
 
-    private Long id;
+    private Long gatheringId;
 
     private Long studyId;
 
@@ -31,7 +31,7 @@ public class GatheringResponse {
 
     public static GatheringResponse from(Gathering gathering) {
         GatheringResponse gatheringResponse = new GatheringResponse();
-        gatheringResponse.id = gathering.getId();
+        gatheringResponse.gatheringId = gathering.getId();
         gatheringResponse.studyId = gathering.getStudyId();
         gatheringResponse.gatheringTime = gathering.getGatheringTime();
         gatheringResponse.numberOfPeople = gathering.getNumberOfPeople();
