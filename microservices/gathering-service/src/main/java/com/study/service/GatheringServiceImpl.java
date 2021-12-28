@@ -65,7 +65,7 @@ public class GatheringServiceImpl implements GatheringService {
     @Override
     @Transactional
     public GatheringResponse update(Long userId, Long gatheringId, GatheringUpdateRequest request) {
-        Gathering findGathering = gatheringRepository.findById(gatheringId)
+        Gathering findGathering = gatheringRepository.findWithGatheringUserById(gatheringId)
                 .orElseThrow(() -> new RuntimeException());
         findGathering.isRegister(userId);
 
@@ -82,7 +82,7 @@ public class GatheringServiceImpl implements GatheringService {
     @Override
     @Transactional
     public void delete(Long userId, Long gatheringId) {
-        Gathering findGathering = gatheringRepository.findById(gatheringId)
+        Gathering findGathering = gatheringRepository.findWithGatheringUserById(gatheringId)
                 .orElseThrow(() -> new RuntimeException());
         findGathering.isRegister(userId);
 
@@ -90,8 +90,8 @@ public class GatheringServiceImpl implements GatheringService {
     }
 
     @Override
-    public GatheringResponse findById(Long userId, Long gatheringId) {
-        Gathering findGathering = gatheringRepository.findWithGatheringUserById(gatheringId)
+    public GatheringResponse findById(Long gatheringId) {
+        Gathering findGathering = gatheringRepository.findById(gatheringId)
                 .orElseThrow(() -> new RuntimeException());
         return GatheringResponse.from(findGathering);
     }
