@@ -4,10 +4,7 @@ import com.study.client.*;
 import com.study.domain.Notification;
 import com.study.dto.NotificationResponse;
 import com.study.fcm.FcmMessageSender;
-import com.study.kakfa.GatheringCreateMessage;
-import com.study.kakfa.MessageCreateMessage;
-import com.study.kakfa.StudyApplyFailMessage;
-import com.study.kakfa.StudyApplySuccessMessage;
+import com.study.kakfa.*;
 import com.study.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -100,17 +97,12 @@ public class NotificationServiceImpl implements NotificationService {
         });
     }
 
-
     private String createMessageTitle(String studyName, String chatRoomName) {
         return studyName + " - " + chatRoomName;
     }
 
     private String createMessageContent(String nickName, String content) {
         return nickName + " : " + content;
-    }
-
-    private String createStudyCreateMessage(String tagName, String studyName) {
-        return tagName + "주제의 스터디가 개설되었습니다.\n " + studyName;
     }
 
     private String createStudyApplySuccessMessage(String studyName) {

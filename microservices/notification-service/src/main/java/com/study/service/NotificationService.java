@@ -1,10 +1,7 @@
 package com.study.service;
 
 import com.study.dto.NotificationResponse;
-import com.study.kakfa.GatheringCreateMessage;
-import com.study.kakfa.MessageCreateMessage;
-import com.study.kakfa.StudyApplyFailMessage;
-import com.study.kakfa.StudyApplySuccessMessage;
+import com.study.kakfa.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
@@ -19,4 +16,5 @@ public interface NotificationService {
     void gatheringCreate(GatheringCreateMessage gatheringCreateMessage);
 
     void messageCreate(MessageCreateMessage messageCreateMessage);
+
 }
