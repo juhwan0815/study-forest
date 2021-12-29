@@ -48,6 +48,41 @@ class StudyQueryRepositoryTest {
     }
 
     @Test
+    @DisplayName("채팅방 ID로 스터디를 조회한다.")
+    void findByChatRoomId() {
+        // given
+        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
+        study.addChatRoom("공지사항");
+        studyRepository.save(study);
+
+        em.flush();
+        em.clear();
+        // when
+        Study findStudy = studyQueryRepository.findByChatRoomId(study.getChatRooms().get(0).getId());
+
+        // then
+        assertThat(findStudy.getName()).isEqualTo("스프링 스터디");
+        assertThat(findStudy.getContent()).isEqualTo("스프링 스터디");
+        assertThat(findStudy.getNumberOfPeople()).isEqualTo(5);
+        assertThat(findStudy.isOffline()).isTrue();
+        assertThat(findStudy.isOffline()).isTrue();
+    }
+
+    @Test
+    @DisplayName("예외 테스트 : 존재하지 않는 채팅방 ID로 스터디를 조회하면 예외가 발생한다..")
+    void findByChatRoomIdNotExist() {
+        // given
+        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
+        studyRepository.save(study);
+
+        em.flush();
+        em.clear();
+
+        // when
+        assertThrows(RuntimeException.class,()-> studyQueryRepository.findByChatRoomId(1L));
+    }
+
+    @Test
     @DisplayName("회원 ID로 스터디와 참가 대기자를 같이 조회한다.")
     void findWithWaitUserByUserId() {
         // given
@@ -125,7 +160,7 @@ class StudyQueryRepositoryTest {
         em.flush();
         em.clear();
         // when
-        assertThrows(RuntimeException.class,()->studyQueryRepository.findWithCategoryAndTagById(100L));
+        assertThrows(RuntimeException.class, () -> studyQueryRepository.findWithCategoryAndTagById(100L));
     }
 
 

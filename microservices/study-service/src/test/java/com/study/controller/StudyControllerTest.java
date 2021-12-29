@@ -943,4 +943,43 @@ class StudyControllerTest {
         // then
         then(studyService).should(times(1)).findByWaitUserId(any());
     }
+
+    @Test
+    @DisplayName("채팅방 ID 로 스터디 조회 API")
+    void findByChatRoomId() throws Exception {
+        // given
+        given(studyService.findByChatRoomId(any()))
+                .willReturn(TEST_STUDY_RESPONSE3);
+
+        // when
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/studies/chatRooms/{chatRoomId}", 1L)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_STUDY_RESPONSE3)))
+                .andDo(document("study/findByChatRoomId",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("AccessToken")
+                        ),
+                        pathParameters(
+                                parameterWithName("chatRoomId").description("채팅방 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("studyId").type(JsonFieldType.NUMBER).description("스터디 ID"),
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("스터디 이름"),
+                                fieldWithPath("content").type(JsonFieldType.STRING).description("스터디 내용"),
+                                fieldWithPath("numberOfPeople").type(JsonFieldType.NUMBER).description("스터디 인원"),
+                                fieldWithPath("currentNumberOfPeople").type(JsonFieldType.NUMBER).description("스터디 현재 인원"),
+                                fieldWithPath("online").type(JsonFieldType.BOOLEAN).description("스터디 온라인 여부"),
+                                fieldWithPath("offline").type(JsonFieldType.BOOLEAN).description("스터디 오프라인여부"),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description("스터디 상태"),
+                                fieldWithPath("imageUrl").type(JsonFieldType.STRING).description("스터디 이미지 URL")
+                        )
+                ));
+
+        // then
+        then(studyService).should(times(1)).findByChatRoomId(any());
+    }
+
+
 }

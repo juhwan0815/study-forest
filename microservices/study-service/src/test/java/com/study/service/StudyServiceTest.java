@@ -743,4 +743,25 @@ class StudyServiceTest {
         then(studyRepository).should(times(1)).findWithStudyUserById(any());
     }
 
+    @Test
+    @DisplayName("채팅방 ID 로 스터디를 조회한다.")
+    void findByChatRoomId() {
+        // given
+        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
+        study.getChatRooms().add(new ChatRoom(1L, "공지사항", study));
+
+        given(studyQueryRepository.findByChatRoomId(any()))
+                .willReturn(study);
+        // when
+        StudyResponse result = studyService.findByChatRoomId(1L);
+
+        // then
+        assertThat(result.getName()).isEqualTo("스프링 스터디");
+        assertThat(result.getContent()).isEqualTo("스프링 스터디");
+        assertThat(result.getNumberOfPeople()).isEqualTo(5);
+        assertThat(result.isOffline()).isTrue();
+        assertThat(result.isOffline()).isTrue();
+        then(studyQueryRepository).should(times(1)).findByChatRoomId(any());
+    }
+
 }
