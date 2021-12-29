@@ -31,8 +31,8 @@ public class StudyQueryRepository {
 
     public Study findByChatRoomId(Long chatRoomId) {
         Study findStudy = queryFactory
-                .selectFrom(QStudy.study)
-                .join(QStudy.study.chatRooms, chatRoom)
+                .selectFrom(study)
+                .join(study.chatRooms, chatRoom)
                 .where(chatRoom.id.eq(chatRoomId))
                 .fetchOne();
 

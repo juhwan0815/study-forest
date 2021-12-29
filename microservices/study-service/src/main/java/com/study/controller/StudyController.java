@@ -190,4 +190,10 @@ public class StudyController {
     public ResponseEntity<StudyResponse> findByChatRoomId(@PathVariable Long chatRoomId) {
         return ResponseEntity.ok(studyService.findByChatRoomId(chatRoomId));
     }
+
+    @GetMapping("/studies/{studyId}/{chatRooms}/{chatRoomId}")
+    public ResponseEntity<ChatRoomResponse> findChatRoomByIdAndChatRoomId(@PathVariable Long studyId,
+                                                                          @PathVariable Long chatRoomId) {
+        return ResponseEntity.ok(studyService.findChatRoomByIdAndChatRoomId(studyId, chatRoomId));
+    }
 }

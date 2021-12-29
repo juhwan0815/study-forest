@@ -325,4 +325,11 @@ public class StudyServiceImpl implements StudyService {
         Study findStudy = studyQueryRepository.findByChatRoomId(chatRoomId);
         return StudyResponse.from(findStudy);
     }
+
+    @Override
+    public ChatRoomResponse findChatRoomByIdAndChatRoomId(Long studyId, Long chatRoomId) {
+        Study findStudy = studyRepository.findWithChatRoomById(studyId)
+                .orElseThrow(() -> new RuntimeException());
+        return ChatRoomResponse.from(findStudy.getChatRoom(chatRoomId));
+    }
 }

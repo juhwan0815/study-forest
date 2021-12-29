@@ -66,4 +66,6 @@ public interface StudyService {
     void deleteTag(Long userId, Long studyId, Long tagId);
 
     StudyResponse findByChatRoomId(Long chatRoomId);
+
+    ChatRoomResponse findChatRoomByIdAndChatRoomId(Long studyId, Long chatRoomId);
 }
