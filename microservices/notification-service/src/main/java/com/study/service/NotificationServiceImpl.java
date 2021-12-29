@@ -1,13 +1,11 @@
 package com.study.service;
 
-import com.study.client.StudyResponse;
-import com.study.client.StudyServiceClient;
-import com.study.client.UserResponse;
-import com.study.client.UserServiceClient;
+import com.study.client.*;
 import com.study.domain.Notification;
 import com.study.dto.NotificationResponse;
 import com.study.fcm.FcmMessageSender;
 import com.study.kakfa.GatheringCreateMessage;
+import com.study.kakfa.MessageCreateMessage;
 import com.study.kakfa.StudyApplyFailMessage;
 import com.study.kakfa.StudyApplySuccessMessage;
 import com.study.repository.NotificationRepository;
@@ -78,12 +76,36 @@ public class NotificationServiceImpl implements NotificationService {
         });
     }
 
+    @Override
+    @Transactional
+    public void messageCreate(MessageCreateMessage messageCreateMessage) {
+        StudyResponse study = studyServiceClient.findByChatRoomId(messageCreateMessage.getRoomId());
+        ChatRoomResponse chatRoom = studyServiceClient.findChatRoomByIdAndChatRoomId(study.getStudyId(), messageCreateMessage.getRoomId());
+        List<UserResponse> studyUsers = studyServiceClient.findStudyUsersById(study.getStudyId());
 
-    private String createChatTitle(String studyName, String chatRoomName) {
+        List<Long> userIds = messageCreateMessage.getUserIds();
+        String messageTitle = createMessageTitle(study.getName(), chatRoom.getName());
+        String messageContent = createMessageContent(messageCreateMessage.getSender(), messageCreateMessage.getContent());
+        studyUsers.forEach(studyUser -> {
+            boolean matchResult = false;
+            for (Long userId : userIds) {
+                if (studyUser.getUserId().equals(userId)) {
+                    matchResult = true;
+                    break;
+                }
+            }
+            if (!matchResult){
+                fcmMessageSender.send(studyUser.getFcmToken(), messageTitle, messageContent);
+            }
+        });
+    }
+
+
+    private String createMessageTitle(String studyName, String chatRoomName) {
         return studyName + " - " + chatRoomName;
     }
 
-    private String createChatContent(String nickName, String content) {
+    private String createMessageContent(String nickName, String content) {
         return nickName + " : " + content;
     }
 

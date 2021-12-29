@@ -11,15 +11,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ChatCreateListener {
+public class MessageCreateListener {
 
     private final NotificationService notificationService;
 
     @KafkaListener(topics = "${kafka.topic.message.create}",
             groupId = "${kafka.consumer.message.create}",
             containerFactory = "messageCreateListenerContainerFactory")
-    public void chatCreateListen(@Payload MessageCreateMessage messageCreateMessage,
-                                 @Headers MessageHeaders messageHeaders) {
-        notificationService.chatCreate(chatCreateMessage);
+    public void messageCreateListen(@Payload MessageCreateMessage messageCreateMessage,
+                                    @Headers MessageHeaders messageHeaders) {
+        notificationService.messageCreate(messageCreateMessage);
     }
 }
