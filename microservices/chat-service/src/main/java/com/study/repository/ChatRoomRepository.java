@@ -1,18 +1,24 @@
 package com.study.repository;
 
+import lombok.Getter;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
+@Getter
 public class ChatRoomRepository {
 
     private Map<Long, Map<String, Long>> chatRoomUsers = new ConcurrentHashMap<>();
     private Map<String, Long> sessionRooms = new ConcurrentHashMap<>();
 
     public void addChatRoomUser(Long roomId, String sessionId, Long userId) {
-        Map<String, Long> users = chatRoomUsers.putIfAbsent(roomId, new HashMap<>());
+        Map<String, Long> users = chatRoomUsers.get(roomId);
+        if(users == null){
+            users = new ConcurrentHashMap<>();
+            chatRoomUsers.put(roomId, users);
+        }
         users.put(sessionId, userId);
     }
 
@@ -21,7 +27,7 @@ public class ChatRoomRepository {
         users.remove(sessionId);
     }
 
-    public void deleteChatRoomUsers(List<Long> roomIds){
+    public void deleteChatRoom(List<Long> roomIds){
         roomIds.forEach(roomId -> chatRoomUsers.remove(roomId));
     }
 
@@ -37,7 +43,7 @@ public class ChatRoomRepository {
         return sessionRooms.get(sessionId);
     }
 
-    public List<Long> getChatRoomUsers(Long roomId, Long userId){
+    public List<Long> getChatRoomUsers(Long roomId){
         Map<String, Long> users = chatRoomUsers.get(roomId);
         return new ArrayList<>(users.values());
     }

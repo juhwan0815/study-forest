@@ -17,14 +17,12 @@ import java.util.Optional;
 /**
  * 클라이언트의 입장/퇴장 이벤트를 서버에서 체크하여 메세지를 전송
  */
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class StompHandler implements ChannelInterceptor {
 
     private final JwtUtils jwtUtils;
     private final ChatRoomRepository chatRoomRepository;
-
 
     /**
      * 웹 소켓을 통해 들어온 요청이 처리되기 전 실행
@@ -72,9 +70,6 @@ public class StompHandler implements ChannelInterceptor {
      */
     public String getRoomId(String destination) {
         int lastIndex = destination.lastIndexOf("/");
-        if (lastIndex != -1) {
-            return destination.substring(lastIndex + 1);
-        } else
-            return "";
+        return destination.substring(lastIndex + 1);
     }
 }

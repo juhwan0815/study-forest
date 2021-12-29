@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
 
-    Slice<Message> findByRoomIdAndCreatedAtBeforeOrOrderByIdDesc(Pageable pageable, Long roomId, LocalDateTime lastMessageDate);
+    Slice<Message> findByRoomIdAndCreatedAtBeforeOrderByIdDesc(Pageable pageable, Long roomId, LocalDateTime lastMessageDate);
 
     @Modifying(clearAutomatically= false)
     @Query("delete from Message m where m.roomId in :roomIds")

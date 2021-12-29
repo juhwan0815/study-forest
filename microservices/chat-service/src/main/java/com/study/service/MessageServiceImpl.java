@@ -29,7 +29,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public Slice<MessageResponse> findByRoomId(Long roomId, Pageable pageable, String lastMessageDate) {
-        Slice<Message> messages = messageRepository.findByRoomIdAndCreatedAtBeforeOrOrderByIdDesc(pageable, roomId, LocalDateTime.parse(lastMessageDate));
+        Slice<Message> messages = messageRepository.findByRoomIdAndCreatedAtBeforeOrderByIdDesc(pageable, roomId, LocalDateTime.parse(lastMessageDate));
         return messages.map(message -> MessageResponse.from(message));
     }
 
@@ -39,7 +39,7 @@ public class MessageServiceImpl implements MessageService {
         Message message = Message.createMessage(userId, sender, request.getContent(), request.getRoomId());
         messageRepository.save(message);
 
-        List<Long> userIds = chatRoomRepository.getChatRoomUsers(request.getRoomId(), userId);
+        List<Long> userIds = chatRoomRepository.getChatRoomUsers(request.getRoomId());
         messageCreateSender.send(MessageCreateMessage.from(request.getRoomId(), sender, request.getContent(), userIds));
         return MessageResponse.from(message);
     }
@@ -47,7 +47,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     @Transactional
     public void deleteMessage(StudyDeleteMessage studyDeleteMessage) {
-        chatRoomRepository.deleteChatRoomUsers(studyDeleteMessage.getChatRoomIds());
+        chatRoomRepository.deleteChatRoom(studyDeleteMessage.getChatRoomIds());
         messageRepository.deleteByRoomIds(studyDeleteMessage.getChatRoomIds());
     }
 
