@@ -8,6 +8,7 @@ import com.study.dto.NotificationResponse;
 import com.study.fcm.FcmMessageSender;
 import com.study.kakfa.GatheringCreateMessage;
 import com.study.kakfa.StudyApplyFailMessage;
+import com.study.kakfa.StudyApplySuccessMessage;
 import com.study.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +47,20 @@ public class NotificationServiceImpl implements NotificationService {
 
         fcmMessageSender.send(user.getFcmToken(), studyApplyFailMessage.getStudyName(), content);
     }
+
+    @Override
+    @Transactional
+    public void studyApplySuccess(StudyApplySuccessMessage studyApplySuccessMessage) {
+        UserResponse user = userServiceClient.findById(studyApplySuccessMessage.getUserId());
+
+        String content = createStudyApplySuccessMessage(studyApplySuccessMessage.getStudyName());
+        Notification notification = Notification.
+                createNotification(user.getUserId(), studyApplySuccessMessage.getStudyName(), content);
+        notificationRepository.save(notification);
+
+        fcmMessageSender.send(user.getFcmToken(), studyApplySuccessMessage.getStudyName(), content);
+    }
+
 
     private String createChatTitle(String studyName, String chatRoomName) {
         return studyName + " - " + chatRoomName;
