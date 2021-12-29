@@ -32,9 +32,21 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
                                   WebDataBinderFactory binderFactory) throws Exception {
 
         String bearerToken = webRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        if(bearerToken == null){
+            return null;
+        }
+
         String jwt = bearerToken.substring(7);
 
-        String userId = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwt).getBody().getSubject();
+        String userId = null;
+        try {
+            userId = Jwts.parser().setSigningKey(secretKey)
+                    .parseClaimsJws(jwt)
+                    .getBody().getSubject();
+        } catch (Exception e){
+            return null;
+        }
+
         return Long.valueOf(userId);
     }
 }
