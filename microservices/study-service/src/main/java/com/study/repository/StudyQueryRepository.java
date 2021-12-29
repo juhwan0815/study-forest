@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 
 import static com.study.domain.QCategory.category;
+import static com.study.domain.QChatRoom.*;
 import static com.study.domain.QStudy.*;
 import static com.study.domain.QStudyUser.*;
 import static com.study.domain.QTag.tag;
@@ -28,7 +29,20 @@ public class StudyQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<Study> findWithWaitUserByUserId(Long userId){
+    public Study findByChatRoomId(Long chatRoomId) {
+        Study findStudy = queryFactory
+                .selectFrom(QStudy.study)
+                .join(QStudy.study.chatRooms, chatRoom)
+                .where(chatRoom.id.eq(chatRoomId))
+                .fetchOne();
+
+        if (findStudy == null) {
+            throw new RuntimeException();
+        }
+        return findStudy;
+    }
+
+    public List<Study> findWithWaitUserByUserId(Long userId) {
         return queryFactory
                 .selectFrom(study).distinct()
                 .join(study.waitUsers, waitUser).fetchJoin()
@@ -36,7 +50,7 @@ public class StudyQueryRepository {
                 .fetch();
     }
 
-    public List<Study> findWithStudyUsersByUserId(Long userId){
+    public List<Study> findWithStudyUsersByUserId(Long userId) {
         return queryFactory
                 .selectFrom(study).distinct()
                 .join(study.studyUsers, studyUser).fetchJoin()

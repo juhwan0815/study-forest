@@ -90,8 +90,8 @@ public class StudyController {
 
     @DeleteMapping("/studies/{studyId}/waitUsers/{waitUserId}")
     public ResponseEntity<Void> failWaitUser(@LoginUser Long userId,
-                                               @PathVariable Long studyId,
-                                               @PathVariable Long waitUserId) {
+                                             @PathVariable Long studyId,
+                                             @PathVariable Long waitUserId) {
         studyService.failWaitUser(userId, studyId, waitUserId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -184,5 +184,10 @@ public class StudyController {
     @GetMapping("/studies/waitUsers")
     public ResponseEntity<List<StudyResponse>> findByWaitUserId(@LoginUser Long userId) {
         return ResponseEntity.ok(studyService.findByWaitUserId(userId));
+    }
+
+    @GetMapping("/studies/chatRooms/{chatRoomId}")
+    public ResponseEntity<StudyResponse> findByChatRoomId(@PathVariable Long chatRoomId) {
+        return ResponseEntity.ok(studyService.findByChatRoomId(chatRoomId));
     }
 }

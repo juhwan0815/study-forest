@@ -64,4 +64,6 @@ public interface StudyService {
     void addTag(Long userId, Long studyId, TagCreateRequest request);
 
     void deleteTag(Long userId, Long studyId, Long tagId);
+
+    StudyResponse findByChatRoomId(Long chatRoomId);
 }

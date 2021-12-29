@@ -319,4 +319,10 @@ public class StudyServiceImpl implements StudyService {
         findStudy.isStudyAdmin(userId);
         findStudy.deleteTag(tagId);
     }
+
+    @Override
+    public StudyResponse findByChatRoomId(Long chatRoomId) {
+        Study findStudy = studyQueryRepository.findByChatRoomId(chatRoomId);
+        return StudyResponse.from(findStudy);
+    }
 }
