@@ -11,4 +11,7 @@ public class UserDeleteMessage {
 
     private Long userId;
 
+    public static UserDeleteMessage from(Long userId) {
+        return new UserDeleteMessage(userId);
+    }
 }
