@@ -50,27 +50,23 @@ kafka:
   topic:
     user:
       delete: user-delete-topic
-    study:
-      create: study-create-topic
     studyApply:
       success: study-apply-success-topic
       fail: study-apply-fail-topic
     gathering:
       create: gathering-create-topic
-    chat:
-      create: chat-create-topic
+    message:
+      create: message-create-topic
   consumer:
     user:
       delete: user-delete-consumer-group1
-    study:
-      create: study-create-consumer-group
     studyApply:
       success: study-apply-success-consumer-group1
       fail: study-apply-fail-consumer-group1
     gathering:
       create: gathering-create-consumer-group
-    chat:
-      create: chat-create-consumer-group
+    message:
+      create: message-create-consumer-group
 
 fcm:
   tempFilePath: study-forest-firebase-adminsdk-fn2ez-6f5e36d81f.json
