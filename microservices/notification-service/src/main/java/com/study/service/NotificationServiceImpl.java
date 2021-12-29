@@ -1,5 +1,6 @@
 package com.study.service;
 
+import com.study.client.StudyResponse;
 import com.study.client.StudyServiceClient;
 import com.study.client.UserResponse;
 import com.study.client.UserServiceClient;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -59,6 +61,21 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.save(notification);
 
         fcmMessageSender.send(user.getFcmToken(), studyApplySuccessMessage.getStudyName(), content);
+    }
+
+    @Override
+    @Transactional
+    public void gatheringCreate(GatheringCreateMessage gatheringCreateMessage) {
+        StudyResponse study = studyServiceClient.findById(gatheringCreateMessage.getStudyId());
+        List<UserResponse> studyUsers = studyServiceClient.findStudyUsersById(gatheringCreateMessage.getStudyId());
+
+        String content = createGatheringNotificationMessage(gatheringCreateMessage);
+        studyUsers.forEach(studyUser -> {
+            fcmMessageSender.send(studyUser.getFcmToken(), study.getName(), content);
+
+            Notification notification = Notification.createNotification(studyUser.getUserId(), study.getName(), content);
+            notificationRepository.save(notification);
+        });
     }
 
 
