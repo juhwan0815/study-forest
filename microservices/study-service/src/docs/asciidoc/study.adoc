@@ -297,3 +297,16 @@ include::{snippets}/study/waitUsers/http-response.adoc[]
 ====== Body
 include::{snippets}/study/waitUsers/response-fields.adoc[]
 
+==== 채팅바 ID 로 스터디 조회 API
+===== 요청
+include::{snippets}/study/findByChatRoomId/http-request.adoc[]
+====== Header
+include::{snippets}/study/findByChatRoomId/request-headers.adoc[]
+====== Path
+include::{snippets}/study/findByChatRoomId/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/study/findByChatRoomId/http-response.adoc[]
+====== Body
+include::{snippets}/study/findByChatRoomId/response-fields.adoc[]
+
