@@ -25,4 +25,5 @@ public class MessageResponse {
     public static MessageResponse from(Message message){
         return new MessageResponse(message.getUserId(), message.getSender(), message.getContent(), LocalDateTime.now());
     }
+
 }

@@ -1,10 +1,9 @@
 package com.study.domain;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
+@AllArgsConstructor
 public class Message {
 
     @Id
@@ -28,7 +27,6 @@ public class Message {
 
     private Long roomId;
 
-    @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
@@ -38,6 +36,7 @@ public class Message {
         message.sender = sender;
         message.content = content;
         message.roomId = roomId;
+        message.createdAt = LocalDateTime.now();
         return message;
     }
 }
