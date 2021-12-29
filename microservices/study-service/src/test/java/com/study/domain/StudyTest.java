@@ -469,4 +469,18 @@ class StudyTest {
         // then
         assertThat(result.size()).isEqualTo(1);
     }
+
+    @Test
+    @DisplayName("스터디 채팅방을 반환한다.")
+    void getChatRoom(){
+        // given
+        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, false, false, null);
+        study.getChatRooms().add(new ChatRoom(1L, "공지사항", study));
+
+        // when
+        ChatRoom result = study.getChatRoom(1L);
+
+        // then
+        assertThat(result.getName()).isEqualTo("공지사항");
+    }
 }

@@ -66,6 +66,7 @@ class StudyQueryRepositoryTest {
         assertThat(findStudy.getNumberOfPeople()).isEqualTo(5);
         assertThat(findStudy.isOffline()).isTrue();
         assertThat(findStudy.isOffline()).isTrue();
+        assertThat(findStudy.getChatRooms().size()).isEqualTo(1);
     }
 
     @Test

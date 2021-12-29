@@ -764,4 +764,22 @@ class StudyServiceTest {
         then(studyQueryRepository).should(times(1)).findByChatRoomId(any());
     }
 
+    @Test
+    @DisplayName("채팅방을 단건 조회한다.")
+    void findByChatRoomByIdAndChatRoomId() {
+        // given
+        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
+        study.getChatRooms().add(new ChatRoom(1L, "공지사항", study));
+
+        given(studyRepository.findWithChatRoomById(any()))
+                .willReturn(Optional.of(study));
+        // when
+        ChatRoomResponse result = studyService.findChatRoomByIdAndChatRoomId(1L, 1L);
+
+        // then
+        assertThat(result.getChatRoomId()).isEqualTo(1L);
+        assertThat(result.getName()).isEqualTo("공지사항");
+        then(studyRepository).should(times(1)).findWithChatRoomById(any());
+    }
+
 }

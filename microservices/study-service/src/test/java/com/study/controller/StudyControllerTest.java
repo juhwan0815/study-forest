@@ -981,5 +981,35 @@ class StudyControllerTest {
         then(studyService).should(times(1)).findByChatRoomId(any());
     }
 
+    @Test
+    @DisplayName("채팅방 단건 조회 API")
+    void findChatRoomByIdAndChatRoomId() throws Exception {
+        // given
+        given(studyService.findChatRoomByIdAndChatRoomId(any(), any()))
+                .willReturn(TEST_CHAT_ROOM_RESPONSE);
+
+        // when
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/studies/{studyId}/chatRooms/{chatRoomId}", 1L, 1L)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_CHAT_ROOM_RESPONSE)))
+                .andDo(document("study/chatRooms/findById",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("AccessToken")
+                        ),
+                        pathParameters(
+                                parameterWithName("studyId").description("스터디 ID"),
+                                parameterWithName("chatRoomId").description("채팅방 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("chatRoomId").type(JsonFieldType.NUMBER).description("채팅방 ID"),
+                                fieldWithPath("name").type(JsonFieldType.STRING).description("채팅방 이름")
+                        )
+                ));
+
+        // then
+        then(studyService).should(times(1)).findChatRoomByIdAndChatRoomId(any(),any());
+    }
 
 }
