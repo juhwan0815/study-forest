@@ -156,4 +156,15 @@ include::{snippets}/user/keyword/find/http-response.adoc[]
 ====== Body
 include::{snippets}/user/keyword/find/response-fields.adoc[]
 
+==== 검색 키워드로 회원 조회 API
+===== 요청
+include::{snippets}/user/keyword/findByKeywordContentContain/http-request.adoc[]
+====== Header
+include::{snippets}/user/keyword/findByKeywordContentContain/request-headers.adoc[]
+====== Param
+include::{snippets}/user/keyword/findByKeywordContentContain/request-parameters.adoc[]
 
+===== 응답
+include::{snippets}/user/keyword/findByKeywordContentContain/http-response.adoc[]
+====== Body
+include::{snippets}/user/keyword/findByKeywordContentContain/response-fields.adoc[]
