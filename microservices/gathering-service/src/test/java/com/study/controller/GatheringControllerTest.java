@@ -13,9 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
@@ -128,7 +126,7 @@ class GatheringControllerTest {
     @DisplayName("스터디 모임 조회 API")
     void findByStudyId() throws Exception {
 
-        Page<GatheringResponse> result = new PageImpl<>(Arrays.asList(TEST_GATHERING_RESPONSE), PageRequest.of(0, 10), 1);
+        Slice<GatheringResponse> result = new SliceImpl<>(Arrays.asList(TEST_GATHERING_RESPONSE), PageRequest.of(0, 10), true);
 
         // given
         given(gatheringService.findByStudyId(any(), any()))
@@ -174,8 +172,6 @@ class GatheringControllerTest {
                                 fieldWithPath("pageable.paged").type(JsonFieldType.BOOLEAN).description("페이징 여부"),
                                 fieldWithPath("pageable.unpaged").type(JsonFieldType.BOOLEAN).description("비페이징 여부"),
                                 fieldWithPath("last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
-                                fieldWithPath("totalPages").type(JsonFieldType.NUMBER).description("총 페이지 수"),
-                                fieldWithPath("totalElements").type(JsonFieldType.NUMBER).description("총 결과 수"),
                                 fieldWithPath("size").type(JsonFieldType.NUMBER).description("페이지 크기"),
                                 fieldWithPath("number").type(JsonFieldType.NUMBER).description("페이지 번호"),
                                 fieldWithPath("sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬여부"),

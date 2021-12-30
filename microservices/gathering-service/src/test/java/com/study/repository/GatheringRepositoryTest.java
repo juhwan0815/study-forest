@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
@@ -61,7 +62,7 @@ class GatheringRepositoryTest {
         em.clear();
 
         // when
-        Page<Gathering> result = gatheringRepository.findByStudyIdOrderByIdDesc(1L, PageRequest.of(0, 10));
+        Slice<Gathering> result = gatheringRepository.findByStudyIdOrderByIdDesc(1L, PageRequest.of(0, 10));
 
         // then
         assertThat(result.getContent().size()).isEqualTo(1);
