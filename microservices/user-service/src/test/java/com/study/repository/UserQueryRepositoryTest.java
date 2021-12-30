@@ -52,7 +52,6 @@ class UserQueryRepositoryTest {
         User findUser = userQueryRepository.findWithKeywordById(user.getId());
 
         // then
-        assertThat(findUser.getId()).isEqualTo(1L);
         assertThat(findUser.getKeywords().size()).isEqualTo(2);
     }
 
