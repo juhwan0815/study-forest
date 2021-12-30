@@ -63,7 +63,7 @@ public class UserController {
     }
 
     @PatchMapping("/users/areas/{areaId}")
-    public ResponseEntity<UserResponse> updateArea(@LoginUser Long userId, Long areaId) {
+    public ResponseEntity<UserResponse> updateArea(@LoginUser Long userId, @PathVariable  Long areaId) {
         return ResponseEntity.ok(userService.updateArea(userId, areaId));
     }
 
