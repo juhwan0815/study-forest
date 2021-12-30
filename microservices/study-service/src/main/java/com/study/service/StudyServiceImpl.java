@@ -40,6 +40,7 @@ public class StudyServiceImpl implements StudyService {
     private final UserServiceClient userServiceClient;
     private final ImageUtil imageUtil;
 
+    private final StudyCreateMessageSender studyCreateMessageSender;
     private final StudyDeleteMessageSender studyDeleteMessageSender;
     private final StudyApplyFailMessageSender studyApplyFailMessageSender;
     private final StudyApplySuccessMessageSender studyApplySuccessMessageSender;
@@ -66,6 +67,7 @@ public class StudyServiceImpl implements StudyService {
         study.changeArea(area.getId());
         studyRepository.save(study);
 
+        studyCreateMessageSender.send(StudyCreateMessage.from(study.getId(), study.getName(), request.getTags()));
         return StudyResponse.from(study, area);
     }
 
