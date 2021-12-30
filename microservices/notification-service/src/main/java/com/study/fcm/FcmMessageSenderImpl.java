@@ -50,9 +50,7 @@ public class FcmMessageSenderImpl implements FcmMessageSender {
         try {
             String response = FirebaseMessaging.getInstance().sendAsync(message).get();
             log.info("Sent message: " + response);
-        } catch (ExecutionException e) {
-            log.error("푸쉬알림 전송 실패");
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             log.error("푸쉬알림 전송 실패");
         }
     }

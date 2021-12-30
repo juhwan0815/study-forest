@@ -15,6 +15,8 @@ public class NotificationResponse {
 
     private Long notificationId;
 
+    private Long userId;
+
     private String title;
 
     private String content;
@@ -26,6 +28,7 @@ public class NotificationResponse {
         NotificationResponse notificationResponse = new NotificationResponse();
         notificationResponse.notificationId = notification.getId();
         notificationResponse.title = notification.getTitle();
+        notificationResponse.userId = notification.getUserId();
         notificationResponse.content = notification.getContent();
         notificationResponse.createdAt = notification.getCreatedAt();
         return notificationResponse;

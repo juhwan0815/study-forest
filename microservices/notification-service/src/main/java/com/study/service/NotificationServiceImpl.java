@@ -7,6 +7,7 @@ import com.study.fcm.FcmMessageSender;
 import com.study.kakfa.*;
 import com.study.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
+import org.graalvm.compiler.replacements.StandardGraphBuilderPlugins;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public Slice<NotificationResponse> findByUserId(Long userId, Pageable pageable) {
-        Slice<Notification> notifications = notificationRepository.findByUserIdOrOrderById(pageable, userId);
+        Slice<Notification> notifications = notificationRepository.findByUserIdOrderById(pageable, userId);
         return notifications.map(notification -> NotificationResponse.from(notification));
     }
 
@@ -91,10 +92,31 @@ public class NotificationServiceImpl implements NotificationService {
                     break;
                 }
             }
-            if (!matchResult){
+            if (!matchResult) {
                 fcmMessageSender.send(studyUser.getFcmToken(), messageTitle, messageContent);
             }
         });
+    }
+
+    @Override
+    @Transactional
+    public void studyCreate(StudyCreateMessage studyCreateMessage) {
+        studyCreateMessage.getTags().forEach(tag -> {
+            List<UserResponse> users = userServiceClient.findByKeywordContentContain(tag);
+            String content = createStudyCreateMessage(tag, studyCreateMessage.getName());
+
+            for (UserResponse user : users) {
+                Notification notification = Notification.createNotification(user.getUserId(), "스터디 생성 알림", content);
+                notificationRepository.save(notification);
+
+                fcmMessageSender.send(user.getFcmToken(), "스터디 생성 알림", content);
+            }
+        });
+    }
+
+
+    private String createStudyCreateMessage(String tagName, String studyName) {
+        return tagName + "키워드의 스터디가 개설되었습니다.\n " + studyName;
     }
 
     private String createMessageTitle(String studyName, String chatRoomName) {

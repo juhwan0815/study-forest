@@ -48,6 +48,8 @@ eureka:
 kafka:
   server: 127.0.0.1:9092
   topic:
+    study:
+      create: study-create-topic
     user:
       delete: user-delete-topic
     studyApply:
@@ -58,6 +60,8 @@ kafka:
     message:
       create: message-create-topic
   consumer:
+    study:
+      create: study-create-consumer-group
     user:
       delete: user-delete-consumer-group1
     studyApply:

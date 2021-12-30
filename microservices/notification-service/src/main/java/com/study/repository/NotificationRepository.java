@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    Slice<Notification> findByUserIdOrOrderById(Pageable pageable, Long userId);
+    Slice<Notification> findByUserIdOrderById(Pageable pageable, Long userId);
 }

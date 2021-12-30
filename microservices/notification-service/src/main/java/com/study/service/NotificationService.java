@@ -17,4 +17,5 @@ public interface NotificationService {
 
     void messageCreate(MessageCreateMessage messageCreateMessage);
 
+    void studyCreate(StudyCreateMessage studyCreateMessage);
 }
