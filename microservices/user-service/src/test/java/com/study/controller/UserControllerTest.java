@@ -473,4 +473,44 @@ class UserControllerTest {
         then(userService).should(times(1)).findKeywordById(any());
     }
 
+    @Test
+    @DisplayName("키워드를 가진 회원 조회 API")
+    void findByKeywordContentContain() throws Exception {
+        // given
+        List<UserResponse> result = Arrays.asList(TEST_USER_RESPONSE2);
+        given(userService.findByKeywordContentContain(any()))
+                .willReturn(result);
+
+        // when
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/users/keywords/notifications")
+                        .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .param("content","스프링"))
+                .andExpect(status().isOk())
+                .andDo(document("user/keyword/findByKeywordContentContain",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("AccessToken")
+                        ),
+                        requestParameters(
+                                parameterWithName("content").description("검색 키워드 내용")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].userId").type(JsonFieldType.NUMBER).description("회원 ID"),
+                                fieldWithPath("[].role").type(JsonFieldType.STRING).description("회원 권한"),
+                                fieldWithPath("[].nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                fieldWithPath("[].gender").type(JsonFieldType.STRING).description("회원 성별"),
+                                fieldWithPath("[].imageUrl").type(JsonFieldType.STRING).description("회원 프로필 이미지"),
+                                fieldWithPath("[].ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
+                                fieldWithPath("[].distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
+                                fieldWithPath("[].areaId").type(JsonFieldType.NUMBER).description("회원 지역 ID"),
+                                fieldWithPath("[].fcmToken").type(JsonFieldType.STRING).description("회원 FCM 토큰")
+                        )
+                ));
+
+        // then
+        then(userService).should(times(1)).findByKeywordContentContain(any());
+    }
+
+
+
 }

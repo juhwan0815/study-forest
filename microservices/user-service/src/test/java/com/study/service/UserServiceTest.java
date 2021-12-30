@@ -321,4 +321,19 @@ class UserServiceTest {
         assertThat(result.size()).isEqualTo(1);
         then(userRepository).should(times(1)).findByIdIn(any());
     }
+
+    @Test
+    @DisplayName("검색어를 포함하는 키워드를 가진 회원을 조회한다.")
+    void findByKeywordContentContain() {
+        // given
+        given(userQueryRepository.findByKeywordContentContain(any()))
+                .willReturn(Arrays.asList(TEST_USER));
+
+        // when
+        List<UserResponse> result = userService.findByKeywordContentContain("검색어");
+
+        // then
+        assertThat(result.size()).isEqualTo(1);
+        then(userQueryRepository).should(times(1)).findByKeywordContentContain(any());
+    }
 }
