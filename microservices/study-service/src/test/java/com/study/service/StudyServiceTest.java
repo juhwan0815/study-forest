@@ -61,6 +61,9 @@ class StudyServiceTest {
     private ImageUtil imageUtil;
 
     @Mock
+    private StudyCreateMessageSender studyCreateMessageSender;
+
+    @Mock
     private StudyDeleteMessageSender studyDeleteMessageSender;
 
     @Mock
@@ -88,6 +91,10 @@ class StudyServiceTest {
         given(studyRepository.save(any()))
                 .willReturn(null);
 
+        willDoNothing()
+                .given(studyCreateMessageSender)
+                .send(any());
+
         // when
         StudyResponse result = studyService.create(1L, TEST_IMAGE_FILE, TEST_STUDY_CREATE_REQUEST);
 
@@ -108,6 +115,7 @@ class StudyServiceTest {
         then(areaServiceClient).should(times(1)).findByCode(any());
         then(imageUtil).should(times(1)).uploadImage(any(), any());
         then(studyRepository).should(times(1)).save(any());
+        then(studyCreateMessageSender).should(times(1)).send(any());
     }
 
     @Test
@@ -125,6 +133,10 @@ class StudyServiceTest {
 
         given(studyRepository.save(any()))
                 .willReturn(null);
+
+        willDoNothing()
+                .given(studyCreateMessageSender)
+                .send(any());
 
         // when
         StudyResponse result = studyService.create(1L, TEST_IMAGE_FILE, studyCreateRequest);
@@ -145,6 +157,7 @@ class StudyServiceTest {
         then(categoryRepository).should(times(1)).findWithParentById(any());
         then(imageUtil).should(times(1)).uploadImage(any(), any());
         then(studyRepository).should(times(1)).save(any());
+        then(studyCreateMessageSender).should(times(1)).send(any());
     }
 
     @Test
