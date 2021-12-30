@@ -1,7 +1,7 @@
 :basedir: {docdir}
 :snippets: {basedir}/build/generated-snippets
 
-= 스터디 서비스 - 카테고리 API
+= 스터디 서비스 - 스터디 API
 :doctype: study
 :icons: font
 :source-highlighter: highlightjs
