@@ -16,6 +16,7 @@ import com.study.repository.GatheringRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,8 +51,8 @@ public class GatheringServiceImpl implements GatheringService {
     }
 
     @Override
-    public Page<GatheringResponse> findByStudyId(Long studyId, Pageable pageable) {
-        Page<Gathering> gatherings = gatheringRepository.findByStudyIdOrderByIdDesc(studyId, pageable);
+    public Slice<GatheringResponse> findByStudyId(Long studyId, Pageable pageable) {
+        Slice<Gathering> gatherings = gatheringRepository.findByStudyIdOrderByIdDesc(studyId, pageable);
         return gatherings.map(gathering -> GatheringResponse.from(gathering));
     }
 

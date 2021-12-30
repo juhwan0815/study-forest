@@ -9,6 +9,7 @@ import com.study.service.GatheringService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +32,8 @@ public class GatheringController {
     }
 
     @GetMapping("/studies/{studyId}/gatherings")
-    public ResponseEntity<Page<GatheringResponse>> findByStudyId(@PathVariable Long studyId,
-                                                                 @PageableDefault(size = 20, page = 0) Pageable pageable) {
+    public ResponseEntity<Slice<GatheringResponse>> findByStudyId(@PathVariable Long studyId,
+                                                                  @PageableDefault(size = 20, page = 0) Pageable pageable) {
         return ResponseEntity.ok(gatheringService.findByStudyId(studyId, pageable));
     }
 

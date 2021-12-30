@@ -10,6 +10,7 @@ import com.study.kakfa.UserDeleteMessage;
 import com.study.kakfa.listener.UserDeleteListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public interface GatheringService {
 
     List<UserResponse> findGatheringUserById(Long gatheringId);
 
-    Page<GatheringResponse> findByStudyId(Long studyId, Pageable pageable);
+    Slice<GatheringResponse> findByStudyId(Long studyId, Pageable pageable);
 
     void deleteByStudyId(StudyDeleteMessage studyDeleteMessage);
 }
