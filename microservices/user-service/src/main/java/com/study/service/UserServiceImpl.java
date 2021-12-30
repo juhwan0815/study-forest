@@ -155,4 +155,12 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<UserResponse> findByKeywordContentContain(String studyName) {
+        List<User> users = userQueryRepository.findByKeywordContentContain(studyName);
+        return users.stream()
+                .map(user -> UserResponse.from(user))
+                .collect(Collectors.toList());
+    }
+
 }

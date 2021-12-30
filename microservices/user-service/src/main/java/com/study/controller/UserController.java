@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponse>> findByIdIn(@Valid UserFindRequest request){
+    public ResponseEntity<List<UserResponse>> findByIdIn(@Valid UserFindRequest request) {
         return ResponseEntity.ok(userService.findByIdIn(request));
     }
 
@@ -69,7 +69,7 @@ public class UserController {
 
     @PatchMapping("/users/distance")
     public ResponseEntity<UserResponse> updateDistance(@LoginUser Long userId,
-                                                             @RequestBody @Valid UserUpdateDistanceRequest request) {
+                                                       @RequestBody @Valid UserUpdateDistanceRequest request) {
         return ResponseEntity.ok(userService.updateDistance(userId, request));
     }
 
@@ -87,8 +87,13 @@ public class UserController {
     }
 
     @GetMapping("/users/keywords")
-    public ResponseEntity<List<KeywordResponse>> findKeywordById(@LoginUser Long userId){
+    public ResponseEntity<List<KeywordResponse>> findKeywordById(@LoginUser Long userId) {
         return ResponseEntity.ok(userService.findKeywordById(userId));
+    }
+
+    @GetMapping("/users/keywords/notifications")
+    public ResponseEntity<List<UserResponse>> findByKeywordContentContain(@RequestParam String content) {
+        return ResponseEntity.ok(userService.findByKeywordContentContain(content));
     }
 
 }

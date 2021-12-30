@@ -35,4 +35,6 @@ public interface UserService {
     List<KeywordResponse> findKeywordById(Long userId);
 
     List<UserResponse> findByIdIn(UserFindRequest request);
+
+    List<UserResponse> findByKeywordContentContain(String studyName);
 }

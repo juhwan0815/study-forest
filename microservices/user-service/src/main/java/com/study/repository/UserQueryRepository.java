@@ -7,6 +7,8 @@ import com.study.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 import static com.study.domain.QKeyword.*;
 import static com.study.domain.QUser.*;
 
@@ -27,6 +29,14 @@ public class UserQueryRepository {
             throw new RuntimeException();
         }
         return findUser;
+    }
+
+    public List<User> findByKeywordContentContain(String content) {
+        return queryFactory
+                .selectFrom(user)
+                .join(user.keywords, keyword)
+                .where(keyword.content.contains(content))
+                .fetch();
     }
 
 }
