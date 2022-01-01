@@ -149,6 +149,38 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("회원 조회 API")
+    void findById() throws Exception {
+        // given
+        given(userService.findById(any()))
+                .willReturn(TEST_USER_RESPONSE2);
+        // when
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/users/{userId}",1L)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE2)))
+                .andDo(document("user/findById",
+                        pathParameters(
+                                parameterWithName("userId").description("회원 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("userId").type(JsonFieldType.NUMBER).description("회원 ID"),
+                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한"),
+                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
+                                fieldWithPath("imageUrl").type(JsonFieldType.STRING).description("회원 프로필 이미지"),
+                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
+                                fieldWithPath("distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
+                                fieldWithPath("areaId").type(JsonFieldType.NUMBER).description("회원 지역 ID"),
+                                fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("회원 FCM 토큰")
+                        )));
+
+        // then
+        then(userService).should(times(1)).findById(any());
+    }
+
+
+    @Test
     @DisplayName("회원 ID 리스트 조회 API")
     void findByIdIn() throws Exception {
         // given
@@ -485,7 +517,7 @@ class UserControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.get("/users/keywords/notifications")
                         .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
                         .accept(MediaType.APPLICATION_JSON)
-                        .param("content","스프링"))
+                        .param("content", "스프링"))
                 .andExpect(status().isOk())
                 .andDo(document("user/keyword/findByKeywordContentContain",
                         requestHeaders(
@@ -510,7 +542,6 @@ class UserControllerTest {
         // then
         then(userService).should(times(1)).findByKeywordContentContain(any());
     }
-
 
 
 }
