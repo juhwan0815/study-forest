@@ -76,6 +76,18 @@ include::{snippets}/user/update/profile/http-response.adoc[]
 ====== Body
 include::{snippets}/user/update/profile/response-fields.adoc[]
 
+
+==== 회원 조회 API
+===== 요청
+include::{snippets}/user/findById/http-request.adoc[]
+===== Path
+include::{snippets}/user/findById/path-parameters.adoc[]
+
+===== 응답
+include::{snippets}/user/findByLoginId/http-response.adoc[]
+====== Body
+include::{snippets}/user/findByLoginId/response-fields.adoc[]
+
 ==== 회원 프로필 조회 API
 ===== 요청
 include::{snippets}/user/findByLoginId/http-request.adoc[]
