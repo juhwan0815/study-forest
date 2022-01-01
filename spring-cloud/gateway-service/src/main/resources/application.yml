@@ -86,6 +86,15 @@ spring:
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*),/$\{segment}
+        # 회원 서비스 - 회원가입 API
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/users
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - RewritePath=/user-service/(?<segment>.*),/$\{segment}
         # 회원 서비스 - 로그인 회원 정보 조회 API
         - id: user-service
           uri: lb://USER-SERVICE
@@ -96,41 +105,22 @@ spring:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*),/$\{segment}
             - AuthorizationHeaderFilter
-        # 회원 서비스 - 로그인 회원 관심 태그 조회 API
+        # 회원 서비스 - 로그인 회원 키워드 조회 API
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
-            - Path=/user-service/users/tags
+            - Path=/user-service/users/keywords
             - Method=GET
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*),/$\{segment}
             - AuthorizationHeaderFilter
-        # 회원 서비스 - 로그인 회원 스터디 신청 내역 조회 API
-        - id: user-service
-          uri: lb://USER-SERVICE
-          predicates:
-            - Path=/user-service/users/studyApply
-            - Method=GET
-          filters:
-            - RemoveRequestHeader=Cookie
-            - RewritePath=/user-service/(?<segment>.*),/$\{segment}
-            - AuthorizationHeaderFilter
-        # 회원 서비스 - 회원 상세 조회 API
+        # 회원 서비스 - 회원 조회 API
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
             - Path=/user-service/users/**
             - Method=GET
-          filters:
-            - RemoveRequestHeader=Cookie
-            - RewritePath=/user-service/(?<segment>.*),/$\{segment}
-        # 회원 서비스 - 회원가입 API
-        - id: user-service
-          uri: lb://USER-SERVICE
-          predicates:
-            - Path=/user-service/users
-            - Method=POST
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*),/$\{segment}
@@ -224,16 +214,6 @@ spring:
         - id: study-service
           uri: lb://STUDY-SERVICE
           predicates:
-            - Path=/study-service/studies/{studyId}/users
-            - Method=GET
-          filters:
-            - RemoveRequestHeader=Cookie
-            - RewritePath=/study-service/(?<segment>.*),/$\{segment}
-            - AuthorizationHeaderFilter
-        # 스터디 서비스 - 알림서비스용 스터디 조회 API
-        - id: study-service
-          uri: lb://STUDY-SERVICE
-          predicates:
             - Path=/study-service/studies/{studyId}/studyUsers
             - Method=GET
           filters:
@@ -259,15 +239,6 @@ spring:
             - RemoveRequestHeader=Cookie
             - RewritePath=/study-service/(?<segment>.*),/$\{segment}
             - AuthorizationHeaderFilter
-        # 스터디 서비스 - 스터디 태그 검색 API
-        - id: study-service
-          uri: lb://STUDY-SERVICE
-          predicates:
-            - Path=/study-service/tags
-            - Method=GET
-          filters:
-            - RemoveRequestHeader=Cookie
-            - RewritePath=/study-service/(?<segment>.*),/$\{segment}
         # 스터디 서비스 - API 문서
         - id: study-service
           uri: lb://STUDY-SERVICE

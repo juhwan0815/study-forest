@@ -39,8 +39,7 @@ public class JwtUtils {
     }
 
     public Long getUserId(String token) {
-        String jwt = token.substring(7);
-        String userId = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwt)
+        String userId = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
                 .getBody().getSubject();
         return Long.valueOf(userId);
     }

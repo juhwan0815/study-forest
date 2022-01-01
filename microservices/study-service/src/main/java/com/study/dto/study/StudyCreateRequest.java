@@ -23,7 +23,7 @@ public class StudyCreateRequest {
 
     private Boolean offline;
 
-    private String AreaCode;
+    private String areaCode;
 
     private Long categoryId;
 }

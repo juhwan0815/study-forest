@@ -34,6 +34,11 @@ public class UserController {
         return ResponseEntity.ok(userService.findByIdIn(request));
     }
 
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<UserResponse> findById(@PathVariable Long userId){
+        return ResponseEntity.ok(userService.findById(userId));
+    }
+
     @PostMapping("/users/{kakaoId}")
     public ResponseEntity<UserResponse> login(@PathVariable Long kakaoId, @RequestHeader String fcmToken) {
         return ResponseEntity.ok(userService.findByKakaoId(kakaoId, fcmToken));

@@ -121,7 +121,7 @@ subprojects {
     sonarqube {
         properties {
             property 'sonar.host.url', 'http://localhost:9000'
-            property 'sonar.login', '7068308d5ae55aa7e0efb227b6598723ecfcbd0b'
+            property 'sonar.login', 'b4beeec51ce348d709554f5b7e8750a9f8b767ba'
             property 'sonar.sources', 'src'
             property 'sonar.language', 'java'
             property 'sonar.projectVersion', '1.1.0-SNAPSHOT'
