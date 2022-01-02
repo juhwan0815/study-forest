@@ -247,7 +247,7 @@ class AreaControllerTest {
         mockMvc.perform(get("/areas/{areaId}/around", 1)
                         .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
-                        .param("searchDistance", String.valueOf(TEST_AREA_AROUND_REQUEST.getDistance())))
+                        .param("distance", String.valueOf(TEST_AREA_AROUND_REQUEST.getDistance())))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
                 .andDo(document("area/findAroundById",
@@ -258,7 +258,7 @@ class AreaControllerTest {
                                 parameterWithName("areaId").description("지역 ID")
                         ),
                         requestParameters(
-                                parameterWithName("searchDistance").description("검색 거리")
+                                parameterWithName("distance").description("검색 거리")
                         ),
                         responseFields(
                                 fieldWithPath("[]").type(JsonFieldType.ARRAY).description("지역 정보 리스트"),
