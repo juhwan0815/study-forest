@@ -5,6 +5,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.study.domain.*;
 import com.study.dto.study.StudySearchRequest;
+import com.study.exception.ChatRoomNotFoundException;
+import com.study.exception.StudyNotFoundException;
 import lombok.RequiredArgsConstructor;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import org.springframework.data.domain.Page;
@@ -37,7 +39,7 @@ public class StudyQueryRepository {
                 .fetchOne();
 
         if (findStudy == null) {
-            throw new RuntimeException();
+            throw new ChatRoomNotFoundException(chatRoomId + "는 존재하지 않는 채팅방 ID 입니다.");
         }
         return findStudy;
     }
@@ -67,7 +69,7 @@ public class StudyQueryRepository {
                 .where(study.id.eq(studyId))
                 .fetchOne();
         if (findStudy == null) {
-            throw new RuntimeException();
+            throw new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다.");
         }
         return findStudy;
     }

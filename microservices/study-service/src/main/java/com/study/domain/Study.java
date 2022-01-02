@@ -1,11 +1,13 @@
 package com.study.domain;
 
 import com.study.dto.chatroom.ChatRoomCreateRequest;
+import com.study.exception.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.ws.rs.WebApplicationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,7 +80,7 @@ public class Study extends BaseEntity {
         this.numberOfPeople = numberOfPeople;
 
         if (currentNumberOfPeople > numberOfPeople) {
-            throw new RuntimeException();
+            throw new StudyException("현재 인원이 더 많기 때문에 스터디 인원을 변경할 수 없습니다.");
         }
 
         this.online = online;
@@ -121,7 +123,7 @@ public class Study extends BaseEntity {
         boolean checkResult = studyUsers.stream()
                 .anyMatch(studyUser -> studyUser.getUserId().equals(userId) && studyUser.getStudyRole().equals(StudyRole.ADMIN));
         if (!checkResult) {
-            throw new RuntimeException();
+            throw new NotStudyAdminException(userId + "는 스터디 관리자가 아닌 회원 ID 입니다.");
         }
     }
 
@@ -130,13 +132,13 @@ public class Study extends BaseEntity {
         boolean waitUserResult = waitUsers.stream()
                 .anyMatch(waitUser -> waitUser.getUserId().equals(userId));
         if (waitUserResult) {
-            throw new RuntimeException();
+            throw new WaitUserDuplicateException(userId + "는 이미 스터디 참가 대기 중인 회원 ID 입니다.");
         }
 
         boolean studyUserResult = studyUsers.stream()
                 .anyMatch(studyUser -> studyUser.getUserId().equals(userId));
         if (studyUserResult) {
-            throw new RuntimeException();
+            throw new StudyUserDuplicateException(userId + "는 이미 스터디 참가자인 회원 ID 입니다.");
         }
 
         WaitUser waitUser = WaitUser.createWaitUser(userId, this);
@@ -146,7 +148,7 @@ public class Study extends BaseEntity {
     public void failWaitUser(Long userId) {
         WaitUser findWaitUser = waitUsers.stream()
                 .filter(waitUser -> waitUser.getUserId().equals(userId))
-                .findFirst().orElseThrow(() -> new RuntimeException());
+                .findFirst().orElseThrow(() -> new WaitUserNotFoundException(userId + "는 스터디 참가 대기자가 아닌 회원 ID 입니다."));
 
         findWaitUser.fail();
     }
@@ -154,7 +156,7 @@ public class Study extends BaseEntity {
     public void deleteWaitUser(Long userId) {
         WaitUser findWaitUser = waitUsers.stream()
                 .filter(waitUser -> waitUser.getUserId().equals(userId))
-                .findFirst().orElseThrow(() -> new RuntimeException());
+                .findFirst().orElseThrow(() -> new WaitUserNotFoundException(userId + "는 스터디 참가 대기자가 아닌 회원 ID 입니다."));
 
         waitUsers.remove(findWaitUser);
     }
@@ -172,7 +174,7 @@ public class Study extends BaseEntity {
     public void successWaitUser(Long userId) {
         WaitUser findWaitUser = waitUsers.stream()
                 .filter(waitUser -> waitUser.getUserId().equals(userId))
-                .findFirst().orElseThrow(() -> new RuntimeException());
+                .findFirst().orElseThrow(() -> new WaitUserNotFoundException(userId + "는 스터디 참가 대기자가 아닌 회원 ID 입니다."));
 
         findWaitUser.success();
     }
@@ -180,7 +182,7 @@ public class Study extends BaseEntity {
     public void deleteStudyUser(Long studyUserId) {
         StudyUser findStudyUser = studyUsers.stream()
                 .filter(studyUser -> studyUser.getUserId().equals(studyUserId))
-                .findFirst().orElseThrow(() -> new RuntimeException());
+                .findFirst().orElseThrow(() -> new StudyUserNotFoundException(studyUserId + "는 스터디 참가자가 아닌 회원 ID 입니다."));
 
         studyUsers.remove(findStudyUser);
         this.currentNumberOfPeople -= 1;
@@ -197,7 +199,7 @@ public class Study extends BaseEntity {
         boolean chatRoomResult = chatRooms.stream()
                 .anyMatch(chatRoom -> chatRoom.getName().equals(name));
         if (chatRoomResult) {
-            throw new RuntimeException();
+            throw new ChatRoomDuplicateException(name + "은 이미 존재하는 채팅방입니다.");
         }
         ChatRoom chatRoom = ChatRoom.createChatRoom(name, this);
         chatRooms.add(chatRoom);
@@ -206,13 +208,13 @@ public class Study extends BaseEntity {
     public void updateChatRoom(Long chatRoomId, String name) {
         ChatRoom findChatRoom = chatRooms.stream()
                 .filter(chatRoom -> chatRoom.getId().equals(chatRoomId))
-                .findFirst().orElseThrow(() -> new RuntimeException());
+                .findFirst().orElseThrow(() -> new ChatRoomNotFoundException(chatRoomId + "는 존재하지 않는 채팅방 ID 입니다."));
 
         boolean chatRoomResult = chatRooms.stream()
                 .anyMatch(chatRoom -> chatRoom.getName().equals(name));
 
         if (chatRoomResult) {
-            throw new RuntimeException();
+            throw new ChatRoomDuplicateException(name + "은 이미 존재하는 채팅방입니다.");
         }
 
         findChatRoom.changeName(name);
@@ -221,7 +223,7 @@ public class Study extends BaseEntity {
     public void deleteChatRoom(Long chatRoomId) {
         ChatRoom findChatRoom = chatRooms.stream()
                 .filter(chatRoom -> chatRoom.getId().equals(chatRoomId))
-                .findFirst().orElseThrow(() -> new RuntimeException());
+                .findFirst().orElseThrow(() -> new ChatRoomNotFoundException(chatRoomId + "는 존재하지 않는 채팅방 ID 입니다."));
 
         chatRooms.remove(findChatRoom);
     }
@@ -230,7 +232,7 @@ public class Study extends BaseEntity {
         boolean tagResult = tags.stream()
                 .anyMatch(tag -> tag.getContent().equals(content));
         if (tagResult) {
-            throw new RuntimeException();
+            throw new TagDuplicateException(content + "는 이미 존재하는 태그입니다.");
         }
 
         Tag tag = Tag.createTag(content, this);
@@ -240,7 +242,7 @@ public class Study extends BaseEntity {
     public void deleteTag(Long tagId) {
         Tag findTag = tags.stream()
                 .filter(tag -> tag.getId().equals(tagId))
-                .findFirst().orElseThrow(() -> new RuntimeException());
+                .findFirst().orElseThrow(() -> new TagNotFoundException(tagId + "는 존재하지 않는 태그 ID 입니다."));
         tags.remove(findTag);
     }
 
@@ -253,6 +255,6 @@ public class Study extends BaseEntity {
     public ChatRoom getChatRoom(Long chatRoomId) {
         return chatRooms.stream()
                 .filter(chatRoom -> chatRoom.getId().equals(chatRoomId))
-                .findFirst().orElseThrow(() -> new RuntimeException());
+                .findFirst().orElseThrow(() -> new ChatRoomNotFoundException(chatRoomId + "는 존재하지 않는 채팅방 ID 입니다."));
     }
 }
