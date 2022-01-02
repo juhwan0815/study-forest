@@ -6,6 +6,8 @@ import com.study.domain.Auth;
 import com.study.dto.KakaoProfile;
 import com.study.dto.TokenResponse;
 import com.study.dto.UserResponse;
+import com.study.exception.AuthNotFoundException;
+import com.study.exception.TokenNotMatchException;
 import com.study.repository.AuthRepository;
 import com.study.utils.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
@@ -46,10 +48,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public TokenResponse refresh(Long userId, String refreshToken) {
         Auth findAuth = authRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new AuthNotFoundException(userId + "로 저장된 refreshToken 이 없습니다."));
 
         if(!refreshToken.equals(findAuth.getRefreshToken())){
-            throw new RuntimeException();
+            throw new TokenNotMatchException("저장된 토큰과 일치하지 않는 refreshToken 입니다.");
         }
 
         String accessToken = jwtUtils.createToken(refreshToken, accessTokenExpirationTime);

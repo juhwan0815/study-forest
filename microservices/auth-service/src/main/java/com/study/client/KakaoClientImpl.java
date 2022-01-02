@@ -2,6 +2,7 @@ package com.study.client;
 
 import com.google.gson.Gson;
 import com.study.dto.KakaoProfile;
+import com.study.exception.KakaoException;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -35,7 +36,7 @@ public class KakaoClientImpl implements KakaoClient {
         if (response.getStatusCode() == HttpStatus.OK) {
             return gson.fromJson(response.getBody(), KakaoProfile.class);
         } else {
-            throw new RuntimeException("");
+            throw new KakaoException("카카오 서버와 통신 중 오류가 발생했습니다.");
         }
     }
 }
