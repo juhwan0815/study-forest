@@ -20,7 +20,7 @@ public class AreaController {
     private final AreaService areaService;
 
     @PostMapping("/areas")
-    public ResponseEntity<Void> create(@RequestBody List<AreaCreateRequest> requests) {
+    public ResponseEntity<Void> create(@RequestBody @Valid List<AreaCreateRequest> requests) {
         areaService.create(requests);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
