@@ -5,6 +5,8 @@ import com.study.domain.Category;
 import com.study.domain.Study;
 import com.study.domain.StudyRole;
 import com.study.dto.study.StudySearchRequest;
+import com.study.exception.ChatRoomNotFoundException;
+import com.study.exception.StudyNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -80,7 +82,7 @@ class StudyQueryRepositoryTest {
         em.clear();
 
         // when
-        assertThrows(RuntimeException.class,()-> studyQueryRepository.findByChatRoomId(1L));
+        assertThrows(ChatRoomNotFoundException.class,()-> studyQueryRepository.findByChatRoomId(1L));
     }
 
     @Test
@@ -161,7 +163,7 @@ class StudyQueryRepositoryTest {
         em.flush();
         em.clear();
         // when
-        assertThrows(RuntimeException.class, () -> studyQueryRepository.findWithCategoryAndTagById(100L));
+        assertThrows(StudyNotFoundException.class, () -> studyQueryRepository.findWithCategoryAndTagById(100L));
     }
 
 

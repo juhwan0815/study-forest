@@ -1,5 +1,6 @@
 package com.study.domain;
 
+import com.study.exception.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -66,7 +67,7 @@ class StudyTest {
         study.addStudyUser(2L, StudyRole.USER);
 
         // when
-        assertThrows(RuntimeException.class,
+        assertThrows(StudyException.class,
                 () -> study.change("백엔드 스터디", "백엔드 스터디", 1, true, true, true, null));
     }
 
@@ -158,7 +159,7 @@ class StudyTest {
         study.addStudyUser(1L, StudyRole.USER);
 
         // when
-        assertThrows(RuntimeException.class, ()-> study.isStudyAdmin(1L));
+        assertThrows(NotStudyAdminException.class, ()-> study.isStudyAdmin(1L));
     }
 
     @Test
@@ -184,7 +185,7 @@ class StudyTest {
         study.addWaitUser(1L);
 
         // when
-        assertThrows(RuntimeException.class, ()-> study.addWaitUser(1L));
+        assertThrows(WaitUserDuplicateException.class, ()-> study.addWaitUser(1L));
     }
 
     @Test
@@ -195,7 +196,7 @@ class StudyTest {
         study.addStudyUser(1L, StudyRole.ADMIN);
 
         // when
-        assertThrows(RuntimeException.class, ()-> study.addWaitUser(1L));
+        assertThrows(StudyUserDuplicateException.class, ()-> study.addWaitUser(1L));
     }
 
     @Test
@@ -219,7 +220,7 @@ class StudyTest {
         Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, false, false, null);
 
         // when
-        assertThrows(RuntimeException.class, ()-> study.failWaitUser(1L));
+        assertThrows(WaitUserNotFoundException.class, ()-> study.failWaitUser(1L));
     }
 
     @Test
@@ -243,7 +244,7 @@ class StudyTest {
         Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, false, false, null);
 
         // when
-        assertThrows(RuntimeException.class, ()-> study.deleteWaitUser(1L));
+        assertThrows(WaitUserNotFoundException.class, ()-> study.deleteWaitUser(1L));
     }
 
     @Test
@@ -283,7 +284,7 @@ class StudyTest {
         Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, false, false, null);
 
         // when
-        assertThrows(RuntimeException.class, ()-> study.successWaitUser(1L));
+        assertThrows(WaitUserNotFoundException.class, ()-> study.successWaitUser(1L));
     }
 
     @Test
@@ -307,7 +308,7 @@ class StudyTest {
         Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, false, false, null);
 
         // when
-        assertThrows(RuntimeException.class, ()-> study.deleteStudyUser(1L));
+        assertThrows(StudyUserNotFoundException.class, ()-> study.deleteStudyUser(1L));
     }
 
     @Test
@@ -346,7 +347,7 @@ class StudyTest {
         study.addChatRoom("공지사항");
 
         // when
-        assertThrows(RuntimeException.class, ()-> study.addChatRoom("공지사항"));
+        assertThrows(ChatRoomDuplicateException.class, ()-> study.addChatRoom("공지사항"));
     }
 
     @Test
@@ -370,7 +371,7 @@ class StudyTest {
         Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, false, false, null);
 
         // when
-        assertThrows(RuntimeException.class, ()-> study.updateChatRoom(1L, "대화방"));
+        assertThrows(ChatRoomNotFoundException.class, ()-> study.updateChatRoom(1L, "대화방"));
     }
 
     @Test
@@ -381,7 +382,7 @@ class StudyTest {
         study.getChatRooms().add(new ChatRoom(1L, "공지사항", study));
 
         // when
-        assertThrows(RuntimeException.class, ()-> study.updateChatRoom(1L, "공지사항"));
+        assertThrows(ChatRoomDuplicateException.class, ()-> study.updateChatRoom(1L, "공지사항"));
     }
 
     @Test
@@ -399,13 +400,13 @@ class StudyTest {
     }
 
     @Test
-    @DisplayName("예외 테스트 : 존재하지 않는 스터디 채팅방을 삭제하면 예외가 발생한다..")
+    @DisplayName("예외 테스트 : 존재하지 않는 스터디 채팅방을 삭제하면 예외가 발생한다.")
     void deleteChatRoomNotExist() {
         // given
         Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, false, false, null);
 
         // when
-        assertThrows(RuntimeException.class, ()-> study.deleteChatRoom(1L));
+        assertThrows(ChatRoomNotFoundException.class, ()-> study.deleteChatRoom(1L));
     }
 
     @Test
@@ -429,7 +430,7 @@ class StudyTest {
         study.addTag("스프링");
 
         // when
-        assertThrows(RuntimeException.class, ()-> study.addTag("스프링"));
+        assertThrows(TagDuplicateException.class, ()-> study.addTag("스프링"));
     }
 
     @Test
@@ -453,7 +454,7 @@ class StudyTest {
         Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, false, false, null);
 
         // when
-        assertThrows(RuntimeException.class, ()-> study.deleteTag(1L));
+        assertThrows(TagNotFoundException.class, ()-> study.deleteTag(1L));
     }
 
     @Test

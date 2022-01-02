@@ -3,6 +3,7 @@ package com.study.service;
 import com.study.domain.Category;
 import com.study.dto.category.CategoryCreateRequest;
 import com.study.dto.category.CategoryResponse;
+import com.study.exception.CategoryDuplicateException;
 import com.study.fixture.CategoryFixture;
 import com.study.repository.CategoryRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -61,7 +62,7 @@ class CategoryServiceTest {
                 .willReturn(Optional.of(TEST_CATEGORY));
 
         // when
-        assertThrows(RuntimeException.class, () -> categoryService.create(TEST_CATEGORY_CREATE_REQUEST));
+        assertThrows(CategoryDuplicateException.class, () -> categoryService.create(TEST_CATEGORY_CREATE_REQUEST));
 
         // then
         then(categoryRepository).should(times(1)).findByName(any());
@@ -101,7 +102,7 @@ class CategoryServiceTest {
                 .willReturn(Optional.of(TEST_CHILD_CATEGORY));
 
         // when
-        assertThrows(RuntimeException.class, () -> categoryService.createChildren(1L, TEST_CATEGORY_CREATE_REQUEST));
+        assertThrows(CategoryDuplicateException.class, () -> categoryService.createChildren(1L, TEST_CATEGORY_CREATE_REQUEST));
 
         // then
         then(categoryRepository).should(times(1)).findById(any());
@@ -140,7 +141,7 @@ class CategoryServiceTest {
                 .willReturn(Optional.of(TEST_CHILD_CATEGORY));
 
         // when
-        assertThrows(RuntimeException.class, () -> categoryService.update(1L, TEST_CATEGORY_UPDATE_REQUEST));
+        assertThrows(CategoryDuplicateException.class, () -> categoryService.update(1L, TEST_CATEGORY_UPDATE_REQUEST));
 
         // then
         then(categoryRepository).should(times(1)).findById(any());
