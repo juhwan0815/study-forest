@@ -12,6 +12,8 @@ import com.study.dto.user.UserFindRequest;
 import com.study.dto.user.UserResponse;
 import com.study.dto.user.UserUpdateDistanceRequest;
 import com.study.dto.user.UserUpdateNickNameRequest;
+import com.study.exception.UserDuplicateException;
+import com.study.exception.UserNotFoundException;
 import com.study.kafka.sender.UserDeleteMessageSender;
 import com.study.kafka.sender.UserDeleteMessageSenderImpl;
 import com.study.kakfa.UserDeleteMessage;
@@ -43,7 +45,7 @@ public class UserServiceImpl implements UserService {
         KakaoProfile kakaoProfile = kakaoClient.getKakaoProfile(kakaoToken);
 
         if (userRepository.findByKakaoId(kakaoProfile.getId()).isPresent()) {
-            throw new RuntimeException("");
+            throw new UserDuplicateException("이미 가입한 회원입니다.");
         }
 
         User user = User.createUser(kakaoProfile.getId(),
@@ -60,7 +62,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse findByKakaoId(Long kakaoId, String fcmToken) {
         User findUser = userRepository.findByKakaoId(kakaoId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new UserNotFoundException(kakaoId + "는 가입하지 않는 카카오 ID 입니다."));
 
         findUser.changeFcmToken(fcmToken);
         return UserResponse.from(findUser);
@@ -69,7 +71,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse findById(Long userId) {
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new UserNotFoundException(userId + "는 존재하지 않는 회원 ID 입니다."));
         return UserResponse.from(findUser);
     }
 
@@ -77,7 +79,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse updateImage(Long userId, MultipartFile image) {
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new UserNotFoundException(userId + "는 존재하지 않는 회원 ID 입니다."));
 
         Image updateImage = imageUtil.uploadImage(image, findUser.getImage());
         findUser.changeImage(updateImage);
@@ -88,7 +90,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse updateProfile(Long userId, UserUpdateNickNameRequest request) {
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new UserNotFoundException(userId + "는 존재하지 않는 회원 ID 입니다."));
 
         findUser.changeProfile(request.getNickName());
         return UserResponse.from(findUser);
@@ -98,7 +100,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void delete(Long userId) {
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new UserNotFoundException(userId + "는 존재하지 않는 회원 ID 입니다."));
         userRepository.delete(findUser);
 
         userDeleteMessageSender.send(UserDeleteMessage.from(findUser.getId()));
@@ -108,7 +110,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse updateArea(Long userId, Long areaId) {
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new UserNotFoundException(userId + "는 존재하지 않는 회원 ID 입니다."));
 
         findUser.changeArea(areaId);
         return UserResponse.from(findUser);
@@ -118,7 +120,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse updateDistance(Long userId, UserUpdateDistanceRequest request) {
         User findUser = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException(""));
+                .orElseThrow(() -> new UserNotFoundException(userId + "는 존재하지 않는 회원 ID 입니다."));
 
         findUser.changeDistance(request.getDistance());
         return UserResponse.from(findUser);

@@ -4,6 +4,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.study.domain.QKeyword;
 import com.study.domain.QUser;
 import com.study.domain.User;
+import com.study.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -26,7 +27,7 @@ public class UserQueryRepository {
                 .fetchOne();
 
         if (findUser == null) {
-            throw new RuntimeException();
+            throw new UserNotFoundException(userId + "는 존재하지 않는 회원 ID 입니다.");
         }
         return findUser;
     }

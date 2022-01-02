@@ -1,5 +1,7 @@
 package com.study.domain;
 
+import com.study.exception.KeywordDuplicateException;
+import com.study.exception.KeywordNotFoundException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -77,7 +79,7 @@ public class User extends BaseEntity {
     public void addKeyword(String content) {
         boolean result = keywords.stream().anyMatch(keyword -> keyword.getContent().equals(content));
         if (result) {
-            throw new RuntimeException("이미 관심 키워드로 추가한 키워드입니다.");
+            throw new KeywordDuplicateException(content + "는 이미 관심 키워드로 추가한 키워드입니다.");
         }
 
         Keyword keyword = Keyword.createKeyword(content, this);
@@ -87,7 +89,7 @@ public class User extends BaseEntity {
     public void deleteKeyword(Long keywordId) {
         Keyword findKeyword = keywords.stream()
                 .filter(keyword -> keyword.getId().equals(keywordId))
-                .findFirst().orElseThrow(() -> new RuntimeException("존재하지 않는 키워드입니다."));
+                .findFirst().orElseThrow(() -> new KeywordNotFoundException(keywordId + "는 존재하지 않는 키워드 ID 입니다."));
 
         keywords.remove(findKeyword);
     }
