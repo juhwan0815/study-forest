@@ -3,6 +3,7 @@ package com.study.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.dto.KakaoProfile;
+import com.study.exception.KakaoException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +67,7 @@ class KakaoClientTest {
                 .andRespond(withStatus(HttpStatus.CREATED));
 
         // when
-        assertThrows(RuntimeException.class, () -> kakaoClient.getKakaoProfile("kakaoToken"));
+        assertThrows(KakaoException.class, () -> kakaoClient.getKakaoProfile("kakaoToken"));
     }
 
 

@@ -7,6 +7,7 @@ import com.study.domain.Auth;
 import com.study.dto.KakaoProfile;
 import com.study.dto.TokenResponse;
 import com.study.dto.UserResponse;
+import com.study.exception.TokenNotMatchException;
 import com.study.repository.AuthRepository;
 import com.study.utils.jwt.JwtUtils;
 import org.junit.jupiter.api.DisplayName;
@@ -136,6 +137,6 @@ class AuthServiceTest {
                 .willReturn(Optional.of(auth));
 
         // when
-        assertThrows(RuntimeException.class, () -> authService.refresh(1L, "refreshToken"));
+        assertThrows(TokenNotMatchException.class, () -> authService.refresh(1L, "refreshToken"));
     }
 }
