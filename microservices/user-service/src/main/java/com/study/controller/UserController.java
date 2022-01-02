@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @RestController
@@ -35,7 +36,7 @@ public class UserController {
     }
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<UserResponse> findById(@PathVariable Long userId){
+    public ResponseEntity<UserResponse> findById(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.findById(userId));
     }
 
@@ -68,7 +69,7 @@ public class UserController {
     }
 
     @PatchMapping("/users/areas/{areaId}")
-    public ResponseEntity<UserResponse> updateArea(@LoginUser Long userId, @PathVariable  Long areaId) {
+    public ResponseEntity<UserResponse> updateArea(@LoginUser Long userId, @PathVariable Long areaId) {
         return ResponseEntity.ok(userService.updateArea(userId, areaId));
     }
 
