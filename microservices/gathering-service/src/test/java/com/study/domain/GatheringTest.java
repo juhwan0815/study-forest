@@ -1,5 +1,8 @@
 package com.study.domain;
 
+import com.study.exception.GatheringUserDuplicateException;
+import com.study.exception.GatheringUserNotFoundException;
+import com.study.exception.NotRegisterException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -83,7 +86,7 @@ class GatheringTest {
         gathering.addGatheringUser(1L, true);
 
         // when
-        assertThrows(RuntimeException.class, () -> gathering.addGatheringUser(1L, true));
+        assertThrows(GatheringUserDuplicateException.class, () -> gathering.addGatheringUser(1L, true));
     }
 
     @Test
@@ -108,7 +111,7 @@ class GatheringTest {
         Gathering gathering = Gathering.createGathering(1L, LocalDateTime.now(), true, "오프라인 모임");
 
         // when
-        assertThrows(RuntimeException.class, () -> gathering.deleteGatheringUser(1L));
+        assertThrows(GatheringUserNotFoundException.class, () -> gathering.deleteGatheringUser(1L));
     }
 
     @Test
@@ -130,7 +133,7 @@ class GatheringTest {
         gathering.addGatheringUser(1L, false);
 
         // when
-        assertThrows(RuntimeException.class, () -> gathering.isRegister(1L));
+        assertThrows(NotRegisterException.class, () -> gathering.isRegister(1L));
     }
 
     @Test
@@ -141,7 +144,7 @@ class GatheringTest {
         gathering.addGatheringUser(1L, false);
 
         // when
-        assertThrows(RuntimeException.class, () -> gathering.isRegister(2L));
+        assertThrows(NotRegisterException.class, () -> gathering.isRegister(2L));
     }
 
     @Test
