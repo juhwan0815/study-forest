@@ -7,6 +7,7 @@ import com.study.domain.Place;
 import com.study.dto.GatheringCreateRequest;
 import com.study.dto.GatheringResponse;
 import com.study.dto.GatheringUpdateRequest;
+import com.study.exception.GatheringNotFoundException;
 import com.study.kakfa.GatheringCreateMessage;
 import com.study.kakfa.StudyDeleteMessage;
 import com.study.kakfa.UserDeleteMessage;
@@ -14,7 +15,6 @@ import com.study.kakfa.sender.GatheringCreateMessageSender;
 import com.study.repository.GatheringQueryRepository;
 import com.study.repository.GatheringRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -67,7 +67,7 @@ public class GatheringServiceImpl implements GatheringService {
     @Transactional
     public GatheringResponse update(Long userId, Long gatheringId, GatheringUpdateRequest request) {
         Gathering findGathering = gatheringRepository.findWithGatheringUserById(gatheringId)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new GatheringNotFoundException(gatheringId + "는 존재하지 않는 모임 ID 입니다."));
         findGathering.isRegister(userId);
 
         findGathering.update(request.getGatheringTime(), request.getOffline(), request.getContent());
@@ -84,7 +84,7 @@ public class GatheringServiceImpl implements GatheringService {
     @Transactional
     public void delete(Long userId, Long gatheringId) {
         Gathering findGathering = gatheringRepository.findWithGatheringUserById(gatheringId)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new GatheringNotFoundException(gatheringId + "는 존재하지 않는 모임 ID 입니다."));
         findGathering.isRegister(userId);
 
         gatheringRepository.delete(findGathering);
@@ -93,7 +93,7 @@ public class GatheringServiceImpl implements GatheringService {
     @Override
     public GatheringResponse findById(Long gatheringId) {
         Gathering findGathering = gatheringRepository.findById(gatheringId)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new GatheringNotFoundException(gatheringId + "는 존재하지 않는 모임 ID 입니다."));
         return GatheringResponse.from(findGathering);
     }
 
@@ -101,7 +101,7 @@ public class GatheringServiceImpl implements GatheringService {
     @Transactional
     public void addGatheringUser(Long userId, Long gatheringId) {
         Gathering findGathering = gatheringRepository.findWithGatheringUserById(gatheringId)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new GatheringNotFoundException(gatheringId + "는 존재하지 않는 모임 ID 입니다."));
 
         findGathering.addGatheringUser(userId, false);
     }
@@ -110,7 +110,7 @@ public class GatheringServiceImpl implements GatheringService {
     @Transactional
     public void deleteGatheringUser(Long userId, Long gatheringId) {
         Gathering findGathering = gatheringRepository.findWithGatheringUserById(gatheringId)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new GatheringNotFoundException(gatheringId + "는 존재하지 않는 모임 ID 입니다."));
 
         findGathering.deleteGatheringUser(userId);
     }
@@ -125,7 +125,7 @@ public class GatheringServiceImpl implements GatheringService {
     @Override
     public List<UserResponse> findGatheringUserById(Long gatheringId) {
         Gathering findGathering = gatheringRepository.findWithGatheringUserById(gatheringId)
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new GatheringNotFoundException(gatheringId + "는 존재하지 않는 모임 ID 입니다."));
 
         List<Long> userIds = findGathering.getGatheringUserId();
         return userServiceClient.findByIdIn(userIds);

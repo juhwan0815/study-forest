@@ -1,6 +1,10 @@
 package com.study.domain;
 
 
+import com.study.exception.GatheringNotFoundException;
+import com.study.exception.GatheringUserDuplicateException;
+import com.study.exception.GatheringUserNotFoundException;
+import com.study.exception.NotRegisterException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -66,7 +70,7 @@ public class Gathering extends BaseEntity {
                 .findAny();
 
         if (optionalGatheringUser.isPresent()) {
-            throw new RuntimeException("이미 모임에 참가한 유저입니다.");
+            throw new GatheringUserDuplicateException(userId + "는 이미 모임에 참가한 회원 ID 입니다.");
         }
 
         GatheringUser gatheringUser = GatheringUser.createGatheringUser(userId, register, this);
@@ -77,7 +81,7 @@ public class Gathering extends BaseEntity {
     public void deleteGatheringUser(Long userId) {
         GatheringUser findGatheringUser = gatheringUsers.stream()
                 .filter(gatheringUser -> gatheringUser.getUserId().equals(userId))
-                .findFirst().orElseThrow(() -> new RuntimeException(userId + "는 존재하지 않는 참가 회원입니다."));
+                .findFirst().orElseThrow(() -> new GatheringUserNotFoundException(userId + "는 존재하지 않는 참가 회원 ID 입니다."));
 
         gatheringUsers.remove(findGatheringUser);
         this.numberOfPeople -= 1;
@@ -89,7 +93,7 @@ public class Gathering extends BaseEntity {
                         gatheringUser.getUserId().equals(userId) && gatheringUser.isRegister());
 
         if (!result) {
-            throw new RuntimeException("모임을 수정할 권한이 없습니다.");
+            throw new NotRegisterException(userId + "는 모임을 등록자가 아닌 참가 회원 ID 입니다");
         }
     }
 
