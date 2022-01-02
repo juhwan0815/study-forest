@@ -2,23 +2,21 @@ package com.study.service;
 
 import com.study.client.KakaoClient;
 import com.study.client.KakaoProfile;
-import com.study.domain.Keyword;
 import com.study.domain.User;
 import com.study.domain.UserRole;
 import com.study.dto.keyword.KeywordResponse;
 import com.study.dto.user.UserResponse;
+import com.study.exception.UserDuplicateException;
 import com.study.kafka.sender.UserDeleteMessageSender;
 import com.study.repository.UserQueryRepository;
 import com.study.repository.UserRepository;
 import com.study.util.ImageUtil;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.convert.DurationFormat;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -29,7 +27,7 @@ import java.util.Optional;
 
 import static com.study.UserFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
@@ -113,7 +111,7 @@ class UserServiceTest {
                 .willReturn(Optional.of(TEST_USER));
 
         // when
-        assertThrows(RuntimeException.class, () -> userService.create("kakaoToken"));
+        assertThrows(UserDuplicateException.class, () -> userService.create("kakaoToken"));
 
         // then
         then(kakaoClient).should(times(1)).getKakaoProfile(any());

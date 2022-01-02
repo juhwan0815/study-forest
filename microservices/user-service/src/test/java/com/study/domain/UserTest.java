@@ -1,5 +1,7 @@
 package com.study.domain;
 
+import com.study.exception.KeywordDuplicateException;
+import com.study.exception.KeywordNotFoundException;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -120,7 +122,7 @@ class UserTest {
         user.addKeyword("개발");
 
         // when
-        assertThrows(RuntimeException.class, ()-> user.addKeyword("개발"));
+        assertThrows(KeywordDuplicateException.class, ()-> user.addKeyword("개발"));
     }
 
     @Test
@@ -144,7 +146,7 @@ class UserTest {
         User user = User.createUser(1L, "황주환", "10~19", "male", UserRole.USER);
 
         // when
-        assertThrows(RuntimeException.class, ()-> user.deleteKeyword(1L));
+        assertThrows(KeywordNotFoundException.class, ()-> user.deleteKeyword(1L));
     }
 
 }

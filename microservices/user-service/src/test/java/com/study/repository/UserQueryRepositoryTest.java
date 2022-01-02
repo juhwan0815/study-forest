@@ -3,6 +3,8 @@ package com.study.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.study.domain.User;
 import com.study.domain.UserRole;
+import com.study.dto.user.UserFindRequest;
+import com.study.exception.UserNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -59,7 +61,7 @@ class UserQueryRepositoryTest {
     @DisplayName("예외 테스트 : 존재하지 않는 회원 Id로 회원과 관심 키워드를 조회하면 예외가 발생한다.")
     void findWithKeywordByNotExistId() {
         // given
-        assertThrows(RuntimeException.class, () -> userQueryRepository.findWithKeywordById(1L));
+        assertThrows(UserNotFoundException.class, () -> userQueryRepository.findWithKeywordById(1L));
     }
 
     @Test
