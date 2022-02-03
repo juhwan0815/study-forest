@@ -75,7 +75,7 @@ public class UserService {
     }
 
     public UserResponse findById(Long userId) {
-        User findUser = userRepository.findById(userId)
+        User findUser = userRepository.findWithAreaById(userId)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
         return UserResponse.from(findUser);
     }

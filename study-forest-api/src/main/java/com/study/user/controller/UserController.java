@@ -7,7 +7,6 @@ import com.study.user.dto.UserUpdateDistanceRequest;
 import com.study.user.dto.UserUpdateProfileRequest;
 import com.study.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -80,6 +79,5 @@ public class UserController {
         userService.updateDistance(userId, request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
 
 }

@@ -42,4 +42,8 @@ public class AreaResponse {
         this.codeType = area.getCodeType();
     }
 
+    public static AreaResponse from(Area area) {
+        return new AreaResponse(area);
+    }
+
 }
