@@ -1,17 +1,17 @@
 package com.study.user.controller;
 
 import com.study.common.NotExistException;
+import com.study.config.LoginUser;
+import com.study.user.dto.UserUpdateProfileRequest;
 import com.study.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,6 +52,13 @@ public class UserController {
         String imageUrl = userService.uploadImage(image);
         response.put("imageUrl", imageUrl);
         return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/api/users/profile")
+    public ResponseEntity<Void> updateProfile(@LoginUser Long userId,
+                                              @RequestBody @Valid UserUpdateProfileRequest request) {
+        userService.updateProfile(userId, request);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 

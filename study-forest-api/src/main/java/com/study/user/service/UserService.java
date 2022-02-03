@@ -9,6 +9,7 @@ import com.study.security.util.JwtUtil;
 import com.study.user.Role;
 import com.study.user.User;
 import com.study.user.UserRepository;
+import com.study.user.dto.UserUpdateProfileRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,5 +58,13 @@ public class UserService {
 
     public String uploadImage(MultipartFile image) {
         return awsClient.upload(image);
+    }
+
+    @Transactional
+    public void updateProfile(Long userId, UserUpdateProfileRequest request) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+
+        findUser.changProfile(request.getNickName(), request.getImageUrl());
     }
 }

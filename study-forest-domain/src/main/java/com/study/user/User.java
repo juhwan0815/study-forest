@@ -56,13 +56,9 @@ public class User extends BaseEntity {
         return user;
     }
 
-    public void changeImage(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-
-    public void changeProfile(String nickName) {
+    public void changProfile(String nickName, String imageUrl) {
         this.nickName = nickName;
+        this.imageUrl = imageUrl;
     }
 
     public void changeDistance(Integer distance) {
