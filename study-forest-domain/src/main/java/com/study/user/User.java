@@ -1,11 +1,13 @@
 package com.study.user;
 
+import com.study.area.Area;
 import com.study.common.BaseEntity;
 import com.study.userKeyword.UserKeyword;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.transaction.reactive.AbstractReactiveTransactionManager;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -26,25 +28,24 @@ public class User extends BaseEntity {
 
     private String nickName; // 닉네임
 
+    private String imageUrl; // 이미지 URL
+
     private String ageRange; // 나이대
 
     private String gender; // 성별
 
     @Enumerated(EnumType.STRING)
-    private UserRole role; // 권한
+    private Role role; // 권한
 
-    private String imageUrl;
-
-    private String fcmToken; // fcmToken
-
-    private Long areaId; // 지역 ID
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "area_id")
+    private Area area;
 
     private Integer distance; // 검색 거리
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserKeyword> keywords = new ArrayList<>(); // 회원의 키워드들
+    private String pushToken; // fcmToken
 
-    public static User createUser(Long kakaoId, String nickName, String ageRange, String gender, UserRole role) {
+    public static User createUser(Long kakaoId, String nickName, String ageRange, String gender, Role role) {
         User user = new User();
         user.kakaoId = kakaoId;
         user.nickName = nickName;
@@ -59,39 +60,16 @@ public class User extends BaseEntity {
         this.imageUrl = imageUrl;
     }
 
-    public void changeFcmToken(String fcmToken) {
-        this.fcmToken = fcmToken;
-    }
 
     public void changeProfile(String nickName) {
         this.nickName = nickName;
-    }
-
-    public void changeArea(Long areaId) {
-        this.areaId = areaId;
     }
 
     public void changeDistance(Integer distance) {
         this.distance = distance;
     }
 
-    public void addKeyword(String content) {
-        boolean result = keywords.stream().anyMatch(keyword -> keyword.getContent().equals(content));
-        if (result) {
-            throw new RuntimeException(content + "는 이미 관심 키워드로 추가한 키워드입니다.");
-        }
-
-        UserKeyword keyword = UserKeyword.createKeyword(content, this);
-        keywords.add(keyword);
+    public void changeImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
-
-    public void deleteKeyword(Long keywordId) {
-        UserKeyword findKeyword = keywords.stream()
-                .filter(keyword -> keyword.getId().equals(keywordId))
-                .findFirst().orElseThrow(() -> new RuntimeException(keywordId + "는 존재하지 않는 키워드 ID 입니다."));
-
-        keywords.remove(findKeyword);
-    }
-
-
 }

@@ -24,6 +24,7 @@ dependencies {
     implementation(project(":study-forest-common"))
     implementation(project(":study-forest-external:study-forest-aws-client"))
     implementation(project(":study-forest-external:study-forest-firebase-client"))
+    implementation(project(":study-forest-external:study-forest-kakao-client"))
 
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
