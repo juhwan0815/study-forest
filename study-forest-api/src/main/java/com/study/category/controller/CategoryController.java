@@ -4,6 +4,7 @@ import com.study.category.dto.CategoryCreateRequest;
 import com.study.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +25,16 @@ public class CategoryController {
 
         Map<String, Long> response = new HashMap<>();
         response.put("categoryId", categoryId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/api/categories/{categoryId}/children")
+    public ResponseEntity<Map<String, Long>> createChild(@PathVariable Long categoryId,
+                                                         @RequestBody @Valid CategoryCreateRequest request) {
+        Long createCategoryId = categoryService.createChildren(categoryId, request);
+
+        Map<String, Long> response = new HashMap<>();
+        response.put("categoryId", createCategoryId);
         return ResponseEntity.ok(response);
     }
 }
