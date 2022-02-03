@@ -68,8 +68,11 @@ public class UserController {
         return ResponseEntity.ok(userService.findById(userId));
     }
 
-//    @PatchMapping("/api/users/areas/areas/{areaId}")
-//    public ResponseEntity<Void> updateArea(@LoginUser Long userId, @PathVariable Long areaId)
+    @PatchMapping("/api/users/areas/{areaId}")
+    public ResponseEntity<Void> updateArea(@LoginUser Long userId, @PathVariable Long areaId) {
+        userService.updateArea(userId, areaId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
 
 }

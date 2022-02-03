@@ -1,5 +1,7 @@
 package com.study.user.service;
 
+import com.study.area.Area;
+import com.study.area.AreaRepository;
 import com.study.client.AwsClient;
 import com.study.client.KakaoClient;
 import com.study.client.KakaoProfile;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import static com.study.common.NotFoundException.AREA_NOT_FOUND;
 import static com.study.common.NotFoundException.USER_NOT_FOUND;
 
 @Service
@@ -24,6 +27,7 @@ import static com.study.common.NotFoundException.USER_NOT_FOUND;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AreaRepository areaRepository;
     private final KakaoClient kakaoClient;
     private final AwsClient awsClient;
     private final JwtUtil jwtUtil;
@@ -73,5 +77,16 @@ public class UserService {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
         return UserResponse.from(findUser);
+    }
+
+    @Transactional
+    public void updateArea(Long userId, Long areaId) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+
+        Area findArea = areaRepository.findById(areaId)
+                .orElseThrow(() -> new NotFoundException(AREA_NOT_FOUND));
+
+        findUser.changeArea(findArea);
     }
 }
