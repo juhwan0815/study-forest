@@ -12,6 +12,7 @@ import com.study.user.Role;
 import com.study.user.User;
 import com.study.user.UserRepository;
 import com.study.user.dto.UserResponse;
+import com.study.user.dto.UserUpdateAreaRequest;
 import com.study.user.dto.UserUpdateDistanceRequest;
 import com.study.user.dto.UserUpdateProfileRequest;
 import lombok.RequiredArgsConstructor;
@@ -81,11 +82,11 @@ public class UserService {
     }
 
     @Transactional
-    public void updateArea(Long userId, Long areaId) {
+    public void updateArea(Long userId, UserUpdateAreaRequest request) {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
 
-        Area findArea = areaRepository.findById(areaId)
+        Area findArea = areaRepository.findByCode(request.getCode())
                 .orElseThrow(() -> new NotFoundException(AREA_NOT_FOUND));
 
         findUser.changeArea(findArea);

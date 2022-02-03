@@ -3,6 +3,7 @@ package com.study.user.controller;
 import com.study.common.NotExistException;
 import com.study.config.LoginUser;
 import com.study.user.dto.UserResponse;
+import com.study.user.dto.UserUpdateAreaRequest;
 import com.study.user.dto.UserUpdateDistanceRequest;
 import com.study.user.dto.UserUpdateProfileRequest;
 import com.study.user.service.UserService;
@@ -68,9 +69,9 @@ public class UserController {
         return ResponseEntity.ok(userService.findById(userId));
     }
 
-    @PatchMapping("/api/users/areas/{areaId}")
-    public ResponseEntity<Void> updateArea(@LoginUser Long userId, @PathVariable Long areaId) {
-        userService.updateArea(userId, areaId);
+    @PatchMapping("/api/users/areas")
+    public ResponseEntity<Void> updateArea(@LoginUser Long userId, @RequestBody @Valid UserUpdateAreaRequest request) {
+        userService.updateArea(userId, request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
