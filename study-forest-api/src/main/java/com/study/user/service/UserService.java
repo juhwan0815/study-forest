@@ -9,6 +9,7 @@ import com.study.security.util.JwtUtil;
 import com.study.user.Role;
 import com.study.user.User;
 import com.study.user.UserRepository;
+import com.study.user.dto.UserResponse;
 import com.study.user.dto.UserUpdateProfileRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -66,5 +67,11 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
 
         findUser.changProfile(request.getNickName(), request.getImageUrl());
+    }
+
+    public UserResponse findById(Long userId) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        return UserResponse.from(findUser);
     }
 }

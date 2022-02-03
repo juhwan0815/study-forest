@@ -2,9 +2,11 @@ package com.study.user.controller;
 
 import com.study.common.NotExistException;
 import com.study.config.LoginUser;
+import com.study.user.dto.UserResponse;
 import com.study.user.dto.UserUpdateProfileRequest;
 import com.study.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,8 +63,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @GetMapping("/api/users/profile")
+    public ResponseEntity<UserResponse> findById(@LoginUser Long userId) {
+        return ResponseEntity.ok(userService.findById(userId));
+    }
 
-
+//    @PatchMapping("/api/users/areas/areas/{areaId}")
+//    public ResponseEntity<Void> updateArea(@LoginUser Long userId, @PathVariable Long areaId)
 
 
 }
