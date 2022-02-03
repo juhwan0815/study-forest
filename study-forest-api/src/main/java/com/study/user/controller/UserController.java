@@ -24,4 +24,13 @@ public class UserController {
                 .build();
     }
 
+    @PostMapping("/api/users/login")
+    public ResponseEntity<Void> login(@RequestHeader String kakaoToken, @RequestHeader String pushToken) {
+        String jwtToken = userService.login(kakaoToken, pushToken);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
+                .build();
+    }
+
 }

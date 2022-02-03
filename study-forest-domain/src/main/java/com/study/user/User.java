@@ -72,4 +72,8 @@ public class User extends BaseEntity {
     public void changeImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
+    public void changePushToken(String pushToken) {
+        this.pushToken = pushToken;
+    }
 }

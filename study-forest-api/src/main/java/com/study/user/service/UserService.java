@@ -3,6 +3,7 @@ package com.study.user.service;
 import com.study.client.KakaoClient;
 import com.study.client.KakaoProfile;
 import com.study.common.DuplicateException;
+import com.study.common.NotFoundException;
 import com.study.security.util.JwtUtil;
 import com.study.user.Role;
 import com.study.user.User;
@@ -10,6 +11,8 @@ import com.study.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.study.common.NotFoundException.USER_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true)
@@ -19,7 +22,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final KakaoClient kakaoClient;
     private final JwtUtil jwtUtil;
-
 
     @Transactional
     public String create(String kakaoToken) {
@@ -37,5 +39,16 @@ public class UserService {
         userRepository.save(user);
 
         return jwtUtil.createToken(user.getId());
+    }
+
+    @Transactional
+    public String login(String kakaoToken, String pushToken) {
+        KakaoProfile kakaoProfile = kakaoClient.getKakaoProfile(kakaoToken);
+
+        User findUser = userRepository.findByKakaoId(kakaoProfile.getId())
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        findUser.changePushToken(pushToken);
+
+        return jwtUtil.createToken(findUser.getId());
     }
 }
