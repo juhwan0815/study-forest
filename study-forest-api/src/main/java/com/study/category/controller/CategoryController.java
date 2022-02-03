@@ -1,13 +1,12 @@
 package com.study.category.controller;
 
 import com.study.category.dto.CategoryCreateRequest;
+import com.study.category.dto.CategoryUpdateRequest;
 import com.study.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -36,5 +35,18 @@ public class CategoryController {
         Map<String, Long> response = new HashMap<>();
         response.put("categoryId", createCategoryId);
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/api/categories/{categoryId}")
+    public ResponseEntity<Void> update(@PathVariable Long categoryId,
+                                       @RequestBody @Valid CategoryUpdateRequest request) {
+        categoryService.update(categoryId, request);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/api/categories/{categoryId}")
+    public ResponseEntity<Void> delete(@PathVariable Long categoryId) {
+        categoryService.delete(categoryId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
