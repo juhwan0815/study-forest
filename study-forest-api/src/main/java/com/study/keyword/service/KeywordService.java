@@ -4,12 +4,16 @@ import com.study.common.NotFoundException;
 import com.study.keyword.Keyword;
 import com.study.keyword.KeywordRepository;
 import com.study.keyword.dto.KeywordCreateRequest;
+import com.study.keyword.dto.KeywordResponse;
 import com.study.user.User;
 import com.study.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.study.common.NotFoundException.KEYWORD_NOT_FOUND;
 import static com.study.common.NotFoundException.USER_NOT_FOUND;
@@ -41,5 +45,11 @@ public class KeywordService {
         }
 
         keywordRepository.delete(findKeyword);
+    }
+
+    public List<KeywordResponse> findByUserId(Long userId) {
+        return keywordRepository.findByUserId(userId).stream()
+                .map(KeywordResponse::from)
+                .collect(Collectors.toList());
     }
 }
