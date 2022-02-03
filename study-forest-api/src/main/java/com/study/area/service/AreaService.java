@@ -3,6 +3,9 @@ package com.study.area.service;
 import com.study.area.Area;
 import com.study.area.AreaRepository;
 import com.study.area.dto.AreaCreateRequest;
+import com.study.area.dto.AreaResponse;
+import com.study.area.dto.AreaSearchRequest;
+import com.study.area.query.AreaQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +18,7 @@ import java.util.List;
 public class AreaService {
 
     private final AreaRepository areaRepository;
+    private final AreaQueryRepository areaQueryRepository;
 
     @Transactional
     public void create(List<AreaCreateRequest> requests) {
@@ -25,5 +29,7 @@ public class AreaService {
         });
     }
 
-
+    public List<AreaResponse> findByDongOrRi(AreaSearchRequest request) {
+        return areaQueryRepository.findBySearchCondition(request.getAreaId(), request.getSearchWord(), request.getSize());
+    }
 }
