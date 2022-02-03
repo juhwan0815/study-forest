@@ -3,12 +3,16 @@ package com.study.category.service;
 import com.study.category.Category;
 import com.study.category.CategoryRepository;
 import com.study.category.dto.CategoryCreateRequest;
+import com.study.category.dto.CategoryResponse;
 import com.study.category.dto.CategoryUpdateRequest;
 import com.study.common.DuplicateException;
 import com.study.common.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.study.common.NotFoundException.CATEGORY_NOT_FOUND;
 
@@ -61,5 +65,11 @@ public class CategoryService {
                 .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_FOUND));
 
         categoryRepository.delete(findCategory);
+    }
+
+    public List<CategoryResponse> findParents() {
+        return categoryRepository.findByParentIsNull().stream()
+                .map(CategoryResponse::from)
+                .collect(Collectors.toList());
     }
 }

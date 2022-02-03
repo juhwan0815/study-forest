@@ -1,6 +1,7 @@
 package com.study.category.controller;
 
 import com.study.category.dto.CategoryCreateRequest;
+import com.study.category.dto.CategoryResponse;
 import com.study.category.dto.CategoryUpdateRequest;
 import com.study.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -48,5 +50,10 @@ public class CategoryController {
     public ResponseEntity<Void> delete(@PathVariable Long categoryId) {
         categoryService.delete(categoryId);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/api/categories/parents")
+    public ResponseEntity<List<CategoryResponse>> findParents() {
+        return ResponseEntity.ok(categoryService.findParents());
     }
 }
