@@ -6,9 +6,7 @@ import com.study.keyword.service.KeywordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -24,5 +22,13 @@ public class KeywordController {
         keywordService.create(userId, request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+
+    @DeleteMapping("/api/keywords/{keywordId}")
+    public ResponseEntity<Void> delete(@LoginUser Long userId, @PathVariable Long keywordId) {
+        keywordService.delete(userId, keywordId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 
 }
