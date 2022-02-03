@@ -28,6 +28,7 @@ subprojects {
     apply plugin: 'io.spring.dependency-management'
     apply plugin: 'java'
     apply plugin: 'jacoco'
+    apply plugin: 'java-library'
     apply plugin: 'org.sonarqube'
     apply plugin: 'org.asciidoctor.jvm.convert'
 
