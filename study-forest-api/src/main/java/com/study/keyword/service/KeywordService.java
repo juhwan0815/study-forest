@@ -48,7 +48,8 @@ public class KeywordService {
     }
 
     public List<KeywordResponse> findByUserId(Long userId) {
-        return keywordRepository.findByUserId(userId).stream()
+        List<Keyword> keywords = keywordRepository.findByUserId(userId);
+        return keywords.stream()
                 .map(KeywordResponse::from)
                 .collect(Collectors.toList());
     }
