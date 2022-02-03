@@ -15,4 +15,5 @@ include 'study-forest-domain'
 include 'study-forest-common'
 include 'study-forest-external:study-forest-firebase-client'
 include 'study-forest-external:study-forest-aws-client'
+include 'study-forest-kakao-client'
 
