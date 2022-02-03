@@ -68,7 +68,15 @@ public class CategoryService {
     }
 
     public List<CategoryResponse> findParents() {
-        return categoryRepository.findByParentIsNull().stream()
+        List<Category> categories = categoryRepository.findByParentIsNull();
+        return categories.stream()
+                .map(CategoryResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    public List<CategoryResponse> findChildrenById(Long categoryId) {
+        List<Category> categories = categoryRepository.findByParentId(categoryId);
+        return categories.stream()
                 .map(CategoryResponse::from)
                 .collect(Collectors.toList());
     }
