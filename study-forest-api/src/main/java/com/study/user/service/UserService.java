@@ -1,5 +1,6 @@
 package com.study.user.service;
 
+import com.study.client.AwsClient;
 import com.study.client.KakaoClient;
 import com.study.client.KakaoProfile;
 import com.study.common.DuplicateException;
@@ -11,6 +12,7 @@ import com.study.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.study.common.NotFoundException.USER_NOT_FOUND;
 
@@ -21,6 +23,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final KakaoClient kakaoClient;
+    private final AwsClient awsClient;
     private final JwtUtil jwtUtil;
 
     @Transactional
@@ -50,5 +53,9 @@ public class UserService {
         findUser.changePushToken(pushToken);
 
         return jwtUtil.createToken(findUser.getId());
+    }
+
+    public String uploadImage(MultipartFile image) {
+        return awsClient.upload(image);
     }
 }
