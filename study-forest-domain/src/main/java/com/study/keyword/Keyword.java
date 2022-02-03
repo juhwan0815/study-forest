@@ -1,4 +1,4 @@
-package com.study.userKeyword;
+package com.study.keyword;
 
 import com.study.common.BaseEntity;
 import com.study.user.User;
@@ -13,7 +13,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-public class UserKeyword extends BaseEntity {
+public class Keyword extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,8 +26,8 @@ public class UserKeyword extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public static UserKeyword createKeyword(String content, User user) {
-        UserKeyword keyword = new UserKeyword();
+    public static Keyword createKeyword(String content, User user) {
+        Keyword keyword = new Keyword();
         keyword.content = content;
         keyword.user = user;
         return keyword;
