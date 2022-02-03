@@ -12,6 +12,7 @@ import com.study.user.Role;
 import com.study.user.User;
 import com.study.user.UserRepository;
 import com.study.user.dto.UserResponse;
+import com.study.user.dto.UserUpdateDistanceRequest;
 import com.study.user.dto.UserUpdateProfileRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -88,5 +89,13 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException(AREA_NOT_FOUND));
 
         findUser.changeArea(findArea);
+    }
+
+    @Transactional
+    public void updateDistance(Long userId, UserUpdateDistanceRequest request) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+
+        findUser.changeDistance(request.getDistance());
     }
 }

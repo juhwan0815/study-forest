@@ -3,6 +3,7 @@ package com.study.user.controller;
 import com.study.common.NotExistException;
 import com.study.config.LoginUser;
 import com.study.user.dto.UserResponse;
+import com.study.user.dto.UserUpdateDistanceRequest;
 import com.study.user.dto.UserUpdateProfileRequest;
 import com.study.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -71,6 +72,12 @@ public class UserController {
     @PatchMapping("/api/users/areas/{areaId}")
     public ResponseEntity<Void> updateArea(@LoginUser Long userId, @PathVariable Long areaId) {
         userService.updateArea(userId, areaId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PatchMapping("/api/users/distance")
+    public ResponseEntity<Void> updateDistance(@LoginUser Long userId, @RequestBody @Valid UserUpdateDistanceRequest request) {
+        userService.updateDistance(userId, request);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

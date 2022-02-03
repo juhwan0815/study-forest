@@ -2,16 +2,12 @@ package com.study.user;
 
 import com.study.area.Area;
 import com.study.common.BaseEntity;
-import com.study.userKeyword.UserKeyword;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.transaction.reactive.AbstractReactiveTransactionManager;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -71,5 +67,9 @@ public class User extends BaseEntity {
 
     public void changePushToken(String pushToken) {
         this.pushToken = pushToken;
+    }
+
+    public void changeArea(Area area) {
+        this.area = area;
     }
 }
