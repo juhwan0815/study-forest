@@ -9,6 +9,7 @@ import com.study.common.NotFoundException;
 import com.study.study.Study;
 import com.study.study.StudyRepository;
 import com.study.study.dto.StudyCreateRequest;
+import com.study.study.dto.StudyResponse;
 import com.study.study.dto.StudyUpdateRequest;
 import com.study.studyuser.StudyRole;
 import com.study.studyuser.StudyUser;
@@ -94,5 +95,11 @@ public class StudyService {
         }
 
         // 삭제
+    }
+
+    public StudyResponse findById(Long studyId) {
+        Study findStudy = studyRepository.findWithCategoryAndTagAndAreaById(studyId)
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
+        return StudyResponse.from(findStudy);
     }
 }

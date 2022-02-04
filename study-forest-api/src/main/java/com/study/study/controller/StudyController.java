@@ -2,6 +2,7 @@ package com.study.study.controller;
 
 import com.study.config.LoginUser;
 import com.study.study.dto.StudyCreateRequest;
+import com.study.study.dto.StudyResponse;
 import com.study.study.dto.StudyUpdateRequest;
 import com.study.study.service.StudyService;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,11 @@ public class StudyController {
     public ResponseEntity<Void> delete(@LoginUser Long userId, @PathVariable Long studyId) {
         studyService.delete(userId, studyId);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/api/studies/{studyId}")
+    public ResponseEntity<StudyResponse> findById(@PathVariable Long studyId) {
+        return ResponseEntity.ok(studyService.findById(studyId));
     }
 
 }
