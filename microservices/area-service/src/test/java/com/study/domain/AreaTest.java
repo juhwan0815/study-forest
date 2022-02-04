@@ -9,7 +9,7 @@ public class AreaTest {
 
     @Test
     @DisplayName("지역을 생성한다.")
-    void createArea(){
+    void createArea() {
         // given
         String code = "code";
         String city = "서울특별시";
@@ -27,6 +27,7 @@ public class AreaTest {
         assertThat(result.getCity()).isEqualTo(city);
         assertThat(result.getGu()).isEqualTo(gu);
         assertThat(result.getDong()).isEqualTo(dong);
+        assertThat(result.getRi()).isNull();
         assertThat(result.getLet()).isEqualTo(let);
         assertThat(result.getLen()).isEqualTo(len);
         assertThat(result.getCodeType()).isEqualTo(codeType);
