@@ -1,6 +1,7 @@
 package com.study.study.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.querydsl.core.annotations.QueryProjection;
 import com.study.area.Area;
 import com.study.area.dto.AreaResponse;
 import com.study.category.dto.CategoryResponse;
@@ -12,6 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -51,6 +53,22 @@ public class StudyResponse {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private WaitStatus waitStatus;
 
+    @QueryProjection
+    public StudyResponse(Study study) {
+        this.studyId = study.getId();
+        this.name = study.getName();
+        this.numberOfPeople = study.getNumberOfPeople();
+        this.currentNumberOfPeople = study.getCurrentNumberOfPeople();
+        this.online = study.isOnline();
+        this.offline = study.isOffline();
+        this.status = study.getStatus();
+        this.imageUrl = study.getImageUrl();
+        this.tags = study.getTags()
+                .stream()
+                .map(tag -> tag.getContent())
+                .collect(Collectors.toList());
+    }
+
     public static StudyResponse from(Study study, AreaResponse area) {
         StudyResponse studyResponse = new StudyResponse();
         studyResponse.studyId = study.getId();
@@ -89,6 +107,12 @@ public class StudyResponse {
         studyResponse.offline = study.isOffline();
         studyResponse.status = study.getStatus();
         studyResponse.imageUrl = study.getImageUrl();
+        studyResponse.childCategory = CategoryResponse.from(study.getCategory());
+        studyResponse.parentCategory = CategoryResponse.from(study.getCategory().getParent());
+        studyResponse.tags = study.getTags()
+                .stream().map(tag -> tag.getContent())
+                .collect(Collectors.toList());
+
         if (studyResponse.area != null) {
             studyResponse.area = AreaResponse.from(study.getArea());
         }

@@ -10,7 +10,9 @@ import com.study.study.Study;
 import com.study.study.StudyRepository;
 import com.study.study.dto.StudyCreateRequest;
 import com.study.study.dto.StudyResponse;
+import com.study.study.dto.StudySearchRequest;
 import com.study.study.dto.StudyUpdateRequest;
+import com.study.study.query.StudyQueryRepository;
 import com.study.studyuser.StudyRole;
 import com.study.studyuser.StudyUser;
 import com.study.studyuser.StudyUserRepository;
@@ -21,6 +23,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 import static com.study.common.NotFoundException.*;
 
@@ -34,6 +38,7 @@ public class StudyService {
     private final CategoryRepository categoryRepository;
     private final AreaRepository areaRepository;
     private final StudyUserRepository studyUserRepository;
+    private final StudyQueryRepository studyQueryRepository;
 
     private final AwsClient awsClient;
 
@@ -101,5 +106,18 @@ public class StudyService {
         Study findStudy = studyRepository.findWithCategoryAndTagAndAreaById(studyId)
                 .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
         return StudyResponse.from(findStudy);
+    }
+
+    public List<StudyResponse> findBySearchRequest(Long userId, StudySearchRequest request) {
+        Area area = null;
+        Integer distance = null;
+        if(userId != null) {
+            User findUser = userRepository.findWithAreaById(userId)
+                    .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+            area = findUser.getArea();
+            distance = findUser.getDistance();
+
+        }
+        return studyQueryRepository.findBySearchCondition(area, distance, request);
     }
 }

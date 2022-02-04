@@ -3,6 +3,7 @@ package com.study.study.controller;
 import com.study.config.LoginUser;
 import com.study.study.dto.StudyCreateRequest;
 import com.study.study.dto.StudyResponse;
+import com.study.study.dto.StudySearchRequest;
 import com.study.study.dto.StudyUpdateRequest;
 import com.study.study.service.StudyService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -55,6 +57,12 @@ public class StudyController {
     @GetMapping("/api/studies/{studyId}")
     public ResponseEntity<StudyResponse> findById(@PathVariable Long studyId) {
         return ResponseEntity.ok(studyService.findById(studyId));
+    }
+
+    @GetMapping("/api/studies")
+    public ResponseEntity<List<StudyResponse>> findBySearchRequest(@LoginUser Long userId,
+                                                                   @Valid StudySearchRequest request) {
+        return ResponseEntity.ok(studyService.findBySearchRequest(userId, request));
     }
 
 }
