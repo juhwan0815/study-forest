@@ -2,6 +2,7 @@ package com.study.service;
 
 import com.study.domain.Area;
 import com.study.dto.AreaResponse;
+import com.study.exception.NotFoundException;
 import com.study.repository.AreaQueryRepository;
 import com.study.repository.AreaRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,7 @@ import java.util.Optional;
 
 import static com.study.AreaFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -75,6 +77,20 @@ class AreaServiceTest {
     }
 
     @Test
+    @DisplayName("지역을 상세 조회할 때 지역이 존재하지 않으면 예외가 발생한다.")
+    void findByIdNotFound() {
+        // given
+        given(areaRepository.findById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> areaService.findById(TEST_AREA.getId()));
+
+        // then
+        then(areaRepository).should(times(1)).findById(any());
+    }
+
+    @Test
     @DisplayName("지역을 검색한다.")
     void findBySearchRequest() {
         // given
@@ -113,6 +129,20 @@ class AreaServiceTest {
     }
 
     @Test
+    @DisplayName("지역 코드로 지역을 조회힐 때 지역이 존재하지 않으면 예외가 발생한다.")
+    void findByCodeNotFound() {
+        // given
+        given(areaRepository.findByCode(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> areaService.findByCode(TEST_AREA_CODE_REQUEST));
+
+        // then
+        then(areaRepository).should(times(1)).findByCode(any());
+    }
+
+    @Test
     @DisplayName("지역 ID와 검색거리로 주변 지역정보를 조회한다.")
     void findAroundById() {
         // given
@@ -131,4 +161,17 @@ class AreaServiceTest {
         then(areaQueryRepository).should(times(1)).findAroundByArea(any(), any());
     }
 
+    @Test
+    @DisplayName("지역 ID와 검색거리로 주변 지역정보를 조회할 때 지역이 존재하지 않으면 예외가 발생한다.")
+    void findAroundByIdNotFound() {
+        // given
+        given(areaRepository.findById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> areaService.findAroundById(TEST_AREA.getId(), TEST_AREA_AROUND_REQUEST));
+
+        // then
+        then(areaRepository).should(times(1)).findById(any());
+    }
 }
