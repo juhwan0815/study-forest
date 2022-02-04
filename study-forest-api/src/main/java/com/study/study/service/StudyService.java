@@ -36,6 +36,10 @@ public class StudyService {
 
     private final AwsClient awsClient;
 
+    public String uploadImage(MultipartFile image) {
+        return awsClient.upload(image);
+    }
+
     @Transactional
     public Long create(Long userId, StudyCreateRequest request) {
         User findUser = userRepository.findById(userId)
@@ -83,7 +87,12 @@ public class StudyService {
         findStudy.changeTags(request.getTags());
     }
 
-    public String uploadImage(MultipartFile image) {
-        return awsClient.upload(image);
+    @Transactional
+    public void delete(Long userId, Long studyId) {
+        if (studyUserRepository.findByUserIdAndAndAndStudyIdAndStudyRole(userId, studyId, StudyRole.ADMIN).isPresent()) {
+            throw new AccessDeniedException("");
+        }
+
+        // 삭제
     }
 }

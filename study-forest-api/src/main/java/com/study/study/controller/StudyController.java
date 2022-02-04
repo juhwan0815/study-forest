@@ -37,14 +37,18 @@ public class StudyController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-
-
     @PostMapping("/api/studies/imageUrls")
     public ResponseEntity<Map<String, String>> convertToImageUrl(@RequestPart MultipartFile image) {
         String imageUrl = studyService.uploadImage(image);
         Map<String, String> response = new HashMap<>();
         response.put("imageUrl", imageUrl);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/api/studies/{studyId}")
+    public ResponseEntity<Void> delete(@LoginUser Long userId, @PathVariable Long studyId) {
+        studyService.delete(userId, studyId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }
