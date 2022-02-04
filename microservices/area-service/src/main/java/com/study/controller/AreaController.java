@@ -31,9 +31,8 @@ public class AreaController {
     }
 
     @GetMapping("/areas")
-    public ResponseEntity<Slice<AreaResponse>> findByDongOrRi(@Valid AreaSearchRequest request,
-                                                              @PageableDefault(size = 50) Pageable pageable) {
-        return ResponseEntity.ok(areaService.findByDongOrRi(request, pageable));
+    public ResponseEntity<List<AreaResponse>> findBySearchRequest(@Valid AreaSearchRequest request) {
+        return ResponseEntity.ok(areaService.findBySearchRequest(request));
     }
 
     @GetMapping("/areas/code")

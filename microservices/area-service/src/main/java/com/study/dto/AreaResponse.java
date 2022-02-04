@@ -1,5 +1,6 @@
 package com.study.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.study.domain.Area;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AreaResponse {
 
-    private Long id;
+    private Long areaId;
 
     private String code;
 
@@ -28,8 +29,20 @@ public class AreaResponse {
 
     private String codeType;
 
-    public static AreaResponse from(Area area){
-        return new AreaResponse(area.getId(), area.getCode(), area.getCity(), area.getGu(), area.getDong(),
-                                area.getRi(), area.getLet(), area.getLen(), area.getCodeType());
+    @QueryProjection
+    public AreaResponse(Area area) {
+        this.areaId = area.getId();
+        this.code = area.getCode();
+        this.city = area.getCity();
+        this.gu = area.getGu();
+        this.dong = area.getDong();
+        this.ri = area.getRi();
+        this.let = area.getLet();
+        this.len = area.getLen();
+        this.codeType = area.getCodeType();
+    }
+
+    public static AreaResponse from(Area area) {
+        return new AreaResponse(area);
     }
 }

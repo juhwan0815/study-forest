@@ -8,7 +8,5 @@ import java.util.Optional;
 
 public interface AreaRepository extends JpaRepository<Area, Long> {
 
-    Slice<Area> findByDongContainsOrRiContainsOrderById(String dong, String ri);
-
     Optional<Area> findByCode(String code);
 }
