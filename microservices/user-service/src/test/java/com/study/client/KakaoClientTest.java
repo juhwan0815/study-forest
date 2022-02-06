@@ -2,7 +2,7 @@ package com.study.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.study.exception.KakaoException;
+import com.study.exception.NetworkException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 
+import static com.study.UserFixture.TEST_KAKAO_TOKEN;
 import static com.study.client.KakaoClientImpl.KAKAO_PROFILE_URL;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -47,7 +48,7 @@ class KakaoClientTest {
                 .andRespond(withSuccess(objectMapper.writeValueAsString(kakaoProfile), MediaType.APPLICATION_JSON));
 
         // when
-        KakaoProfile result = kakaoClient.getKakaoProfile("kakaoToken");
+        KakaoProfile result = kakaoClient.getKakaoProfile(TEST_KAKAO_TOKEN);
 
         // then
         assertThat(result.getId()).isEqualTo(1L);
@@ -67,7 +68,7 @@ class KakaoClientTest {
                 .andRespond(withStatus(HttpStatus.CREATED));
 
         // when
-        assertThrows(KakaoException.class, () -> kakaoClient.getKakaoProfile("kakaoToken"));
+        assertThrows(NetworkException.class, () -> kakaoClient.getKakaoProfile(TEST_KAKAO_TOKEN));
     }
 
 

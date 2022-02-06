@@ -15,20 +15,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.study.UserFixture.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,11 +37,11 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.headerWit
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.fileUpload;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -85,27 +84,18 @@ class UserControllerTest {
     @DisplayName("회원 가입 API")
     void create() throws Exception {
         // given
-        given(userService.create(any()))
-                .willReturn(TEST_USER_RESPONSE1);
+        willDoNothing()
+                .given(userService)
+                .create(any());
 
         // when
         mockMvc.perform(post("/users")
                         .accept(MediaType.APPLICATION_JSON_VALUE)
-                        .header("kakaoToken", TEST_KAKAO_TOKEN))
+                        .header(TEST_KAKAO_TOKEN, TEST_KAKAO_TOKEN))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE1)))
                 .andDo(document("user/create",
                         requestHeaders(
                                 headerWithName("kakaoToken").description("kakaoToken")
-                        ),
-                        responseFields(
-                                fieldWithPath("userId").type(JsonFieldType.NUMBER).description("회원 ID"),
-                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한"),
-                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
-                                fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
-                                fieldWithPath("imageUrl").type(JsonFieldType.STRING).description("회원 프로필 이미지"),
-                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("distance").type(JsonFieldType.NUMBER).description("회원 검색 거리")
                         )));
 
         // then
@@ -117,14 +107,14 @@ class UserControllerTest {
     void login() throws Exception {
         // given
         given(userService.findByKakaoId(any(), any()))
-                .willReturn(TEST_USER_RESPONSE2);
+                .willReturn(TEST_USER_RESPONSE);
 
         // when
-        mockMvc.perform(post("/users/{kakaoId}", 1L)
+        mockMvc.perform(post("/users/{kakaoId}", TEST_USER.getKakaoId())
                         .accept(MediaType.APPLICATION_JSON_VALUE)
-                        .header("fcmToken", TEST_FCM_TOKEN))
+                        .header(TEST_FCM_TOKEN, TEST_FCM_TOKEN))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE2)))
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE)))
                 .andDo(document("user/login",
                         pathParameters(
                                 parameterWithName("kakaoId").description("카카오 ID")
@@ -134,13 +124,12 @@ class UserControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("userId").type(JsonFieldType.NUMBER).description("회원 ID"),
-                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한"),
                                 fieldWithPath("nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("imageUrl").type(JsonFieldType.STRING).description("회원 프로필 이미지"),
-                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
                                 fieldWithPath("areaId").type(JsonFieldType.NUMBER).description("회원 지역 ID"),
+                                fieldWithPath("distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
                                 fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("회원 FCM 토큰")
                         )));
 
@@ -153,25 +142,24 @@ class UserControllerTest {
     void findById() throws Exception {
         // given
         given(userService.findById(any()))
-                .willReturn(TEST_USER_RESPONSE2);
+                .willReturn(TEST_USER_RESPONSE);
         // when
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/users/{userId}",1L)
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/users/{userId}", TEST_USER.getId())
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE2)))
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE)))
                 .andDo(document("user/findById",
                         pathParameters(
                                 parameterWithName("userId").description("회원 ID")
                         ),
                         responseFields(
                                 fieldWithPath("userId").type(JsonFieldType.NUMBER).description("회원 ID"),
-                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한"),
                                 fieldWithPath("nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("imageUrl").type(JsonFieldType.STRING).description("회원 프로필 이미지"),
-                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
                                 fieldWithPath("areaId").type(JsonFieldType.NUMBER).description("회원 지역 ID"),
+                                fieldWithPath("distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
                                 fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("회원 FCM 토큰")
                         )));
 
@@ -184,7 +172,7 @@ class UserControllerTest {
     @DisplayName("회원 ID 리스트 조회 API")
     void findByIdIn() throws Exception {
         // given
-        List<UserResponse> result = Arrays.asList(TEST_USER_RESPONSE2);
+        List<UserResponse> result = Arrays.asList(TEST_USER_RESPONSE);
 
         given(userService.findByIdIn(any()))
                 .willReturn(result);
@@ -201,13 +189,12 @@ class UserControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("[].userId").type(JsonFieldType.NUMBER).description("회원 ID"),
-                                fieldWithPath("[].role").type(JsonFieldType.STRING).description("회원 권한"),
                                 fieldWithPath("[].nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                fieldWithPath("[].ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("[].gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("[].imageUrl").type(JsonFieldType.STRING).description("회원 프로필 이미지"),
-                                fieldWithPath("[].ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("[].distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
                                 fieldWithPath("[].areaId").type(JsonFieldType.NUMBER).description("회원 지역 ID"),
+                                fieldWithPath("[].distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
                                 fieldWithPath("[].fcmToken").type(JsonFieldType.STRING).description("회원 FCM 토큰")
                         )));
 
@@ -216,91 +203,31 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("회원 이미지 수정 API")
-    void updateImage() throws Exception {
-        // given
-        MockMultipartHttpServletRequestBuilder builder =
-                fileUpload("/users/image");
-
-        builder.with(request -> {
-            request.setMethod("PATCH");
-            return request;
-        });
-
-        MockMultipartFile file = new MockMultipartFile(
-                "image",
-                "프로필사진.png",
-                MediaType.IMAGE_PNG_VALUE,
-                "<<image>>".getBytes(StandardCharsets.UTF_8));
-
-        given(userService.updateImage(any(), any()))
-                .willReturn(TEST_USER_RESPONSE2);
-        // when
-        mockMvc.perform(builder.file(file)
-                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                        .accept(MediaType.APPLICATION_JSON_VALUE)
-                        .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE2)))
-                .andDo(document("user/update/image",
-                        requestHeaders(
-                                headerWithName(HttpHeaders.AUTHORIZATION).description("AccessToken")
-                        ),
-                        requestParts(
-                                partWithName("image").description("변경할 이미지 파일, 이미지를 없애고 싶으면 안보내도 된다.")
-                        ),
-                        responseFields(
-                                fieldWithPath("userId").type(JsonFieldType.NUMBER).description("회원 ID"),
-                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한"),
-                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
-                                fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
-                                fieldWithPath("imageUrl").type(JsonFieldType.STRING).description("회원 프로필 이미지"),
-                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
-                                fieldWithPath("areaId").type(JsonFieldType.NUMBER).description("회원 지역 ID"),
-                                fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("회원 FCM 토큰")
-                        )));
-
-        // then
-        then(userService).should(times(1)).updateImage(any(), any());
-    }
-
-    @Test
     @DisplayName("회원 프로필 수정 API")
-    void updateProfile() throws Exception {
+    void update() throws Exception {
         // given
-        given(userService.updateProfile(any(), any()))
-                .willReturn(TEST_USER_RESPONSE2);
+        willDoNothing()
+                .given(userService)
+                .update(any(), any());
+
         // when
         mockMvc.perform(RestDocumentationRequestBuilders.patch("/users/profile")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON_VALUE)
                         .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
-                        .content(objectMapper.writeValueAsString(TEST_USER_UPDATE_NICKNAME_REQUEST)))
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(TEST_USER_UPDATE_REQUEST)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE2)))
                 .andDo(document("user/update/profile",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("AccessToken")
                         ),
-
                         requestFields(
-                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("회원 닉네임")
-                        ),
-                        responseFields(
-                                fieldWithPath("userId").type(JsonFieldType.NUMBER).description("회원 ID"),
-                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한"),
                                 fieldWithPath("nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
-                                fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
-                                fieldWithPath("imageUrl").type(JsonFieldType.STRING).description("회원 프로필 이미지"),
-                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
-                                fieldWithPath("areaId").type(JsonFieldType.NUMBER).description("회원 지역 ID"),
-                                fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("회원 FCM 토큰")
+                                fieldWithPath("imageUrl").type(JsonFieldType.STRING).description("변경할 이미지 URL")
                         )));
 
         // then
-        then(userService).should(times(1)).updateProfile(any(), any());
+        then(userService).should(times(1)).update(any(), any());
     }
 
     @Test
@@ -308,26 +235,25 @@ class UserControllerTest {
     void findByLoginId() throws Exception {
         // given
         given(userService.findById(any()))
-                .willReturn(TEST_USER_RESPONSE2);
+                .willReturn(TEST_USER_RESPONSE);
         // when
         mockMvc.perform(RestDocumentationRequestBuilders.get("/users/profile")
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE2)))
+                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE)))
                 .andDo(document("user/findByLoginId",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("AccessToken")
                         ),
                         responseFields(
                                 fieldWithPath("userId").type(JsonFieldType.NUMBER).description("회원 ID"),
-                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한"),
                                 fieldWithPath("nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("imageUrl").type(JsonFieldType.STRING).description("회원 프로필 이미지"),
-                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
                                 fieldWithPath("areaId").type(JsonFieldType.NUMBER).description("회원 지역 ID"),
+                                fieldWithPath("distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
                                 fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("회원 FCM 토큰")
                         )));
 
@@ -336,54 +262,24 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("회원 탈퇴 API")
-    void delete() throws Exception {
-        // given
-        given(userService.findById(any()))
-                .willReturn(TEST_USER_RESPONSE2);
-        // when
-        mockMvc.perform(RestDocumentationRequestBuilders.delete("/users")
-                        .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
-                .andExpect(status().isOk())
-                .andDo(document("user/delete",
-                        requestHeaders(
-                                headerWithName(HttpHeaders.AUTHORIZATION).description("AccessToken")
-                        )));
-
-        // then
-        then(userService).should(times(1)).delete(any());
-    }
-
-    @Test
     @DisplayName("회원 지역 수정 API")
     void updateArea() throws Exception {
         // given
-        given(userService.updateArea(any(), any()))
-                .willReturn(TEST_USER_RESPONSE2);
+        willDoNothing()
+                .given(userService)
+                .updateArea(any(), any());
 
         // when
-        mockMvc.perform(RestDocumentationRequestBuilders.patch("/users/areas/{areaId}", 1L)
+        mockMvc.perform(RestDocumentationRequestBuilders.patch("/users/areas/{areaId}", TEST_USER_AREA_ID)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE2)))
                 .andDo(document("user/update/area",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("AccessToken")
                         ),
                         pathParameters(
                                 parameterWithName("areaId").description("지역 ID")
-                        ),
-                        responseFields(
-                                fieldWithPath("userId").type(JsonFieldType.NUMBER).description("회원 ID"),
-                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한"),
-                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
-                                fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
-                                fieldWithPath("imageUrl").type(JsonFieldType.STRING).description("회원 프로필 이미지"),
-                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
-                                fieldWithPath("areaId").type(JsonFieldType.NUMBER).description("회원 지역 ID"),
-                                fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("회원 FCM 토큰")
                         )));
 
         // then
@@ -394,34 +290,23 @@ class UserControllerTest {
     @DisplayName("회원 검색 거리 수정 API")
     void updateDistance() throws Exception {
         // given
-        given(userService.updateDistance(any(), any()))
-                .willReturn(TEST_USER_RESPONSE2);
+        willDoNothing()
+                .given(userService)
+                .updateDistance(any(), any());
 
         // when
         mockMvc.perform(RestDocumentationRequestBuilders.patch("/users/distance")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON_VALUE)
                         .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(TEST_USER_UPDATE_DISTANCE_REQUEST)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(TEST_USER_RESPONSE2)))
                 .andDo(document("user/update/distance",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("AccessToken")
                         ),
                         requestFields(
                                 fieldWithPath("distance").type(JsonFieldType.NUMBER).description("검색 거리")
-                        ),
-                        responseFields(
-                                fieldWithPath("userId").type(JsonFieldType.NUMBER).description("회원 ID"),
-                                fieldWithPath("role").type(JsonFieldType.STRING).description("회원 권한"),
-                                fieldWithPath("nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
-                                fieldWithPath("gender").type(JsonFieldType.STRING).description("회원 성별"),
-                                fieldWithPath("imageUrl").type(JsonFieldType.STRING).description("회원 프로필 이미지"),
-                                fieldWithPath("ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
-                                fieldWithPath("areaId").type(JsonFieldType.NUMBER).description("회원 지역 ID"),
-                                fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("회원 FCM 토큰")
                         )));
 
         // then
@@ -463,7 +348,7 @@ class UserControllerTest {
                 .deleteKeyword(any(), any());
 
         // when
-        mockMvc.perform(RestDocumentationRequestBuilders.delete("/users/keywords/{keywordId}", 1L)
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/users/keywords/{keywordId}", TEST_KEYWORD.getId())
                         .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
                 .andDo(document("user/keyword/delete",
@@ -488,8 +373,8 @@ class UserControllerTest {
 
         // when
         mockMvc.perform(RestDocumentationRequestBuilders.get("/users/keywords")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
+                        .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(document("user/keyword/find",
                         requestHeaders(
@@ -509,7 +394,7 @@ class UserControllerTest {
     @DisplayName("키워드를 가진 회원 조회 API")
     void findByKeywordContentContain() throws Exception {
         // given
-        List<UserResponse> result = Arrays.asList(TEST_USER_RESPONSE2);
+        List<UserResponse> result = Arrays.asList(TEST_USER_RESPONSE);
         given(userService.findByKeywordContentContain(any()))
                 .willReturn(result);
 
@@ -528,13 +413,12 @@ class UserControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("[].userId").type(JsonFieldType.NUMBER).description("회원 ID"),
-                                fieldWithPath("[].role").type(JsonFieldType.STRING).description("회원 권한"),
                                 fieldWithPath("[].nickName").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                fieldWithPath("[].ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
                                 fieldWithPath("[].gender").type(JsonFieldType.STRING).description("회원 성별"),
                                 fieldWithPath("[].imageUrl").type(JsonFieldType.STRING).description("회원 프로필 이미지"),
-                                fieldWithPath("[].ageRange").type(JsonFieldType.STRING).description("회원 나이대"),
-                                fieldWithPath("[].distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
                                 fieldWithPath("[].areaId").type(JsonFieldType.NUMBER).description("회원 지역 ID"),
+                                fieldWithPath("[].distance").type(JsonFieldType.NUMBER).description("회원 검색 거리"),
                                 fieldWithPath("[].fcmToken").type(JsonFieldType.STRING).description("회원 FCM 토큰")
                         )
                 ));
@@ -543,5 +427,48 @@ class UserControllerTest {
         then(userService).should(times(1)).findByKeywordContentContain(any());
     }
 
+    @Test
+    @DisplayName("프로필 이미지 URL 생성 API")
+    void convertToImageUrl() throws Exception {
+        // given
+        Map<String, String> result = new HashMap<>();
+        result.put("imageUrl", TEST_USER_IMAGE_URL);
+
+        given(userService.uploadImage(any()))
+                .willReturn(TEST_USER_IMAGE_URL);
+
+        // when
+        mockMvc.perform(multipart("/api/users/imageUrls").file(TEST_IMAGE_FILE)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(result)))
+                .andDo(document("user/imageUrls",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("AccessToken")
+                        ),
+                        requestParts(
+                                partWithName("image").description("이미지 파일")
+                        ),
+                        responseFields(
+                                fieldWithPath("imageUrl").type(JsonFieldType.STRING).description("이미지 URL")
+                        )
+                ));
+
+        // then
+        then(userService).should(times(1)).uploadImage(any());
+    }
+
+    @Test
+    @DisplayName("프로필 이미지 URL 생성 API 예외")
+    void convertToImageUrlNotExist() throws Exception {
+        // when
+        mockMvc.perform(multipart("/api/users/imageUrls").file(TEST_EMPTY_IMAGE_FILE)
+                        .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
+                        .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().is4xxClientError());
+    }
 
 }
