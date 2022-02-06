@@ -1,6 +1,7 @@
 package com.study.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.study.AuthFixture;
 import com.study.config.LoginUserArgumentResolver;
 import com.study.dto.TokenResponse;
 import com.study.service.AuthService;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
+import static com.study.AuthFixture.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -41,16 +43,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(AuthController.class)
 class AuthControllerTest {
 
-    private static final String TEST_AUTHORIZATION = "bearer **" ;
-
     @MockBean
     private AuthService authService;
 
     @MockBean
     private LoginUserArgumentResolver loginUserArgumentResolver;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     private MockMvc mockMvc;
 
@@ -71,18 +68,17 @@ class AuthControllerTest {
     @Test
     @DisplayName("소셜 로그인 API 테스트")
     void login() throws Exception {
-
-        TokenResponse tokenResponse = new TokenResponse("accessToken", "refreshToken");
-
+        // given
         given(authService.login(any(), any()))
-                .willReturn(tokenResponse);
+                .willReturn(TEST_TOKEN_RESPONSE);
 
+        // when
         mockMvc.perform(post("/social/login")
-                        .header("kakaoToken", "kakaoToken")
-                        .header("fcmToken", "fcmToken"))
+                        .header(TEST_KAKAO_TOKEN, TEST_KAKAO_TOKEN)
+                        .header(TEST_FCM_TOKEN, TEST_FCM_TOKEN))
                 .andExpect(status().isOk())
-                .andExpect(header().string("accessToken", "accessToken"))
-                .andExpect(header().string("refreshToken", "refreshToken"))
+                .andExpect(header().string(TEST_AUTH_ACCESS_TOKEN, TEST_TOKEN_RESPONSE.getAccessToken()))
+                .andExpect(header().string(TEST_AUTH_REFRESH_TOKEN, TEST_TOKEN_RESPONSE.getRefreshToken()))
                 .andDo(document("auth/social/login",
                         requestHeaders(
                                 headerWithName("kakaoToken").description("kakaoToken"),
@@ -93,27 +89,26 @@ class AuthControllerTest {
                                 headerWithName("refreshToken").description("RefreshToken")
                         )));
 
+        // then
         then(authService).should(times(1)).login(any(), any());
     }
 
     @Test
     @DisplayName("토큰 재발급 API 테스트")
     void refresh() throws Exception {
-
-        TokenResponse tokenResponse = new TokenResponse("accessToken", "refreshToken");
-
+        // given
         given(loginUserArgumentResolver.resolveArgument(any(), any(), any(), any()))
-                .willReturn(1L);
+                .willReturn(TEST_AUTH.getUserId());
 
         given(authService.refresh(any(), any()))
-                .willReturn(tokenResponse);
+                .willReturn(TEST_TOKEN_RESPONSE);
 
-
+        // when
         mockMvc.perform(post("/refresh")
-                        .header("Authorization", TEST_AUTHORIZATION))
+                        .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
-                .andExpect(header().string("accessToken", "accessToken"))
-                .andExpect(header().string("refreshToken", "refreshToken"))
+                .andExpect(header().string(TEST_AUTH_ACCESS_TOKEN, TEST_TOKEN_RESPONSE.getAccessToken()))
+                .andExpect(header().string(TEST_AUTH_REFRESH_TOKEN, TEST_TOKEN_RESPONSE.getRefreshToken()))
                 .andDo(document("auth/refresh",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("RefreshToken")
@@ -123,8 +118,8 @@ class AuthControllerTest {
                                 headerWithName("refreshToken").description("RefreshToken")
                         )));
 
+        // then
         then(authService).should(times(1)).refresh(any(), any());
     }
-
 
 }

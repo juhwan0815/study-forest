@@ -2,8 +2,8 @@ package com.study.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.study.dto.KakaoProfile;
-import com.study.exception.KakaoException;
+import com.study.AuthFixture;
+import com.study.exception.NetworkException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +13,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 
+import static com.study.AuthFixture.*;
 import static com.study.client.KakaoClientImpl.KAKAO_PROFILE_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @RestClientTest(value = KakaoClientImpl.class)
 class KakaoClientTest {
@@ -33,7 +35,7 @@ class KakaoClientTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("카카오에서 회원프로필을 가져온다.")
+    @DisplayName("카카오 회원프로필을 가져온다.")
     void getKakaoProfile() throws JsonProcessingException {
         // given
         KakaoProfile.Properties properties =
@@ -47,10 +49,10 @@ class KakaoClientTest {
                 .andRespond(withSuccess(objectMapper.writeValueAsString(kakaoProfile), MediaType.APPLICATION_JSON));
 
         // when
-        KakaoProfile result = kakaoClient.getKakaoProfile("kakaoToken");
+        KakaoProfile result = kakaoClient.getKakaoProfile(TEST_KAKAO_TOKEN);
 
         // then
-        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getId()).isEqualTo(kakaoProfile.getId());
         assertThat(result.getKakao_account().getAge_range()).isEqualTo(kakaoAccount.getAge_range());
         assertThat(result.getKakao_account().getGender()).isEqualTo(kakaoAccount.getGender());
         assertThat(result.getProperties().getNickname()).isEqualTo(properties.getNickname());
@@ -59,15 +61,15 @@ class KakaoClientTest {
     }
 
     @Test
-    @DisplayName("예외 테스트 : 200 응답이 아닐 경우 예외가 발생한다.")
-    void ifNotSuccessResponse() throws JsonProcessingException {
+    @DisplayName("카카오 서버가 장애가 나면 예외가 발생한다.")
+    void getKakaoProfileNetworkError() throws JsonProcessingException {
         // given
         mockServer.expect(requestTo(KAKAO_PROFILE_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.CREATED));
 
         // when
-        assertThrows(KakaoException.class, () -> kakaoClient.getKakaoProfile("kakaoToken"));
+        assertThrows(NetworkException.class, () -> kakaoClient.getKakaoProfile(TEST_KAKAO_TOKEN));
     }
 
 

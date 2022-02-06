@@ -1,15 +1,15 @@
 package com.study.service;
 
-import com.study.AuthFixture;
 import com.study.client.KakaoClient;
+import com.study.client.KakaoProfile;
 import com.study.client.UserServiceClient;
 import com.study.domain.Auth;
-import com.study.dto.KakaoProfile;
 import com.study.dto.TokenResponse;
 import com.study.dto.UserResponse;
-import com.study.exception.TokenNotMatchException;
+import com.study.exception.NotFoundException;
+import com.study.exception.NotMatchException;
 import com.study.repository.AuthRepository;
-import com.study.utils.jwt.JwtUtils;
+import com.study.utils.JwtUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,18 +65,18 @@ class AuthServiceTest {
                 .willReturn(new UserResponse(1L, "USER", "황주환"));
 
         given(jwtUtils.createToken(any(), any(), any(), any()))
-                .willReturn("accessToken")
-                .willReturn("refreshToken");
+                .willReturn(TEST_AUTH_ACCESS_TOKEN)
+                .willReturn(TEST_AUTH_REFRESH_TOKEN);
 
         given(authRepository.save(any()))
                 .willReturn(TEST_AUTH);
 
         // when
-        TokenResponse result = authService.login("kakaoToken", "fcmToken");
+        TokenResponse result = authService.login(TEST_KAKAO_TOKEN, TEST_FCM_TOKEN);
 
-        // then
-        assertThat(result.getAccessToken()).isEqualTo("accessToken");
-        assertThat(result.getRefreshToken()).isEqualTo("refreshToken");
+        // thenR
+        assertThat(result.getAccessToken()).isEqualTo(TEST_AUTH_ACCESS_TOKEN);
+        assertThat(result.getRefreshToken()).isEqualTo(TEST_AUTH_REFRESH_TOKEN);
         then(kakaoClient).should(times(1)).getKakaoProfile(any());
         then(userServiceClient).should(times(1)).loginByKakaoId(any(), any());
         then(jwtUtils).should(times(2)).createToken(any(), any(), any(), any());
@@ -84,59 +84,76 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("refresh 토큰으로 accessToken 과 refreshToken 을 갱신한다.")
+    @DisplayName("accessToken 과 refreshToken 을 갱신한다.")
     void refreshAccessTokenAndRefreshToken() {
         // given
-        Auth auth = Auth.createAuth(1L, "refreshToken", 5L);
+        Auth auth = Auth.createAuth(TEST_AUTH.getUserId(), TEST_AUTH_REFRESH_TOKEN, 5L);
 
         given(authRepository.findById(any()))
                 .willReturn(Optional.of(auth));
 
         given(jwtUtils.createToken(any(), any()))
-                .willReturn("accessToken")
-                .willReturn("refreshToken");
+                .willReturn(TEST_AUTH_ACCESS_TOKEN)
+                .willReturn(TEST_AUTH_REFRESH_TOKEN);
 
         // when
-        TokenResponse result = authService.refresh(1L, "refreshToken");
+        TokenResponse result = authService.refresh(TEST_AUTH.getUserId(), TEST_AUTH_REFRESH_TOKEN);
 
         // then
-        assertThat(result.getAccessToken()).isEqualTo("accessToken");
-        assertThat(result.getRefreshToken()).isEqualTo("refreshToken");
+        assertThat(result.getAccessToken()).isEqualTo(TEST_AUTH_ACCESS_TOKEN);
+        assertThat(result.getRefreshToken()).isEqualTo(TEST_AUTH_REFRESH_TOKEN);
         then(authRepository).should(times(1)).findById(any());
         then(jwtUtils).should(times(2)).createToken(any(), any());
         then(authRepository).should(times(1)).save(any());
     }
 
     @Test
-    @DisplayName("refresh 토큰으로 accessToken 만 갱신한다.")
+    @DisplayName("accessToken 을 갱신한다.")
     void refreshAccessToken() {
         // given
         given(authRepository.findById(any()))
                 .willReturn(Optional.of(TEST_AUTH));
 
         given(jwtUtils.createToken(any(), any()))
-                .willReturn("accessToken");
+                .willReturn(TEST_AUTH_ACCESS_TOKEN);
 
         // when
-        TokenResponse result = authService.refresh(1L, "refreshToken");
+        TokenResponse result = authService.refresh(TEST_AUTH.getUserId(), TEST_AUTH_REFRESH_TOKEN);
 
         // then
-        assertThat(result.getAccessToken()).isEqualTo("accessToken");
+        assertThat(result.getAccessToken()).isEqualTo(TEST_AUTH_ACCESS_TOKEN);
         assertThat(result.getRefreshToken()).isNull();
         then(authRepository).should(times(1)).findById(any());
         then(jwtUtils).should(times(1)).createToken(any(), any());
     }
 
     @Test
-    @DisplayName("예외 테스트 : refreshToken 이 일치하지 않을 경우 예외가 발생한다.")
-    void ifNotMatchRefreshToken(){
-        Auth auth = Auth.createAuth(1L, "refreshToken1", 30L);
-
+    @DisplayName("토큰을 갱신할 때 refreshToken 이 일치하지 않을 경우 예외가 발생한다.")
+    void refreshNotMatch() {
         // given
+        Auth auth = Auth.createAuth(TEST_AUTH.getUserId(), "refreshToken1", TEST_AUTH.getExpiration());
+
         given(authRepository.findById(any()))
                 .willReturn(Optional.of(auth));
 
         // when
-        assertThrows(TokenNotMatchException.class, () -> authService.refresh(1L, "refreshToken"));
+        assertThrows(NotMatchException.class, () -> authService.refresh(TEST_AUTH.getUserId(), TEST_AUTH_REFRESH_TOKEN));
+
+        // then
+        then(authRepository).should(times(1)).findById(any());
+    }
+
+    @Test
+    @DisplayName("토큰을 갱신할 때 인증이 존재하지 않는 경우 예외가 발생한다.")
+    void refreshNotFound() {
+        // given
+        given(authRepository.findById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> authService.refresh(TEST_AUTH.getUserId(), TEST_AUTH_REFRESH_TOKEN));
+
+        // then
+        then(authRepository).should(times(1)).findById(any());
     }
 }
