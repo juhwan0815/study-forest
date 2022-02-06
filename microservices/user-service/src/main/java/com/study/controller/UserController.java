@@ -1,13 +1,13 @@
 package com.study.controller;
 
 import com.study.config.LoginUser;
-import com.study.domain.User;
 import com.study.dto.keyword.KeywordCreateRequest;
 import com.study.dto.keyword.KeywordResponse;
 import com.study.dto.user.UserFindRequest;
 import com.study.dto.user.UserResponse;
 import com.study.dto.user.UserUpdateDistanceRequest;
-import com.study.dto.user.UserUpdateNickNameRequest;
+import com.study.dto.user.UserUpdateRequest;
+import com.study.exception.NotExistException;
 import com.study.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,8 +16,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static com.study.exception.NotExistException.IMAGE_NOT_EXIST;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,8 +29,9 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/users")
-    public ResponseEntity<UserResponse> create(@RequestHeader String kakaoToken) {
-        return ResponseEntity.ok(userService.create(kakaoToken));
+    public ResponseEntity<Void> create(@RequestHeader String kakaoToken) {
+        userService.create(kakaoToken);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/users")
@@ -45,16 +49,24 @@ public class UserController {
         return ResponseEntity.ok(userService.findByKakaoId(kakaoId, fcmToken));
     }
 
-    @PatchMapping("/users/image")
-    public ResponseEntity<UserResponse> updateImage(@LoginUser Long userId,
-                                                    @RequestPart(required = false) MultipartFile image) {
-        return ResponseEntity.ok(userService.updateImage(userId, image));
+    @PostMapping("/api/users/imageUrls")
+    public ResponseEntity<Map<String, String>> convertToImageUrl(@RequestPart MultipartFile image) {
+
+        if (image.isEmpty()) {
+            throw new NotExistException(IMAGE_NOT_EXIST);
+        }
+
+        Map<String, String> response = new HashMap<>();
+        String imageUrl = userService.uploadImage(image);
+        response.put("imageUrl", imageUrl);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/users/profile")
-    public ResponseEntity<UserResponse> updateProfile(@LoginUser Long userId,
-                                                      @RequestBody @Valid UserUpdateNickNameRequest request) {
-        return ResponseEntity.ok(userService.updateProfile(userId, request));
+    public ResponseEntity<Void> update(@LoginUser Long userId,
+                                       @RequestBody @Valid UserUpdateRequest request) {
+        userService.update(userId, request);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/users/profile")
@@ -62,21 +74,17 @@ public class UserController {
         return ResponseEntity.ok(userService.findById(userId));
     }
 
-    @DeleteMapping("/users")
-    public ResponseEntity<Void> delete(@LoginUser Long userId) {
-        userService.delete(userId);
+    @PatchMapping("/users/areas/{areaId}")
+    public ResponseEntity<Void> updateArea(@LoginUser Long userId, @PathVariable Long areaId) {
+        userService.updateArea(userId, areaId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PatchMapping("/users/areas/{areaId}")
-    public ResponseEntity<UserResponse> updateArea(@LoginUser Long userId, @PathVariable Long areaId) {
-        return ResponseEntity.ok(userService.updateArea(userId, areaId));
-    }
-
     @PatchMapping("/users/distance")
-    public ResponseEntity<UserResponse> updateDistance(@LoginUser Long userId,
-                                                       @RequestBody @Valid UserUpdateDistanceRequest request) {
-        return ResponseEntity.ok(userService.updateDistance(userId, request));
+    public ResponseEntity<Void> updateDistance(@LoginUser Long userId,
+                                               @RequestBody @Valid UserUpdateDistanceRequest request) {
+        userService.updateDistance(userId, request);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/users/keywords")

@@ -5,28 +5,24 @@ import com.study.dto.keyword.KeywordResponse;
 import com.study.dto.user.UserFindRequest;
 import com.study.dto.user.UserResponse;
 import com.study.dto.user.UserUpdateDistanceRequest;
-import com.study.dto.user.UserUpdateNickNameRequest;
+import com.study.dto.user.UserUpdateRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface UserService {
 
-    UserResponse create(String kakaoToken);
+    void create(String kakaoToken);
 
     UserResponse findByKakaoId(Long kakaoId, String fcmToken);
 
     UserResponse findById(Long userId);
 
-    UserResponse updateImage(Long userId, MultipartFile image);
+    void update(Long userId, UserUpdateRequest request);
 
-    UserResponse updateProfile(Long userId, UserUpdateNickNameRequest request);
+    void updateArea(Long userId, Long areaId);
 
-    void delete(Long userId);
-
-    UserResponse updateArea(Long userId, Long areaId);
-
-    UserResponse updateDistance(Long userId, UserUpdateDistanceRequest request);
+    void updateDistance(Long userId, UserUpdateDistanceRequest request);
 
     void addKeyword(Long userId, KeywordCreateRequest request);
 
@@ -37,4 +33,6 @@ public interface UserService {
     List<UserResponse> findByIdIn(UserFindRequest request);
 
     List<UserResponse> findByKeywordContentContain(String studyName);
+
+    String uploadImage(MultipartFile image);
 }

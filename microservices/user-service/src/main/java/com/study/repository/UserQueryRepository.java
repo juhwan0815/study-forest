@@ -1,17 +1,15 @@
 package com.study.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.study.domain.QKeyword;
-import com.study.domain.QUser;
-import com.study.domain.User;
-import com.study.exception.UserNotFoundException;
+import com.study.dto.user.QUserResponse;
+import com.study.dto.user.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.study.domain.QKeyword.*;
-import static com.study.domain.QUser.*;
+import static com.study.domain.QKeyword.keyword;
+import static com.study.domain.QUser.user;
 
 @Repository
 @RequiredArgsConstructor
@@ -19,22 +17,10 @@ public class UserQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public User findWithKeywordById(Long userId) {
-        User findUser = queryFactory
-                .selectFrom(user).distinct()
-                .leftJoin(user.keywords, keyword).fetchJoin()
-                .where(user.id.eq(userId))
-                .fetchOne();
-
-        if (findUser == null) {
-            throw new UserNotFoundException(userId + "는 존재하지 않는 회원 ID 입니다.");
-        }
-        return findUser;
-    }
-
-    public List<User> findByKeywordContentContain(String content) {
+    public List<UserResponse> findByKeywordContentContain(String content) {
         return queryFactory
-                .selectFrom(user)
+                .select(new QUserResponse(user)).distinct()
+                .from(user)
                 .join(user.keywords, keyword)
                 .where(keyword.content.contains(content))
                 .fetch();
