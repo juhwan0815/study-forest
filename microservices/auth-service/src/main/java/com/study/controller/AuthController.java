@@ -18,7 +18,6 @@ public class AuthController {
 
     @PostMapping("/social/login")
     public ResponseEntity socialLogin(@RequestHeader String kakaoToken, @RequestHeader String fcmToken) {
-
         TokenResponse token = authService.login(kakaoToken, fcmToken);
 
         return ResponseEntity.status(HttpStatus.OK)

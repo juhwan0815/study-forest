@@ -1,4 +1,4 @@
-package com.study.dto;
+package com.study.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

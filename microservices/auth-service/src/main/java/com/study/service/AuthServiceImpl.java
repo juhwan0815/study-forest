@@ -1,18 +1,20 @@
 package com.study.service;
 
 import com.study.client.KakaoClient;
+import com.study.client.KakaoProfile;
 import com.study.client.UserServiceClient;
 import com.study.domain.Auth;
-import com.study.dto.KakaoProfile;
 import com.study.dto.TokenResponse;
 import com.study.dto.UserResponse;
-import com.study.exception.AuthNotFoundException;
-import com.study.exception.TokenNotMatchException;
+import com.study.exception.NotFoundException;
+import com.study.exception.NotMatchException;
 import com.study.repository.AuthRepository;
-import com.study.utils.jwt.JwtUtils;
+import com.study.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import static com.study.exception.NotFoundException.AUTH_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -48,10 +50,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public TokenResponse refresh(Long userId, String refreshToken) {
         Auth findAuth = authRepository.findById(userId)
-                .orElseThrow(() -> new AuthNotFoundException(userId + "로 저장된 refreshToken 이 없습니다."));
+                .orElseThrow(() -> new NotFoundException(AUTH_NOT_FOUND));
 
-        if(!refreshToken.equals(findAuth.getRefreshToken())){
-            throw new TokenNotMatchException("저장된 토큰과 일치하지 않는 refreshToken 입니다.");
+        if (!refreshToken.equals(findAuth.getRefreshToken())) {
+            throw new NotMatchException("refreshToken 이 일치하지 않습니다.");
         }
 
         String accessToken = jwtUtils.createToken(refreshToken, accessTokenExpirationTime);

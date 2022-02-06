@@ -13,5 +13,4 @@ public interface UserServiceClient {
     @PostMapping("/users/{kakaoId}")
     UserResponse loginByKakaoId(@PathVariable Long kakaoId, @RequestHeader String fcmToken);
 
-
 }

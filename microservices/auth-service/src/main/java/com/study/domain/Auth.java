@@ -1,6 +1,7 @@
 package com.study.domain;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -10,8 +11,9 @@ import org.springframework.data.redis.core.TimeToLive;
 import java.util.concurrent.TimeUnit;
 
 @RedisHash("auth")
-@Getter
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Auth {
 
     @Id
