@@ -1,38 +1,42 @@
 package com.study.service;
 
 import com.study.client.AreaServiceClient;
+import com.study.client.AwsClient;
 import com.study.client.UserResponse;
 import com.study.client.UserServiceClient;
-import com.study.domain.*;
+import com.study.domain.ChatRoom;
+import com.study.domain.Study;
+import com.study.domain.StudyRole;
 import com.study.dto.chatroom.ChatRoomResponse;
 import com.study.dto.study.StudyCreateRequest;
 import com.study.dto.study.StudyResponse;
 import com.study.dto.study.StudySearchRequest;
+import com.study.dto.study.StudyUpdateRequest;
 import com.study.dto.studyuser.StudyUserResponse;
-import com.study.kakfa.UserDeleteMessage;
+import com.study.exception.AccessDeniedException;
+import com.study.exception.NotFoundException;
 import com.study.kakfa.sender.*;
 import com.study.repository.CategoryRepository;
 import com.study.repository.StudyQueryRepository;
 import com.study.repository.StudyRepository;
-import com.study.util.ImageUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static com.study.fixture.CategoryFixture.TEST_CATEGORY;
-import static com.study.fixture.CategoryFixture.TEST_CHILD_CATEGORY;
-import static com.study.fixture.StudyFixture.*;
+import static com.study.CategoryFixture.TEST_CATEGORY;
+import static com.study.CategoryFixture.TEST_CHILD_CATEGORY;
+import static com.study.CommonFixture.TEST_IMAGE_FILE;
+import static com.study.CommonFixture.TEST_SIZE;
+import static com.study.StudyFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 
@@ -58,7 +62,7 @@ class StudyServiceTest {
     private UserServiceClient userServiceClient;
 
     @Mock
-    private ImageUtil imageUtil;
+    private AwsClient awsClient;
 
     @Mock
     private StudyCreateMessageSender studyCreateMessageSender;
@@ -79,41 +83,26 @@ class StudyServiceTest {
     @DisplayName("온라인/오프라인을 지원하는 스터디를 생성한다.")
     void create() {
         // given
-        given(categoryRepository.findWithParentById(any()))
-                .willReturn(Optional.of(TEST_CHILD_CATEGORY));
+        given(categoryRepository.findById(any()))
+                .willReturn(Optional.of(TEST_CATEGORY));
 
         given(areaServiceClient.findByCode(any()))
                 .willReturn(TEST_AREA_RESPONSE);
 
-        given(imageUtil.uploadImage(any(), any()))
-                .willReturn(TEST_IMAGE);
-
         given(studyRepository.save(any()))
-                .willReturn(null);
+                .willReturn(TEST_STUDY);
 
         willDoNothing()
                 .given(studyCreateMessageSender)
                 .send(any());
 
         // when
-        StudyResponse result = studyService.create(1L, TEST_IMAGE_FILE, TEST_STUDY_CREATE_REQUEST);
+        Long result = studyService.create(1L, TEST_STUDY_CREATE_REQUEST);
 
         // then
-        assertThat(result.getName()).isEqualTo(TEST_STUDY_CREATE_REQUEST.getName());
-        assertThat(result.getContent()).isEqualTo(TEST_STUDY_CREATE_REQUEST.getContent());
-        assertThat(result.getCurrentNumberOfPeople()).isEqualTo(1);
-        assertThat(result.getNumberOfPeople()).isEqualTo(TEST_STUDY_CREATE_REQUEST.getNumberOfPeople());
-        assertThat(result.getArea()).isEqualTo(TEST_AREA_RESPONSE);
-        assertThat(result.isOnline()).isEqualTo(TEST_STUDY_CREATE_REQUEST.getOnline());
-        assertThat(result.isOffline()).isEqualTo(TEST_STUDY_CREATE_REQUEST.getOffline());
-        assertThat(result.getStatus()).isEqualTo(StudyStatus.OPEN);
-        assertThat(result.getImageUrl()).isEqualTo(TEST_IMAGE.getImageUrl());
-        assertThat(result.getParentCategory().getName()).isEqualTo(TEST_CATEGORY.getName());
-        assertThat(result.getChildCategory().getName()).isEqualTo(TEST_CHILD_CATEGORY.getName());
-        assertThat(result.getTags().size()).isEqualTo(TEST_STUDY_CREATE_REQUEST.getTags().size());
-        then(categoryRepository).should(times(1)).findWithParentById(any());
+        assertThat(result).isEqualTo(TEST_STUDY.getId());
+        then(categoryRepository).should(times(1)).findById(any());
         then(areaServiceClient).should(times(1)).findByCode(any());
-        then(imageUtil).should(times(1)).uploadImage(any(), any());
         then(studyRepository).should(times(1)).save(any());
         then(studyCreateMessageSender).should(times(1)).send(any());
     }
@@ -123,122 +112,147 @@ class StudyServiceTest {
     void createOnline() {
         // given
         StudyCreateRequest studyCreateRequest
-                = new StudyCreateRequest("스프링", 5, "스프링", Arrays.asList("스프링", "JPA"), true, false, null, 1L);
+                = new StudyCreateRequest(TEST_STUDY_NAME, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_CONTENT, Arrays.asList("스프링", "JPA"), TEST_STUDY_ONLINE, false, TEST_AREA_CODE, TEST_STUDY_IMAGE_URL, TEST_CATEGORY.getId());
 
-        given(categoryRepository.findWithParentById(any()))
-                .willReturn(Optional.of(TEST_CHILD_CATEGORY));
-
-        given(imageUtil.uploadImage(any(), any()))
-                .willReturn(TEST_IMAGE);
+        given(categoryRepository.findById(any()))
+                .willReturn(Optional.of(TEST_CATEGORY));
 
         given(studyRepository.save(any()))
-                .willReturn(null);
+                .willReturn(TEST_STUDY);
 
         willDoNothing()
                 .given(studyCreateMessageSender)
                 .send(any());
 
         // when
-        StudyResponse result = studyService.create(1L, TEST_IMAGE_FILE, studyCreateRequest);
+        Long result = studyService.create(TEST_USER_RESPONSE.getUserId(), studyCreateRequest);
 
         // then
-        assertThat(result.getName()).isEqualTo(studyCreateRequest.getName());
-        assertThat(result.getContent()).isEqualTo(studyCreateRequest.getContent());
-        assertThat(result.getCurrentNumberOfPeople()).isEqualTo(1);
-        assertThat(result.getNumberOfPeople()).isEqualTo(studyCreateRequest.getNumberOfPeople());
-        assertThat(result.getArea().getId()).isNull();
-        assertThat(result.isOnline()).isEqualTo(studyCreateRequest.getOnline());
-        assertThat(result.isOffline()).isEqualTo(studyCreateRequest.getOffline());
-        assertThat(result.getStatus()).isEqualTo(StudyStatus.OPEN);
-        assertThat(result.getImageUrl()).isEqualTo(TEST_IMAGE.getImageUrl());
-        assertThat(result.getParentCategory().getName()).isEqualTo(TEST_CATEGORY.getName());
-        assertThat(result.getChildCategory().getName()).isEqualTo(TEST_CHILD_CATEGORY.getName());
-        assertThat(result.getTags().size()).isEqualTo(studyCreateRequest.getTags().size());
-        then(categoryRepository).should(times(1)).findWithParentById(any());
-        then(imageUtil).should(times(1)).uploadImage(any(), any());
+        assertThat(result).isEqualTo(TEST_STUDY.getId());
+        then(categoryRepository).should(times(1)).findById(any());
         then(studyRepository).should(times(1)).save(any());
         then(studyCreateMessageSender).should(times(1)).send(any());
     }
 
     @Test
-    @DisplayName("스터디 이미지를 수정한다.")
-    void updateImage() {
+    @DisplayName("스터디를 생성할 때 카테고리가 존재하지 않으면 예외가 발생한다.")
+    void createNotFound() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.addStudyUser(1L, StudyRole.ADMIN);
-
-        given(studyRepository.findWithStudyUserById(any()))
-                .willReturn(Optional.of(study));
-
-        given(imageUtil.uploadImage(any(), any()))
-                .willReturn(TEST_IMAGE);
+        given(categoryRepository.findById(any()))
+                .willReturn(Optional.empty());
 
         // when
-        StudyResponse result = studyService.updateImage(1L, 1L, TEST_IMAGE_FILE);
+        assertThrows(NotFoundException.class, () -> studyService.create(TEST_USER_RESPONSE.getUserId(), TEST_STUDY_CREATE_REQUEST));
 
         // then
-        assertThat(result.getImageUrl()).isEqualTo(TEST_IMAGE.getImageUrl());
-        then(studyRepository).should(times(1)).findWithStudyUserById(any());
-        then(imageUtil).should(times(1)).uploadImage(any(), any());
-    }
-
-    @Test
-    @DisplayName("스터디 지역을 수정한다.")
-    void updateArea() {
-        // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.addStudyUser(1L, StudyRole.ADMIN);
-
-        given(studyRepository.findWithStudyUserById(any()))
-                .willReturn(Optional.of(study));
-
-        given(areaServiceClient.findByCode(any()))
-                .willReturn(TEST_AREA_RESPONSE);
-
-        // when
-        StudyResponse result = studyService.updateArea(1L, 1L, TEST_STUDY_UPDATE_AREA_REQUEST);
-
-        // then
-        assertThat(result.getArea()).isEqualTo(TEST_AREA_RESPONSE);
-        then(studyRepository).should(times(1)).findWithStudyUserById(any());
-        then(areaServiceClient).should(times(1)).findByCode(any());
+        then(categoryRepository).should(times(1)).findById(any());
     }
 
     @Test
     @DisplayName("스터디를 수정한다.")
     void update() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.addStudyUser(1L, StudyRole.ADMIN);
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
 
-        given(studyRepository.findWithStudyUserById(any()))
+        given(studyRepository.findWithTagById(any()))
                 .willReturn(Optional.of(study));
 
-        given(categoryRepository.findWithParentById(any()))
-                .willReturn(Optional.of(TEST_CHILD_CATEGORY));
+        given(categoryRepository.findById(any()))
+                .willReturn(Optional.of(TEST_CATEGORY));
+
+        given(areaServiceClient.findByCode(any()))
+                .willReturn(TEST_AREA_RESPONSE);
 
         // when
-        StudyResponse result = studyService.update(1L, 1L, TEST_STUDY_UPDATE_REQUEST);
+        studyService.update(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId(), TEST_STUDY_UPDATE_REQUEST);
 
         // then
-        assertThat(result.getName()).isEqualTo(TEST_STUDY_UPDATE_REQUEST.getName());
-        assertThat(result.getContent()).isEqualTo(TEST_STUDY_UPDATE_REQUEST.getContent());
-        assertThat(result.getNumberOfPeople()).isEqualTo(TEST_STUDY_UPDATE_REQUEST.getNumberOfPeople());
-        assertThat(result.isOnline()).isEqualTo(TEST_STUDY_UPDATE_REQUEST.getOnline());
-        assertThat(result.isOffline()).isEqualTo(TEST_STUDY_UPDATE_REQUEST.getOffline());
-        assertThat(result.getStatus()).isEqualTo(StudyStatus.CLOSE);
-        assertThat(result.getParentCategory().getName()).isEqualTo(TEST_CATEGORY.getName());
-        assertThat(result.getChildCategory().getName()).isEqualTo(TEST_CHILD_CATEGORY.getName());
-        then(studyRepository).should(times(1)).findWithStudyUserById(any());
-        then(categoryRepository).should(times(1)).findWithParentById(any());
+        then(studyRepository).should(times(1)).findWithTagById(any());
+        then(categoryRepository).should(times(1)).findById(any());
+        then(areaServiceClient).should(times(1)).findByCode(any());
+    }
+
+    @Test
+    @DisplayName("온라인 스터디로 수정한다.")
+    void updateOnline() {
+        // given
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
+
+        StudyUpdateRequest studyUpdateRequest = new StudyUpdateRequest(TEST_STUDY_NAME, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_CONTENT, Arrays.asList("스프링", "JPA"), TEST_STUDY_ONLINE, false, TEST_STUDY_OPEN, TEST_AREA_CODE, TEST_STUDY_IMAGE_URL, TEST_CATEGORY.getId());
+
+        given(studyRepository.findWithTagById(any()))
+                .willReturn(Optional.of(study));
+
+        given(categoryRepository.findById(any()))
+                .willReturn(Optional.of(TEST_CATEGORY));
+
+        // when
+        studyService.update(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId(), studyUpdateRequest);
+
+        // then
+        then(studyRepository).should(times(1)).findWithTagById(any());
+        then(categoryRepository).should(times(1)).findById(any());
+    }
+
+    @Test
+    @DisplayName("스터디를 수정할 때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void updateNotFound() {
+        // given
+        given(studyRepository.findWithTagById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.update(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId(), TEST_STUDY_UPDATE_REQUEST));
+
+        // then
+        then(studyRepository).should(times(1)).findWithTagById(any());
+    }
+
+    @Test
+    @DisplayName("스터디를 수정할 때 스터디 관리자가 아니면 예외가 발생한다.")
+    void updateNotAdmin() {
+        // given
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
+
+        given(studyRepository.findWithTagById(any()))
+                .willReturn(Optional.of(study));
+
+        // when
+        assertThrows(AccessDeniedException.class, () -> studyService.update(2L, TEST_STUDY.getId(), TEST_STUDY_UPDATE_REQUEST));
+
+        // then
+        then(studyRepository).should(times(1)).findWithTagById(any());
+    }
+
+    @Test
+    @DisplayName("스터디를 수정할 때 카테고리가 존재하지 않으면 예외가 발생한다.")
+    void updateCategoryNotFound() {
+        // given
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(1L, StudyRole.ADMIN);
+
+        given(studyRepository.findWithTagById(any()))
+                .willReturn(Optional.of(study));
+
+        given(categoryRepository.findById(any()))
+                .willReturn(Optional.empty());
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.update(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId(), TEST_STUDY_UPDATE_REQUEST));
+
+        // then
+        then(studyRepository).should(times(1)).findWithTagById(any());
+        then(categoryRepository).should(times(1)).findById(any());
     }
 
     @Test
     @DisplayName("스터디를 삭제한다.")
     void delete() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.addStudyUser(1L, StudyRole.ADMIN);
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
 
         given(studyRepository.findWithStudyUserById(any()))
                 .willReturn(Optional.of(study));
@@ -252,7 +266,7 @@ class StudyServiceTest {
                 .send(any());
 
         // when
-        studyService.delete(1L, 1L);
+        studyService.delete(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId());
 
         // then
         then(studyRepository).should(times(1)).findWithStudyUserById(any());
@@ -261,131 +275,173 @@ class StudyServiceTest {
     }
 
     @Test
-    @DisplayName("스터디 ID 로 스터디를 조회한다.")
+    @DisplayName("스터디를 삭제할때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void deleteNotFound() {
+        // given
+        given(studyRepository.findWithStudyUserById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.delete(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId()));
+
+        // then
+        then(studyRepository).should(times(1)).findWithStudyUserById(any());
+    }
+
+    @Test
+    @DisplayName("스터디를 삭제할때 스터디 관리자가 아니면 예외가 발생한다.")
+    void deleteNotAdmin() {
+        // given
+        Study study = study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
+
+        given(studyRepository.findWithStudyUserById(any()))
+                .willReturn(Optional.of(study));
+
+        // when
+        assertThrows(AccessDeniedException.class, () -> studyService.delete(2L, TEST_STUDY.getId()));
+
+        // then
+        then(studyRepository).should(times(1)).findWithStudyUserById(any());
+    }
+
+    @Test
+    @DisplayName("스터디를 상세 조회한다.")
     void findById() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, TEST_CHILD_CATEGORY);
-        study.changeArea(1L);
-        study.addTags(Arrays.asList("스프링", "JPA"));
+        Study study = study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.changeArea(TEST_AREA_RESPONSE.getId());
+        study.changeTags(Arrays.asList("스프링", "JPA"));
 
-        given(studyQueryRepository.findWithCategoryAndTagById(any()))
-                .willReturn(study);
+        given(studyRepository.findWithCategoryAndTagById(any()))
+                .willReturn(Optional.of(study));
 
         given(areaServiceClient.findById(any()))
                 .willReturn(TEST_AREA_RESPONSE);
 
         // when
-        StudyResponse result = studyService.findById(1L);
+        StudyResponse result = studyService.findById(TEST_STUDY.getId());
 
         // then
+        assertThat(result.getParentCategory().getCategoryId()).isEqualTo(TEST_CHILD_CATEGORY.getId());
         assertThat(result.getParentCategory().getName()).isEqualTo(TEST_CATEGORY.getName());
+        assertThat(result.getChildCategory().getCategoryId()).isEqualTo(TEST_CHILD_CATEGORY.getId());
         assertThat(result.getChildCategory().getName()).isEqualTo(TEST_CHILD_CATEGORY.getName());
         assertThat(result.getArea()).isEqualTo(TEST_AREA_RESPONSE);
         assertThat(result.getTags().size()).isEqualTo(2);
-        then(studyQueryRepository).should(times(1)).findWithCategoryAndTagById(any());
+        then(studyRepository).should(times(1)).findWithCategoryAndTagById(any());
         then(areaServiceClient).should(times(1)).findById(any());
     }
 
     @Test
-    @DisplayName("스터디 ID 로 온라인 스터디를 조회한다.")
-    void findByIdOnline() {
+    @DisplayName("스터디를 상세 조회할때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void findByIdNotFound() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, false, TEST_CHILD_CATEGORY);
-        study.addTags(Arrays.asList("스프링", "JPA"));
-
-        given(studyQueryRepository.findWithCategoryAndTagById(any()))
-                .willReturn(study);
+        given(studyRepository.findWithCategoryAndTagById(any()))
+                .willReturn(Optional.empty());
 
         // when
-        StudyResponse result = studyService.findById(1L);
+        assertThrows(NotFoundException.class, () -> studyService.findById(TEST_STUDY.getId()));
 
         // then
+        then(studyRepository).should(times(1)).findWithCategoryAndTagById(any());
+    }
+
+    @Test
+    @DisplayName("온라인 스터디를 상세 조회한다.")
+    void findByIdOnline() {
+        // given
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, false, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.changeTags(Arrays.asList("스프링", "JPA"));
+
+        given(studyRepository.findWithCategoryAndTagById(any()))
+                .willReturn(Optional.of(study));
+
+        // when
+        StudyResponse result = studyService.findById(TEST_STUDY.getId());
+
+        // then
+        assertThat(result.getParentCategory().getCategoryId()).isEqualTo(TEST_CHILD_CATEGORY.getId());
         assertThat(result.getParentCategory().getName()).isEqualTo(TEST_CATEGORY.getName());
+        assertThat(result.getChildCategory().getCategoryId()).isEqualTo(TEST_CHILD_CATEGORY.getId());
         assertThat(result.getChildCategory().getName()).isEqualTo(TEST_CHILD_CATEGORY.getName());
         assertThat(result.getArea()).isNull();
         assertThat(result.getTags().size()).isEqualTo(2);
-        then(studyQueryRepository).should(times(1)).findWithCategoryAndTagById(any());
+        then(studyRepository).should(times(1)).findWithCategoryAndTagById(any());
     }
 
     @Test
     @DisplayName("비회원이 온라인 스터디를 검색한다.")
     void searchOnlineNotLoginUser() {
         // given
-        StudySearchRequest studySearchRequest = new StudySearchRequest("스프링", 1L, true, true);
+        StudySearchRequest studySearchRequest
+                = new StudySearchRequest(TEST_STUDY_NAME, TEST_CATEGORY.getId(), TEST_STUDY_ONLINE, false, TEST_SIZE, TEST_STUDY.getId());
 
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, false, TEST_CHILD_CATEGORY);
-        study.addTags(Arrays.asList("스프링", "JPA"));
-        study.changeImage(TEST_IMAGE);
-
-        PageRequest pageable = PageRequest.of(0, 20);
-        Page<Study> studies = new PageImpl<>(Arrays.asList(study), pageable, 1L);
-
-        given(studyQueryRepository.findBySearchCondition(any(), any(), any()))
-                .willReturn(studies);
+        given(studyQueryRepository.findBySearchCondition(any(), any()))
+                .willReturn(Arrays.asList(TEST_STUDY_RESPONSE3));
 
         // when
-        Page<StudyResponse> result = studyService.search(null, pageable, studySearchRequest);
+        List<StudyResponse> result = studyService.search(null, studySearchRequest);
 
         // then
-        assertThat(result.getContent().size()).isEqualTo(1);
-        then(studyQueryRepository).should(times(1)).findBySearchCondition(any(), any(), any());
+        assertThat(result.size()).isEqualTo(1);
+        then(studyQueryRepository).should(times(1)).findBySearchCondition(any(), any());
+    }
+
+    @Test
+    @DisplayName("비회원이 온라인 스터디를 검색한다.")
+    void searchOfflineNotLoginUser() {
+        // given
+        given(studyQueryRepository.findBySearchCondition(any(), any()))
+                .willReturn(Arrays.asList(TEST_STUDY_RESPONSE3));
+
+        // when
+        List<StudyResponse> result = studyService.search(null, TEST_STUDY_SEARCH_REQUEST);
+
+        // then
+        assertThat(result.size()).isEqualTo(1);
+        then(studyQueryRepository).should(times(1)).findBySearchCondition(any(), any());
     }
 
     @Test
     @DisplayName("회원이 온라인 스터디를 조회한다.")
     void searchOnline() {
         // given
-        StudySearchRequest studySearchRequest = new StudySearchRequest("스프링", 1L, true, false);
-        UserResponse user = new UserResponse(1L, "USER", "황주환", "10~19", "male", "이미지 URL", null, 3, "fcmToken");
+        StudySearchRequest studySearchRequest
+                = new StudySearchRequest(TEST_STUDY_NAME, TEST_CATEGORY.getId(), TEST_STUDY_ONLINE, false, TEST_SIZE, TEST_STUDY.getId());
 
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, false, true, TEST_CHILD_CATEGORY);
-        study.addTags(Arrays.asList("스프링", "JPA"));
-        study.changeImage(TEST_IMAGE);
-
-        PageRequest pageable = PageRequest.of(0, 20);
-        Page<Study> studies = new PageImpl<>(Arrays.asList(study), pageable, 1L);
-
-        given(studyQueryRepository.findBySearchCondition(any(), any(), any()))
-                .willReturn(studies);
+        given(studyQueryRepository.findBySearchCondition(any(), any()))
+                .willReturn(Arrays.asList(TEST_STUDY_RESPONSE3));
 
         // when
-        Page<StudyResponse> result = studyService.search(1L, pageable, studySearchRequest);
+        List<StudyResponse> result = studyService.search(TEST_USER_RESPONSE.getUserId(), studySearchRequest);
 
         // then
-        assertThat(result.getContent().size()).isEqualTo(1);
-        then(studyQueryRepository).should(times(1)).findBySearchCondition(any(), any(), any());
+        assertThat(result.size()).isEqualTo(1);
+        then(studyQueryRepository).should(times(1)).findBySearchCondition(any(), any());
     }
 
     @Test
     @DisplayName("지역을 등록한 회원이 오프라인 스터디를 검색한다.")
     void searchOffline() {
         // given
-        StudySearchRequest studySearchRequest = new StudySearchRequest("스프링", 1L, false, true);
-
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, false, true, TEST_CHILD_CATEGORY);
-        study.addTags(Arrays.asList("스프링", "JPA"));
-        study.changeImage(TEST_IMAGE);
-
-        PageRequest pageable = PageRequest.of(0, 20);
-        Page<Study> studies = new PageImpl<>(Arrays.asList(study), pageable, 1L);
-
-        given(studyQueryRepository.findBySearchCondition(any(), any(), any()))
-                .willReturn(studies);
-
         given(userServiceClient.findById(any()))
                 .willReturn(TEST_USER_RESPONSE);
 
         given(areaServiceClient.findAroundById(any(), any()))
                 .willReturn(Arrays.asList(TEST_AREA_RESPONSE));
 
+        given(studyQueryRepository.findBySearchCondition(any(), any()))
+                .willReturn(Arrays.asList(TEST_STUDY_RESPONSE3));
+
         // when
-        Page<StudyResponse> result = studyService.search(1L, pageable, studySearchRequest);
+        List<StudyResponse> result = studyService.search(TEST_USER_RESPONSE.getUserId(), TEST_STUDY_SEARCH_REQUEST);
 
         // then
-        assertThat(result.getContent().size()).isEqualTo(1);
-        then(studyQueryRepository).should(times(1)).findBySearchCondition(any(), any(), any());
+        assertThat(result.size()).isEqualTo(1);
         then(userServiceClient).should(times(1)).findById(any());
         then(areaServiceClient).should(times(1)).findAroundById(any(), any());
+        then(studyQueryRepository).should(times(1)).findBySearchCondition(any(), any());
     }
 
 
@@ -393,45 +449,47 @@ class StudyServiceTest {
     @DisplayName("회원의 지역이 없는 오프라인 스터디를 조회한다.")
     void searchNotExistUserArea() {
         // given
-        StudySearchRequest studySearchRequest = new StudySearchRequest("스프링", 1L, false, true);
-        UserResponse user = new UserResponse(1L, "USER", "황주환", "10~19", "male", "이미지 URL", null, 3, "fcmToken");
-
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, false, true, TEST_CHILD_CATEGORY);
-        study.addTags(Arrays.asList("스프링", "JPA"));
-        study.changeImage(TEST_IMAGE);
-
-        PageRequest pageable = PageRequest.of(0, 20);
-        Page<Study> studies = new PageImpl<>(Arrays.asList(study), pageable, 1L);
-
-        given(studyQueryRepository.findBySearchCondition(any(), any(), any()))
-                .willReturn(studies);
-
+        UserResponse userResponse = new UserResponse(1L, TEST_USER_NICKNAME, TEST_USER_AGE_RANGE, TEST_USER_GENDER, TEST_USER_IMAGE_URL, null, TEST_USER_DISTANCE, TEST_FCM_TOKEN);
         given(userServiceClient.findById(any()))
-                .willReturn(user);
+                .willReturn(userResponse);
+
+        given(studyQueryRepository.findBySearchCondition(any(), any()))
+                .willReturn(Arrays.asList(TEST_STUDY_RESPONSE3));
 
         // when
-        Page<StudyResponse> result = studyService.search(1L, pageable, studySearchRequest);
+        List<StudyResponse> result = studyService.search(TEST_USER_RESPONSE.getUserId(), TEST_STUDY_SEARCH_REQUEST);
 
         // then
-        assertThat(result.getContent().size()).isEqualTo(1);
-        then(studyQueryRepository).should(times(1)).findBySearchCondition(any(), any(), any());
+        assertThat(result.size()).isEqualTo(1);
         then(userServiceClient).should(times(1)).findById(any());
+        then(studyQueryRepository).should(times(1)).findBySearchCondition(any(), any());
     }
 
     @Test
     @DisplayName("스터디 참가 대기자를 추가한다.")
     void createWaitUser() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-
         given(studyRepository.findWithWaitUserById(any()))
-                .willReturn(Optional.of(study));
+                .willReturn(Optional.of(TEST_STUDY));
 
         // when
-        studyService.createWaitUser(1L, 1L);
+        studyService.createWaitUser(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId());
 
         // then
-        assertThat(study.getWaitUsers().size()).isEqualTo(1);
+        then(studyRepository).should(times(1)).findWithWaitUserById(any());
+    }
+
+    @Test
+    @DisplayName("스터디 참가 대기자를 추가할 때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void createWaitUserNotFound() {
+        // given
+        given(studyRepository.findWithWaitUserById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.createWaitUser(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId()));
+
+        // then
         then(studyRepository).should(times(1)).findWithWaitUserById(any());
     }
 
@@ -439,13 +497,28 @@ class StudyServiceTest {
     @DisplayName("스터디 참가 대기자를 삭제한다.")
     void deleteWaitUser() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
         study.addWaitUser(1L);
 
         given(studyRepository.findWithWaitUserById(any()))
                 .willReturn(Optional.of(study));
+
         // when
-        studyService.deleteWaitUser(1L, 1L);
+        studyService.deleteWaitUser(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId());
+
+        // then
+        then(studyRepository).should(times(1)).findWithWaitUserById(any());
+    }
+
+    @Test
+    @DisplayName("스터디 참가 대기자를 삭제할 때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void deleteWaitUserNotFound() {
+        // given
+        given(studyRepository.findWithWaitUserById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.deleteWaitUser(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId()));
 
         // then
         then(studyRepository).should(times(1)).findWithWaitUserById(any());
@@ -455,8 +528,8 @@ class StudyServiceTest {
     @DisplayName("스터디 참가 대기자를 거부한다.")
     void failWaitUser() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.addStudyUser(1L, StudyRole.ADMIN);
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
         study.addWaitUser(2L);
 
         given(studyRepository.findWithWaitUserById(any()))
@@ -467,7 +540,7 @@ class StudyServiceTest {
                 .send(any());
 
         // when
-        studyService.failWaitUser(1L, 1L, 2L);
+        studyService.failWaitUser(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId(), 2L);
 
         // then
         then(studyRepository).should(times(1)).findWithWaitUserById(any());
@@ -475,10 +548,42 @@ class StudyServiceTest {
     }
 
     @Test
+    @DisplayName("스터디 참가 대기자를 거부할 때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void failWaitUserNotFound() {
+        // given
+        given(studyRepository.findWithWaitUserById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.failWaitUser(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId(), 2L));
+
+        // then
+        then(studyRepository).should(times(1)).findWithWaitUserById(any());
+    }
+
+    @Test
+    @DisplayName("스터디 참가 대기자를 거부할 때 스터디 관리자가 아니면 예외가 발생한다.")
+    void failWaitUserNotAdmin() {
+        // given
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
+        study.addWaitUser(2L);
+
+        given(studyRepository.findWithWaitUserById(any()))
+                .willReturn(Optional.of(study));
+
+        // when
+        assertThrows(AccessDeniedException.class, () -> studyService.failWaitUser(2L, TEST_STUDY.getId(), 2L));
+
+        // then
+        then(studyRepository).should(times(1)).findWithWaitUserById(any());
+    }
+
+    @Test
     @DisplayName("스터디 참가 대기자 리스트를 조회한다.")
     void findWaitUsersById() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
         study.addWaitUser(1L);
 
         given(studyRepository.findWithWaitUserById(any()))
@@ -488,7 +593,7 @@ class StudyServiceTest {
                 .willReturn(Arrays.asList(TEST_USER_RESPONSE));
 
         // when
-        List<UserResponse> result = studyService.findWaitUsersById(1L);
+        List<UserResponse> result = studyService.findWaitUsersById(TEST_STUDY.getId());
 
         // then
         assertThat(result.size()).isEqualTo(1);
@@ -497,11 +602,25 @@ class StudyServiceTest {
     }
 
     @Test
+    @DisplayName("스터디 참가 대기자 리스트를 조회할 때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void findWaitUsersByIdNotFound() {
+        // given
+        given(studyRepository.findWithWaitUserById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.findWaitUsersById(TEST_STUDY.getId()));
+
+        // then
+        then(studyRepository).should(times(1)).findWithWaitUserById(any());
+    }
+
+    @Test
     @DisplayName("스터디 참가자를 추가한다.")
     void createStudyUser() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.addStudyUser(1L, StudyRole.ADMIN);
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
         study.addWaitUser(2L);
 
         given(studyRepository.findWithWaitUserById(any()))
@@ -511,7 +630,7 @@ class StudyServiceTest {
                 .given(studyApplySuccessMessageSender)
                 .send(any());
         // when
-        studyService.createStudyUser(1L, 1L, 2L);
+        studyService.createStudyUser(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId(), 2L);
 
         // then
         then(studyRepository).should(times(1)).findWithWaitUserById(any());
@@ -519,34 +638,114 @@ class StudyServiceTest {
     }
 
     @Test
+    @DisplayName("스터디 참가자를 추가할 때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void createStudyUserNotFound() {
+        // given
+        given(studyRepository.findWithWaitUserById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.createStudyUser(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId(), 2L));
+
+        // then
+        then(studyRepository).should(times(1)).findWithWaitUserById(any());
+    }
+
+    @Test
+    @DisplayName("스터디 참가자를 추가할 때 스터디 관리자가 아니면 예외가 발생한다.")
+    void createStudyUserNotAdmin() {
+        // given
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
+        study.addWaitUser(2L);
+
+        given(studyRepository.findWithWaitUserById(any()))
+                .willReturn(Optional.of(study));
+
+        // when
+        assertThrows(AccessDeniedException.class, () -> studyService.createStudyUser(2L, TEST_STUDY.getId(), 2L));
+
+        // then
+        then(studyRepository).should(times(1)).findWithWaitUserById(any());
+    }
+
+    @Test
     @DisplayName("스터디 관리자가 스터디 참가자를 삭제한다.")
     void deleteStudyUser() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.addStudyUser(1L, StudyRole.ADMIN);
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
         study.addStudyUser(2L, StudyRole.USER);
 
         given(studyRepository.findWithStudyUserById(any()))
                 .willReturn(Optional.of(study));
+
         // when
-        studyService.deleteStudyUser(1L, 1L, 2L);
+        studyService.deleteStudyUser(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId(), 2L);
 
         // then
         then(studyRepository).should(times(1)).findWithStudyUserById(any());
     }
 
     @Test
+    @DisplayName("스터디 관리자가 스터디 참가자를 삭제할 때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void deleteStudyUserNotFound() {
+        // given
+        given(studyRepository.findWithStudyUserById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.deleteStudyUser(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId(), 2L));
+
+        // then
+        then(studyRepository).should(times(1)).findWithStudyUserById(any());
+    }
+
+    @Test
+    @DisplayName("스터디 관리자가 스터디 참가자를 삭제할 때 스터디 관리자가 아니면 예외가 발생한다.")
+    void deleteStudyUserNotAdmin() {
+        // given
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
+        study.addStudyUser(2L, StudyRole.USER);
+
+        given(studyRepository.findWithStudyUserById(any()))
+                .willReturn(Optional.of(study));
+
+        // when
+        assertThrows(AccessDeniedException.class, () -> studyService.deleteStudyUser(2L, TEST_STUDY.getId(), 2L));
+
+        // then
+        then(studyRepository).should(times(1)).findWithStudyUserById(any());
+    }
+
+
+    @Test
     @DisplayName("스터디 참가자가 탈퇴한다.")
     void deleteStudyUserSelf() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.addStudyUser(1L, StudyRole.ADMIN);
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
         study.addStudyUser(2L, StudyRole.USER);
 
         given(studyRepository.findWithStudyUserById(any()))
                 .willReturn(Optional.of(study));
         // when
-        studyService.deleteStudyUser(1L, 1L);
+        studyService.deleteStudyUser(2L, TEST_STUDY.getId());
+
+        // then
+        then(studyRepository).should(times(1)).findWithStudyUserById(any());
+    }
+
+    @Test
+    @DisplayName("스터디 참가자가 탈퇴할 때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void deleteStudyUserSelfNotFound() {
+        // given
+        given(studyRepository.findWithStudyUserById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.deleteStudyUser(2L, TEST_STUDY.getId()));
 
         // then
         then(studyRepository).should(times(1)).findWithStudyUserById(any());
@@ -556,7 +755,7 @@ class StudyServiceTest {
     @DisplayName("스터디 참가자 리스트를 조회한다.")
     void findStudyUsersById() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
         study.addStudyUser(1L, StudyRole.ADMIN);
 
         given(studyRepository.findWithStudyUserById(any()))
@@ -566,7 +765,7 @@ class StudyServiceTest {
                 .willReturn(Arrays.asList(TEST_USER_RESPONSE));
 
         // when
-        List<StudyUserResponse> result = studyService.findStudyUsersById(1L);
+        List<StudyUserResponse> result = studyService.findStudyUsersById(TEST_STUDY.getId());
 
         // then
         assertThat(result.size()).isEqualTo(1);
@@ -575,16 +774,62 @@ class StudyServiceTest {
     }
 
     @Test
+    @DisplayName("스터디 참가자 리스트를 조회할 때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void findStudyUsersByIdNotFound() {
+        // given
+        given(studyRepository.findWithStudyUserById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.findStudyUsersById(TEST_STUDY.getId()));
+
+        // then
+        then(studyRepository).should(times(1)).findWithStudyUserById(any());
+    }
+
+    @Test
     @DisplayName("스터디 채팅방을 생성한다.")
     void createChatRoom() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.addStudyUser(1L, StudyRole.ADMIN);
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
 
         given(studyRepository.findWithChatRoomById(any()))
                 .willReturn(Optional.of(study));
+
         // when
-        studyService.createChatRoom(1L, 1L, TEST_CHAT_ROOM_CREATE_REQUEST);
+        studyService.createChatRoom(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId(), TEST_CHAT_ROOM_CREATE_REQUEST);
+
+        // then
+        then(studyRepository).should(times(1)).findWithChatRoomById(any());
+    }
+
+    @Test
+    @DisplayName("스터디 채팅방을 생성할 때 스터디 관리자가 아니면 예외가 발생한다.")
+    void createChatRoomNotAdmin() {
+        // given
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
+
+        given(studyRepository.findWithChatRoomById(any()))
+                .willReturn(Optional.of(study));
+
+        // when
+        assertThrows(AccessDeniedException.class, () -> studyService.createChatRoom(2L, TEST_STUDY.getId(), TEST_CHAT_ROOM_CREATE_REQUEST));
+
+        // then
+        then(studyRepository).should(times(1)).findWithChatRoomById(any());
+    }
+
+    @Test
+    @DisplayName("스터디 채팅방을 생성할 때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void createChatRoomNotFound() {
+        // given
+        given(studyRepository.findWithChatRoomById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.createChatRoom(TEST_USER_RESPONSE.getUserId(), TEST_STUDY.getId(), TEST_CHAT_ROOM_CREATE_REQUEST));
 
         // then
         then(studyRepository).should(times(1)).findWithChatRoomById(any());
@@ -594,9 +839,9 @@ class StudyServiceTest {
     @DisplayName("스터디 채팅방을 수정한다.")
     void updateChatRoom() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.addStudyUser(1L, StudyRole.ADMIN);
-        study.getChatRooms().add(new ChatRoom(1L, "공지사항", study));
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
+        study.getChatRooms().add(new ChatRoom(1L, "떠들기", study));
 
         given(studyRepository.findWithChatRoomById(any()))
                 .willReturn(Optional.of(study));
@@ -608,12 +853,42 @@ class StudyServiceTest {
     }
 
     @Test
+    @DisplayName("스터디 채팅방을 수정할 때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void updateChatRoomNotFound() {
+        // given
+        given(studyRepository.findWithChatRoomById(any()))
+                .willReturn(Optional.empty());
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.updateChatRoom(1L, TEST_STUDY.getId(), 1L, TEST_CHAT_ROOM_UPDATE_REQUEST));
+
+        // then
+        then(studyRepository).should(times(1)).findWithChatRoomById(any());
+    }
+
+    @Test
+    @DisplayName("스터디 채팅방을 수정할 때 스터디 관리자가 아니면 예외가 발생한다.")
+    void updateChatRoomNotAdmin() {
+        // given
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
+        study.getChatRooms().add(new ChatRoom(1L, "떠들기", study));
+
+        given(studyRepository.findWithChatRoomById(any()))
+                .willReturn(Optional.of(study));
+        // when
+        assertThrows(AccessDeniedException.class, () -> studyService.updateChatRoom(2L, TEST_STUDY.getId(), 1L, TEST_CHAT_ROOM_UPDATE_REQUEST));
+
+        // then
+        then(studyRepository).should(times(1)).findWithChatRoomById(any());
+    }
+
+    @Test
     @DisplayName("스터디 채팅방을 삭제한다.")
     void deleteChatRoom() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.addStudyUser(1L, StudyRole.ADMIN);
-        study.getChatRooms().add(new ChatRoom(1L, "공지사항", study));
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
+        study.getChatRooms().add(new ChatRoom(1L, TEST_CHAT_ROOM_NAME, study));
 
         given(studyRepository.findWithChatRoomById(any()))
                 .willReturn(Optional.of(study));
@@ -621,6 +896,7 @@ class StudyServiceTest {
         willDoNothing()
                 .given(chatRoomDeleteMessageSender)
                 .send(any());
+
         // when
         studyService.deleteChatRoom(1L, 1L, 1L);
 
@@ -629,20 +905,68 @@ class StudyServiceTest {
         then(chatRoomDeleteMessageSender).should(times(1)).send(any());
     }
 
+
+    @Test
+    @DisplayName("스터디 채팅방을 삭제할 때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void deleteChatRoomNotFound() {
+        // given
+        given(studyRepository.findWithChatRoomById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.deleteChatRoom(1L, TEST_STUDY.getId(), 1L));
+
+        // then
+        then(studyRepository).should(times(1)).findWithChatRoomById(any());
+    }
+
+    @Test
+    @DisplayName("스터디 채팅방을 삭제할 때 스터디 관리자가 아니면 예외가 발생한다.")
+    void deleteChatRoomNotAdmin() {
+        // given
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.addStudyUser(TEST_USER_RESPONSE.getUserId(), StudyRole.ADMIN);
+        study.getChatRooms().add(new ChatRoom(1L, TEST_CHAT_ROOM_NAME, study));
+
+        given(studyRepository.findWithChatRoomById(any()))
+                .willReturn(Optional.of(study));
+
+        // when
+        assertThrows(AccessDeniedException.class, () -> studyService.deleteChatRoom(2L, TEST_STUDY.getId(), 1L));
+
+        // then
+        then(studyRepository).should(times(1)).findWithChatRoomById(any());
+    }
+
     @Test
     @DisplayName("스터디 채팅방을 조회한다.")
     void findChatRoomsById() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.addChatRoom("공지사항");
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.getChatRooms().add(new ChatRoom(1L, TEST_CHAT_ROOM_NAME, study));
 
         given(studyRepository.findWithChatRoomById(any()))
                 .willReturn(Optional.of(study));
+
         // when
-        List<ChatRoomResponse> result = studyService.findChatRoomsById(1L);
+        List<ChatRoomResponse> result = studyService.findChatRoomsById(TEST_STUDY.getId());
 
         // then
         assertThat(result.size()).isEqualTo(1);
+        then(studyRepository).should(times(1)).findWithChatRoomById(any());
+    }
+
+    @Test
+    @DisplayName("스터디 채팅방을 조회할때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void findChatRoomsByIdNotFOund() {
+        // given
+        given(studyRepository.findWithChatRoomById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.findChatRoomsById(TEST_STUDY.getId()));
+
+        // then
         then(studyRepository).should(times(1)).findWithChatRoomById(any());
     }
 
@@ -650,136 +974,107 @@ class StudyServiceTest {
     @DisplayName("회원이 가입된 스터디를 조회한다.")
     void findByUserId() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-
-        given(studyQueryRepository.findByUserId(any()))
-                .willReturn(Arrays.asList(study));
+        given(studyQueryRepository.findByStudyUserId(any()))
+                .willReturn(Arrays.asList(TEST_STUDY_RESPONSE3));
 
         // when
-        List<StudyResponse> result = studyService.findByUserId(1L);
+        List<StudyResponse> result = studyService.findByUserId(TEST_USER_RESPONSE.getUserId());
 
         // then
         assertThat(result.size()).isEqualTo(1);
-        then(studyQueryRepository).should(times(1)).findByUserId(any());
+        then(studyQueryRepository).should(times(1)).findByStudyUserId(any());
     }
 
     @Test
     @DisplayName("회원이 가입 신청한 스터디를 조회한다.")
     void findByWaitUserId() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.changeImage(TEST_IMAGE);
-        study.addWaitUser(1L);
-        study.getTags().add(new Tag(1L, "스프링", study));
-
-        given(studyQueryRepository.findWithWaitUserByUserId(any()))
-                .willReturn(Arrays.asList(study));
+        given(studyQueryRepository.findByWaitUserId(any()))
+                .willReturn(Arrays.asList(TEST_STUDY_RESPONSE3));
 
         // when
         List<StudyResponse> result = studyService.findByWaitUserId(1L);
 
         // then
         assertThat(result.size()).isEqualTo(1L);
-        assertThat(result.get(0).getWaitStatus()).isEqualTo(WaitStatus.WAIT);
-        then(studyQueryRepository).should(times(1)).findWithWaitUserByUserId(any());
-    }
-
-    @Test
-    @DisplayName("스터디 참가자와 스터디 대기자에서 회원을 삭제한다.")
-    void deleteStudyUserAndWaitUser() {
-        // given
-        Study study1 = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study1.addWaitUser(1L);
-
-        Study study2 = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study2.addStudyUser(1L, StudyRole.ADMIN);
-
-        given(studyQueryRepository.findWithWaitUserByUserId(any()))
-                .willReturn(Arrays.asList(study1));
-
-        given(studyQueryRepository.findWithStudyUsersByUserId(any()))
-                .willReturn(Arrays.asList(study2));
-
-        // when
-        studyService.deleteStudyUserAndWaitUser(UserDeleteMessage.from(1L));
-
-        // then
-        then(studyQueryRepository).should(times(1)).findWithWaitUserByUserId(any());
-        then(studyQueryRepository).should(times(1)).findWithStudyUsersByUserId(any());
-    }
-
-    @Test
-    @DisplayName("스터디 태그를 추가한다.")
-    void addTag() {
-        // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.addStudyUser(1L, StudyRole.ADMIN);
-
-        given(studyRepository.findWithStudyUserById(any()))
-                .willReturn(Optional.of(study));
-
-        // when
-        studyService.addTag(1L, 1L, TEST_TAG_CREATE_REQUEST);
-
-        // then
-        then(studyRepository).should(times(1)).findWithStudyUserById(any());
-    }
-
-    @Test
-    @DisplayName("스터디 태그를 삭제한다.")
-    void deleteTag() {
-        // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.addStudyUser(1L, StudyRole.ADMIN);
-        study.getTags().add(new Tag(1L, "스프링", study));
-
-        given(studyRepository.findWithStudyUserById(any()))
-                .willReturn(Optional.of(study));
-
-        // when
-        studyService.deleteTag(1L, 1L, 1L);
-
-        // then
-        then(studyRepository).should(times(1)).findWithStudyUserById(any());
+        then(studyQueryRepository).should(times(1)).findByWaitUserId(any());
     }
 
     @Test
     @DisplayName("채팅방 ID 로 스터디를 조회한다.")
     void findByChatRoomId() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.getChatRooms().add(new ChatRoom(1L, "공지사항", study));
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.getChatRooms().add(new ChatRoom(1L, TEST_CHAT_ROOM_NAME, study));
 
-        given(studyQueryRepository.findByChatRoomId(any()))
-                .willReturn(study);
+        given(studyRepository.findByChatRoomId(any()))
+                .willReturn(Optional.of(study));
         // when
         StudyResponse result = studyService.findByChatRoomId(1L);
 
         // then
-        assertThat(result.getName()).isEqualTo("스프링 스터디");
-        assertThat(result.getContent()).isEqualTo("스프링 스터디");
-        assertThat(result.getNumberOfPeople()).isEqualTo(5);
-        assertThat(result.isOffline()).isTrue();
-        assertThat(result.isOffline()).isTrue();
-        then(studyQueryRepository).should(times(1)).findByChatRoomId(any());
+        assertThat(result.getName()).isEqualTo(study.getName());
+        then(studyRepository).should(times(1)).findByChatRoomId(any());
+    }
+
+    @Test
+    @DisplayName("채팅방 ID 로 스터디를 조회할 때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void findByChatRoomIdNotFound() {
+        // given
+        given(studyRepository.findByChatRoomId(any()))
+                .willReturn(Optional.empty());
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.findByChatRoomId(1L));
+
+        // then
+        then(studyRepository).should(times(1)).findByChatRoomId(any());
     }
 
     @Test
     @DisplayName("채팅방을 단건 조회한다.")
     void findByChatRoomByIdAndChatRoomId() {
         // given
-        Study study = Study.createStudy("스프링 스터디", "스프링 스터디", 5, true, true, null);
-        study.getChatRooms().add(new ChatRoom(1L, "공지사항", study));
+        Study study = Study.createStudy(TEST_STUDY_NAME, TEST_STUDY_CONTENT, TEST_STUDY_NUMBER_OF_PEOPLE, TEST_STUDY_ONLINE, TEST_STUDY_OFFLINE, TEST_STUDY_IMAGE_URL, TEST_CHILD_CATEGORY);
+        study.getChatRooms().add(new ChatRoom(1L, TEST_CHAT_ROOM_NAME, study));
 
         given(studyRepository.findWithChatRoomById(any()))
                 .willReturn(Optional.of(study));
+
         // when
-        ChatRoomResponse result = studyService.findChatRoomByIdAndChatRoomId(1L, 1L);
+        ChatRoomResponse result = studyService.findChatRoomByIdAndChatRoomId(TEST_STUDY.getId(), 1L);
 
         // then
         assertThat(result.getChatRoomId()).isEqualTo(1L);
-        assertThat(result.getName()).isEqualTo("공지사항");
+        assertThat(result.getName()).isEqualTo(TEST_CHAT_ROOM_NAME);
         then(studyRepository).should(times(1)).findWithChatRoomById(any());
     }
 
+    @Test
+    @DisplayName("채팅방을 단건 조회할때 스터디가 존재하지 않으면 예외가 발생한다.")
+    void findByChatRoomByIdAndChatRoomIdNotFound() {
+        // given
+        given(studyRepository.findWithChatRoomById(any()))
+                .willReturn(Optional.empty());
+
+        // when
+        assertThrows(NotFoundException.class, () -> studyService.findChatRoomByIdAndChatRoomId(TEST_STUDY.getId(), 1L));
+
+        // then
+        then(studyRepository).should(times(1)).findWithChatRoomById(any());
+    }
+
+    @Test
+    @DisplayName("이미지를 업로드한다.")
+    void uploadImage() {
+        // given
+        given(awsClient.upload(any()))
+                .willReturn(TEST_STUDY_IMAGE_URL);
+        // when
+        String result = studyService.uploadImage(TEST_IMAGE_FILE);
+
+        // then
+        assertThat(result).isEqualTo(TEST_STUDY_IMAGE_URL);
+        then(awsClient).should(times(1)).upload(any());
+
+    }
 }

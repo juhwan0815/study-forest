@@ -24,12 +24,12 @@ class ChatRoomTest {
     @DisplayName("스터디 채팅방 이름을 수정한다.")
     void changeName() {
         // given
-        ChatRoom chatRoom = ChatRoom.createChatRoom("공지사항", null);
+        ChatRoom chatRoom = ChatRoom.createChatRoom(null, null);
 
         // when
-        chatRoom.changeName("대화방");
+        chatRoom.changeName("공지사항");
 
         // then
-        assertThat(chatRoom.getName()).isEqualTo("대화방");
+        assertThat(chatRoom.getName()).isEqualTo("공지사항");
     }
 }

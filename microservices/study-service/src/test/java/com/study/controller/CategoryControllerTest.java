@@ -23,10 +23,12 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import static com.study.fixture.CategoryFixture.TEST_CATEGORY_CREATE_REQUEST;
-import static com.study.fixture.CategoryFixture.TEST_CATEGORY_RESPONSE;
+import static com.study.CategoryFixture.*;
+import static com.study.CommonFixture.TEST_AUTHORIZATION;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
@@ -47,8 +49,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(CategoryController.class)
 class CategoryControllerTest {
-
-    private final String TEST_AUTHORIZATION = "Bearer *****";
 
     @MockBean
     private CategoryService categoryService;
@@ -74,16 +74,21 @@ class CategoryControllerTest {
     @Test
     @DisplayName("카테고리 생성 API")
     void create() throws Exception {
-        given(categoryService.create(any()))
-                .willReturn(TEST_CATEGORY_RESPONSE);
+        // given
+        Map<String, Long> response = new HashMap<>();
+        response.put("categoryId", TEST_CATEGORY.getId());
 
+        given(categoryService.create(any()))
+                .willReturn(TEST_CATEGORY.getId());
+
+        // when
         mockMvc.perform(post("/categories")
                         .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(TEST_CATEGORY_CREATE_REQUEST)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(TEST_CATEGORY_RESPONSE)))
+                .andExpect(content().json(objectMapper.writeValueAsString(response)))
                 .andDo(document("category/create",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("AccessToken")
@@ -92,27 +97,31 @@ class CategoryControllerTest {
                                 fieldWithPath("name").type(JsonFieldType.STRING).description("카테고리 이름")
                         ),
                         responseFields(
-                                fieldWithPath("categoryId").type(JsonFieldType.NUMBER).description("카테고리 ID"),
-                                fieldWithPath("name").type(JsonFieldType.STRING).description("카테고리 이름")
-                        )
-                ));
+                                fieldWithPath("categoryId").type(JsonFieldType.NUMBER).description("카테고리 ID")
+                        )));
 
+        // then
         then(categoryService).should(times(1)).create(any());
     }
 
     @Test
     @DisplayName("하위 카테고리 생성 API")
     void createChildren() throws Exception {
-        given(categoryService.createChildren(any(), any()))
-                .willReturn(TEST_CATEGORY_RESPONSE);
+        // given
+        Map<String, Long> response = new HashMap<>();
+        response.put("categoryId", TEST_CATEGORY.getId());
 
-        mockMvc.perform(post("/categories/{categoryId}/children", 1L)
+        given(categoryService.createChildren(any(), any()))
+                .willReturn(TEST_CATEGORY.getId());
+
+        // when
+        mockMvc.perform(post("/categories/{categoryId}/children", TEST_CATEGORY.getId())
                         .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(TEST_CATEGORY_CREATE_REQUEST)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(TEST_CATEGORY_RESPONSE)))
+                .andExpect(content().json(objectMapper.writeValueAsString(response)))
                 .andDo(document("category/createChildren",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("AccessToken")
@@ -124,27 +133,29 @@ class CategoryControllerTest {
                                 fieldWithPath("name").type(JsonFieldType.STRING).description("카테고리 이름")
                         ),
                         responseFields(
-                                fieldWithPath("categoryId").type(JsonFieldType.NUMBER).description("카테고리 ID"),
-                                fieldWithPath("name").type(JsonFieldType.STRING).description("카테고리 이름")
+                                fieldWithPath("categoryId").type(JsonFieldType.NUMBER).description("카테고리 ID")
                         )
                 ));
 
+        // then
         then(categoryService).should(times(1)).createChildren(any(), any());
     }
 
     @Test
     @DisplayName("카테고리 수정 API")
     void update() throws Exception {
-        given(categoryService.update(any(), any()))
-                .willReturn(TEST_CATEGORY_RESPONSE);
+        // given
+        willDoNothing()
+                .given(categoryService)
+                .update(any(), any());
 
-        mockMvc.perform(put("/categories/{categoryId}", 1L)
+        // when
+        mockMvc.perform(put("/categories/{categoryId}", TEST_CATEGORY.getId())
                         .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(TEST_CATEGORY_CREATE_REQUEST)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(TEST_CATEGORY_RESPONSE)))
                 .andDo(document("category/update",
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("AccessToken")
@@ -154,24 +165,23 @@ class CategoryControllerTest {
                         ),
                         requestFields(
                                 fieldWithPath("name").type(JsonFieldType.STRING).description("카테고리 이름")
-                        ),
-                        responseFields(
-                                fieldWithPath("categoryId").type(JsonFieldType.NUMBER).description("카테고리 ID"),
-                                fieldWithPath("name").type(JsonFieldType.STRING).description("카테고리 이름")
                         )
                 ));
 
+        // then
         then(categoryService).should(times(1)).update(any(), any());
     }
 
     @Test
     @DisplayName("카테고리 삭제 API")
     void delete() throws Exception {
+        // given
         willDoNothing()
                 .given(categoryService)
                 .delete(any());
 
-        mockMvc.perform(RestDocumentationRequestBuilders.delete("/categories/{categoryId}", 1L)
+        // when
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/categories/{categoryId}", TEST_CATEGORY.getId())
                         .header(HttpHeaders.AUTHORIZATION, TEST_AUTHORIZATION))
                 .andExpect(status().isOk())
                 .andDo(document("category/delete",
@@ -183,17 +193,20 @@ class CategoryControllerTest {
                         )
                 ));
 
+        // then
         then(categoryService).should(times(1)).delete(any());
     }
 
     @Test
     @DisplayName("상위 카테고리 조회 API")
     void findParentCategory() throws Exception {
+        // given
         List<CategoryResponse> result = Arrays.asList(TEST_CATEGORY_RESPONSE);
 
         given(categoryService.findParent())
                 .willReturn(result);
 
+        // when
         mockMvc.perform(get("/categories")
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -205,18 +218,20 @@ class CategoryControllerTest {
                         )
                 ));
 
+        // then
         then(categoryService).should(times(1)).findParent();
     }
 
     @Test
     @DisplayName("하위 카테고리 조회 API")
     void findByParent() throws Exception {
+        // given
         List<CategoryResponse> result = Arrays.asList(TEST_CATEGORY_RESPONSE);
-
         given(categoryService.findByParent(any()))
                 .willReturn(result);
 
-        mockMvc.perform(get("/categories/{categoryId}/children",1L)
+        // when
+        mockMvc.perform(get("/categories/{categoryId}/children", TEST_CATEGORY.getId())
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
