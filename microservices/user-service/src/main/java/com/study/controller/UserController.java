@@ -49,7 +49,7 @@ public class UserController {
         return ResponseEntity.ok(userService.findByKakaoId(kakaoId, fcmToken));
     }
 
-    @PostMapping("/api/users/imageUrls")
+    @PostMapping("/users/imageUrls")
     public ResponseEntity<Map<String, String>> convertToImageUrl(@RequestPart MultipartFile image) {
 
         if (image.isEmpty()) {

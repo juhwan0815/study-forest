@@ -78,7 +78,7 @@ public class User extends BaseEntity {
     public void addKeyword(String content) {
         boolean result = keywords.stream().anyMatch(keyword -> keyword.getContent().equals(content));
         if (result) {
-            throw new DuplicateException(content + "는 이미 관심 키워드로 추가한 키워드입니다.");
+            throw new DuplicateException(String.format("%s는 이미 관심 키워드로 추가한 키워드입니다.", content));
         }
 
         Keyword keyword = Keyword.createKeyword(content, this);

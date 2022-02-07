@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService {
         User findUser = userRepository.findWithKeywordById(userId)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
         return findUser.getKeywords().stream()
-                .map(keyword -> KeywordResponse.from(keyword))
+                .map(KeywordResponse::from)
                 .collect(Collectors.toList());
     }
 
@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
     public List<UserResponse> findByIdIn(UserFindRequest request) {
         List<User> users = userRepository.findByIdIn(request.getUserIds());
         return users.stream()
-                .map(user -> UserResponse.from(user))
+                .map(UserResponse::from)
                 .collect(Collectors.toList());
     }
 

@@ -51,10 +51,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(UserController.class)
 class UserControllerTest {
 
-    private final String TEST_AUTHORIZATION = "Bearer *****";
-    private final String TEST_KAKAO_TOKEN = "kakaoToken";
-    private final String TEST_FCM_TOKEN = "fcmToken";
-
     @MockBean
     private UserService userService;
 
