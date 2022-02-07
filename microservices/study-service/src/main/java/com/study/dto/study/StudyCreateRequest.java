@@ -18,7 +18,7 @@ public class StudyCreateRequest {
     @NotBlank(message = "스터디 이름은 필수입니다.")
     private String name;
 
-    @Min(value = 2,message = "참여인원은 최소 2명이어야 합니다.")
+    @Min(value = 2, message = "참여인원은 최소 2명이어야 합니다.")
     @NotNull(message = "참여인원은 필수입니다.")
     private Integer numberOfPeople;
 
@@ -36,7 +36,10 @@ public class StudyCreateRequest {
 
     private String areaCode;
 
+    private String imageUrl;
+
     @NotNull(message = "카테고리 ID 는 필수입니다.")
     @Positive(message = "카테고리 ID 는 양수이어야 합니다.")
     private Long categoryId;
+
 }

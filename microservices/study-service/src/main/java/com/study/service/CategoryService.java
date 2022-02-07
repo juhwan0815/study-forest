@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface CategoryService {
 
-    CategoryResponse create(CategoryCreateRequest request);
+    Long create(CategoryCreateRequest request);
 
-    CategoryResponse createChildren(Long categoryId, CategoryCreateRequest request);
+    Long createChildren(Long categoryId, CategoryCreateRequest request);
 
-    CategoryResponse update(Long categoryId, CategoryUpdateRequest request);
+    void update(Long categoryId, CategoryUpdateRequest request);
 
     void delete(Long categoryId);
 

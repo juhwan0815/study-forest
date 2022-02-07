@@ -4,32 +4,26 @@ import com.study.client.UserResponse;
 import com.study.dto.chatroom.ChatRoomCreateRequest;
 import com.study.dto.chatroom.ChatRoomResponse;
 import com.study.dto.chatroom.ChatRoomUpdateRequest;
-import com.study.dto.study.*;
+import com.study.dto.study.StudyCreateRequest;
+import com.study.dto.study.StudyResponse;
+import com.study.dto.study.StudySearchRequest;
+import com.study.dto.study.StudyUpdateRequest;
 import com.study.dto.studyuser.StudyUserResponse;
-import com.study.dto.tag.TagCreateRequest;
-import com.study.kakfa.UserDeleteMessage;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface StudyService {
 
-    StudyResponse create(Long userId, MultipartFile file, StudyCreateRequest request);
+    Long create(Long userId, StudyCreateRequest request);
 
-    StudyResponse updateImage(Long userId, Long studyId, MultipartFile file);
-
-    StudyResponse updateArea(Long userId, Long studyId, StudyUpdateAreaRequest request);
-
-    StudyResponse update(Long userId, Long studyId, StudyUpdateRequest request);
+    void update(Long userId, Long studyId, StudyUpdateRequest request);
 
     void delete(Long userId, Long studyId);
 
     StudyResponse findById(Long studyId);
 
-    Page<StudyResponse> search(Long userId, Pageable pageable, StudySearchRequest request);
+    List<StudyResponse> search(Long userId, StudySearchRequest request);
 
     void createWaitUser(Long userId, Long studyId);
 
@@ -59,13 +53,9 @@ public interface StudyService {
 
     List<StudyResponse> findByWaitUserId(Long userId);
 
-    void deleteStudyUserAndWaitUser(UserDeleteMessage userDeleteMessage);
-
-    void addTag(Long userId, Long studyId, TagCreateRequest request);
-
-    void deleteTag(Long userId, Long studyId, Long tagId);
-
     StudyResponse findByChatRoomId(Long chatRoomId);
 
     ChatRoomResponse findChatRoomByIdAndChatRoomId(Long studyId, Long chatRoomId);
+
+    String uploadImage(MultipartFile image);
 }

@@ -5,21 +5,25 @@ import com.study.config.LoginUser;
 import com.study.dto.chatroom.ChatRoomCreateRequest;
 import com.study.dto.chatroom.ChatRoomResponse;
 import com.study.dto.chatroom.ChatRoomUpdateRequest;
-import com.study.dto.study.*;
+import com.study.dto.study.StudyCreateRequest;
+import com.study.dto.study.StudyResponse;
+import com.study.dto.study.StudySearchRequest;
+import com.study.dto.study.StudyUpdateRequest;
 import com.study.dto.studyuser.StudyUserResponse;
-import com.study.dto.tag.TagCreateRequest;
+import com.study.exception.NotExistException;
 import com.study.service.StudyService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static com.study.exception.NotExistException.IMAGE_NOT_EXIST;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,32 +31,34 @@ public class StudyController {
 
     private final StudyService studyService;
 
+    @PostMapping("/studies/imageUrls")
+    public ResponseEntity<Map<String, String>> convertToImageUrl(@RequestPart MultipartFile image) {
+
+        if (image.isEmpty()) {
+            throw new NotExistException(IMAGE_NOT_EXIST);
+        }
+
+        Map<String, String> response = new HashMap<>();
+        String imageUrl = studyService.uploadImage(image);
+        response.put("imageUrl", imageUrl);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/studies")
-    public ResponseEntity<StudyResponse> create(@LoginUser Long userId,
-                                                @RequestPart(required = false) MultipartFile file,
-                                                @RequestPart @Valid StudyCreateRequest request) {
-        return ResponseEntity.ok(studyService.create(userId, file, request));
+    public ResponseEntity<Map<String, Long>> create(@LoginUser Long userId,
+                                                    @RequestBody @Valid StudyCreateRequest request) {
+        Long studyId = studyService.create(userId, request);
+        Map<String, Long> response = new HashMap<>();
+        response.put("studyId", studyId);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/studies/{studyId}")
-    public ResponseEntity<StudyResponse> update(@LoginUser Long userId,
-                                                @PathVariable Long studyId,
-                                                @RequestBody @Valid StudyUpdateRequest request) {
-        return ResponseEntity.ok(studyService.update(userId, studyId, request));
-    }
-
-    @PatchMapping("/studies/{studyId}/images")
-    public ResponseEntity<StudyResponse> updateImage(@LoginUser Long userId,
-                                                     @PathVariable Long studyId,
-                                                     @RequestPart(required = false) MultipartFile file) {
-        return ResponseEntity.ok(studyService.updateImage(userId, studyId, file));
-    }
-
-    @PatchMapping("/studies/{studyId}/areas")
-    public ResponseEntity<StudyResponse> updateArea(@LoginUser Long userId,
-                                                    @PathVariable Long studyId,
-                                                    @RequestBody @Valid StudyUpdateAreaRequest request) {
-        return ResponseEntity.ok(studyService.updateArea(userId, studyId, request));
+    public ResponseEntity<Void> update(@LoginUser Long userId,
+                                       @PathVariable Long studyId,
+                                       @RequestBody @Valid StudyUpdateRequest request) {
+        studyService.update(userId, studyId, request);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping("/studies/{studyId}")
@@ -68,10 +74,9 @@ public class StudyController {
     }
 
     @GetMapping("/studies")
-    public ResponseEntity<Page<StudyResponse>> search(@LoginUser Long userId,
-                                                      @PageableDefault(size = 25, page = 0) Pageable pageable,
+    public ResponseEntity<List<StudyResponse>> search(@LoginUser Long userId,
                                                       @Valid StudySearchRequest request) {
-        return ResponseEntity.ok(studyService.search(userId, pageable, request));
+        return ResponseEntity.ok(studyService.search(userId, request));
     }
 
     @PostMapping("/studies/{studyId}/waitUsers")
@@ -160,22 +165,7 @@ public class StudyController {
         return ResponseEntity.ok(studyService.findChatRoomsById(studyId));
     }
 
-    @PostMapping("/studies/{studyId}/tags")
-    public ResponseEntity<Void> addTag(@LoginUser Long userId,
-                                       @PathVariable Long studyId,
-                                       @RequestBody @Valid TagCreateRequest request) {
-        studyService.addTag(userId, studyId, request);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    @DeleteMapping("/studies/{studyId}/tags/{tagId}")
-    public ResponseEntity<Void> deleteTag(@LoginUser Long userId,
-                                          @PathVariable Long studyId,
-                                          @PathVariable Long tagId) {
-        studyService.deleteTag(userId, studyId, tagId);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
+    // 여기 부터
     @GetMapping("/users/studies")
     public ResponseEntity<List<StudyResponse>> findByUserId(@LoginUser Long userId) {
         return ResponseEntity.ok(studyService.findByUserId(userId));

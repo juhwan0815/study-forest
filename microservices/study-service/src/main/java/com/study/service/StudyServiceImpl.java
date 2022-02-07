@@ -1,36 +1,34 @@
 package com.study.service;
 
-import com.study.client.AreaResponse;
-import com.study.client.AreaServiceClient;
-import com.study.client.UserResponse;
-import com.study.client.UserServiceClient;
+import com.study.client.*;
 import com.study.domain.Category;
-import com.study.domain.Image;
 import com.study.domain.Study;
 import com.study.domain.StudyRole;
 import com.study.dto.chatroom.ChatRoomCreateRequest;
 import com.study.dto.chatroom.ChatRoomResponse;
 import com.study.dto.chatroom.ChatRoomUpdateRequest;
-import com.study.dto.study.*;
+import com.study.dto.study.StudyCreateRequest;
+import com.study.dto.study.StudyResponse;
+import com.study.dto.study.StudySearchRequest;
+import com.study.dto.study.StudyUpdateRequest;
 import com.study.dto.studyuser.StudyUserResponse;
-import com.study.dto.tag.TagCreateRequest;
-import com.study.exception.CategoryNotFoundException;
-import com.study.exception.StudyNotFoundException;
+import com.study.exception.AccessDeniedException;
+import com.study.exception.NotFoundException;
 import com.study.kakfa.*;
 import com.study.kakfa.sender.*;
 import com.study.repository.CategoryRepository;
 import com.study.repository.StudyQueryRepository;
 import com.study.repository.StudyRepository;
-import com.study.util.ImageUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.study.exception.NotFoundException.CATEGORY_NOT_FOUND;
+import static com.study.exception.NotFoundException.STUDY_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +40,7 @@ public class StudyServiceImpl implements StudyService {
     private final CategoryRepository categoryRepository;
     private final AreaServiceClient areaServiceClient;
     private final UserServiceClient userServiceClient;
-    private final ImageUtil imageUtil;
+    private final AwsClient awsClient;
 
     private final StudyCreateMessageSender studyCreateMessageSender;
     private final StudyDeleteMessageSender studyDeleteMessageSender;
@@ -52,84 +50,68 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     @Transactional
-    public StudyResponse create(Long userId, MultipartFile file, StudyCreateRequest request) {
-        Category findCategory = categoryRepository.findWithParentById(request.getCategoryId())
-                .orElseThrow(() -> new CategoryNotFoundException(request.getCategoryId() + "는 존재하지 않는 카테고리 ID 입니다."));
-
-        AreaResponse area = new AreaResponse();
-        if (request.getOffline() == true) {
-            area = areaServiceClient.findByCode(request.getAreaCode());
-        }
-
-        Image image = imageUtil.uploadImage(file, null);
+    public Long create(Long userId, StudyCreateRequest request) {
+        Category findCategory = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new NotFoundException(String.format(CATEGORY_NOT_FOUND)));
 
         Study study = Study.createStudy(request.getName(), request.getContent(), request.getNumberOfPeople(),
-                request.getOnline(), request.getOffline(), findCategory);
+                request.getOnline(), request.getOffline(), request.getImageUrl(), findCategory);
         study.addStudyUser(userId, StudyRole.ADMIN);
-        study.changeImage(image);
-        study.addTags(request.getTags());
-        study.changeArea(area.getId());
-        studyRepository.save(study);
+        study.changeTags(request.getTags());
 
+        if (request.getOffline() == true) {
+            AreaResponse area = areaServiceClient.findByCode(request.getAreaCode());
+            study.changeArea(area.getId());
+        }
+
+        Study savedStudy = studyRepository.save(study);
         studyCreateMessageSender.send(StudyCreateMessage.from(study.getId(), study.getName(), request.getTags()));
-        return StudyResponse.from(study, area);
+        return savedStudy.getId();
     }
 
     @Override
     @Transactional
-    public StudyResponse updateImage(Long userId, Long studyId, MultipartFile file) {
-        Study findStudy = studyRepository.findWithStudyUserById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
-        findStudy.isStudyAdmin(userId);
+    public void update(Long userId, Long studyId, StudyUpdateRequest request) {
+        Study findStudy = studyRepository.findWithTagById(studyId)
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
 
-        Image image = imageUtil.uploadImage(file, findStudy.getImage());
-        findStudy.changeImage(image);
-        return StudyResponse.from(findStudy);
-    }
+        if (!findStudy.isStudyAdmin(userId)) {
+            throw new AccessDeniedException();
+        }
 
-    @Override
-    @Transactional
-    public StudyResponse updateArea(Long userId, Long studyId, StudyUpdateAreaRequest request) {
-        Study findStudy = studyRepository.findWithStudyUserById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
-        findStudy.isStudyAdmin(userId);
+        Category findCategory = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new NotFoundException(CATEGORY_NOT_FOUND));
 
-        AreaResponse area = areaServiceClient.findByCode(request.getAreaCode());
-        findStudy.changeArea(area.getId());
-        return StudyResponse.from(findStudy, area);
-    }
 
-    @Override
-    @Transactional
-    public StudyResponse update(Long userId, Long studyId, StudyUpdateRequest request) {
-        Study findStudy = studyRepository.findWithStudyUserById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
-        findStudy.isStudyAdmin(userId);
+        findStudy.update(request.getName(), request.getContent(), request.getNumberOfPeople(),
+                request.getOnline(), request.getOffline(), request.getOpen(), request.getImageUrl(), findCategory);
+        findStudy.changeTags(request.getTags());
 
-        Category findCategory = categoryRepository.findWithParentById(request.getCategoryId())
-                .orElseThrow(() -> new CategoryNotFoundException(request.getCategoryId() + "는 존재하지 않느 카테고리 ID 입니다."));
-
-        findStudy.change(request.getName(), request.getContent(), request.getNumberOfPeople(),
-                request.getOnline(), request.getOffline(), request.getOpen(), findCategory);
-
-        return StudyResponse.from(findStudy, null);
+        if (request.getOffline() == true) {
+            AreaResponse area = areaServiceClient.findByCode(request.getAreaCode());
+            findStudy.changeArea(area.getId());
+        }
     }
 
     @Override
     @Transactional
     public void delete(Long userId, Long studyId) {
         Study findStudy = studyRepository.findWithStudyUserById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
-        findStudy.isStudyAdmin(userId);
-        List<Long> chatRoomIds = findStudy.getChatRoomsId();
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
 
+        if (!findStudy.isStudyAdmin(userId)) {
+            throw new AccessDeniedException();
+        }
+
+        List<Long> chatRoomIds = findStudy.getChatRoomsId();
         studyRepository.delete(findStudy);
         studyDeleteMessageSender.send(StudyDeleteMessage.from(findStudy.getId(), chatRoomIds));
     }
 
     @Override
     public StudyResponse findById(Long studyId) {
-        Study findStudy = studyQueryRepository.findWithCategoryAndTagById(studyId);
+        Study findStudy = studyRepository.findWithCategoryAndTagById(studyId)
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
 
         AreaResponse areaResponse = null;
         if (findStudy.isOffline()) {
@@ -140,8 +122,7 @@ public class StudyServiceImpl implements StudyService {
     }
 
     @Override
-    public Page<StudyResponse> search(Long userId, Pageable pageable, StudySearchRequest request) {
-
+    public List<StudyResponse> search(Long userId, StudySearchRequest request) {
         List<Long> areaIds = null;
         if (request.getOffline() && userId != null) {
             UserResponse user = userServiceClient.findById(userId);
@@ -150,15 +131,14 @@ public class StudyServiceImpl implements StudyService {
                 areaIds = areas.stream().map(area -> area.getId()).collect(Collectors.toList());
             }
         }
-        Page<Study> findStudies = studyQueryRepository.findBySearchCondition(request, areaIds, pageable);
-        return findStudies.map(study -> StudyResponse.fromWithTag(study));
+        return studyQueryRepository.findBySearchCondition(request, areaIds);
     }
 
     @Override
     @Transactional
     public void createWaitUser(Long userId, Long studyId) {
         Study findStudy = studyRepository.findWithWaitUserById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
         findStudy.addWaitUser(userId);
     }
 
@@ -166,7 +146,7 @@ public class StudyServiceImpl implements StudyService {
     @Transactional
     public void deleteWaitUser(Long userId, Long studyId) {
         Study findStudy = studyRepository.findWithWaitUserById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
         findStudy.deleteWaitUser(userId);
     }
 
@@ -174,8 +154,12 @@ public class StudyServiceImpl implements StudyService {
     @Transactional
     public void failWaitUser(Long userId, Long studyId, Long waitUserId) {
         Study findStudy = studyRepository.findWithWaitUserById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
-        findStudy.isStudyAdmin(userId);
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
+
+        if (!findStudy.isStudyAdmin(userId)) {
+            throw new AccessDeniedException();
+        }
+
         findStudy.failWaitUser(waitUserId);
 
         studyApplyFailMessageSender.send(StudyApplyFailMessage.from(waitUserId, findStudy.getId(), findStudy.getName()));
@@ -184,7 +168,7 @@ public class StudyServiceImpl implements StudyService {
     @Override
     public List<UserResponse> findWaitUsersById(Long studyId) {
         Study findStudy = studyRepository.findWithWaitUserById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
 
         List<Long> userIds = findStudy.getWaitUsersId();
         return userServiceClient.findByIdIn(userIds);
@@ -194,8 +178,11 @@ public class StudyServiceImpl implements StudyService {
     @Transactional
     public void createStudyUser(Long userId, Long studyId, Long studyUserId) {
         Study findStudy = studyRepository.findWithWaitUserById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
-        findStudy.isStudyAdmin(userId);
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
+
+        if (!findStudy.isStudyAdmin(userId)) {
+            throw new AccessDeniedException();
+        }
 
         findStudy.successWaitUser(studyUserId);
         findStudy.addStudyUser(studyUserId, StudyRole.USER);
@@ -206,8 +193,11 @@ public class StudyServiceImpl implements StudyService {
     @Transactional
     public void deleteStudyUser(Long userId, Long studyId, Long studyUserId) {
         Study findStudy = studyRepository.findWithStudyUserById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
-        findStudy.isStudyAdmin(userId);
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
+
+        if (!findStudy.isStudyAdmin(userId)) {
+            throw new AccessDeniedException();
+        }
 
         findStudy.deleteStudyUser(studyUserId);
     }
@@ -216,7 +206,7 @@ public class StudyServiceImpl implements StudyService {
     @Transactional
     public void deleteStudyUser(Long userId, Long studyId) {
         Study findStudy = studyRepository.findWithStudyUserById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
 
         findStudy.deleteStudyUser(userId);
     }
@@ -224,7 +214,7 @@ public class StudyServiceImpl implements StudyService {
     @Override
     public List<StudyUserResponse> findStudyUsersById(Long studyId) {
         Study findStudy = studyRepository.findWithStudyUserById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
         List<Long> userIds = findStudy.getStudyUsersId();
 
         List<UserResponse> users = userServiceClient.findByIdIn(userIds);
@@ -238,8 +228,11 @@ public class StudyServiceImpl implements StudyService {
     @Transactional
     public void createChatRoom(Long userId, Long studyId, ChatRoomCreateRequest request) {
         Study findStudy = studyRepository.findWithChatRoomById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
-        findStudy.isStudyAdmin(userId);
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
+
+        if (!findStudy.isStudyAdmin(userId)) {
+            throw new AccessDeniedException();
+        }
 
         findStudy.addChatRoom(request.getName());
     }
@@ -248,8 +241,11 @@ public class StudyServiceImpl implements StudyService {
     @Transactional
     public void updateChatRoom(Long userId, Long studyId, Long chatRoomId, ChatRoomUpdateRequest request) {
         Study findStudy = studyRepository.findWithChatRoomById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
-        findStudy.isStudyAdmin(userId);
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
+
+        if (!findStudy.isStudyAdmin(userId)) {
+            throw new AccessDeniedException();
+        }
 
         findStudy.updateChatRoom(chatRoomId, request.getName());
     }
@@ -258,8 +254,11 @@ public class StudyServiceImpl implements StudyService {
     @Transactional
     public void deleteChatRoom(Long userId, Long studyId, Long chatRoomId) {
         Study findStudy = studyRepository.findWithChatRoomById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
-        findStudy.isStudyAdmin(userId);
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
+
+        if (!findStudy.isStudyAdmin(userId)) {
+            throw new AccessDeniedException();
+        }
 
         findStudy.deleteChatRoom(chatRoomId);
         chatRoomDeleteMessageSender.send(ChatRoomDeleteMessage.from(chatRoomId));
@@ -268,71 +267,39 @@ public class StudyServiceImpl implements StudyService {
     @Override
     public List<ChatRoomResponse> findChatRoomsById(Long studyId) {
         Study findStudy = studyRepository.findWithChatRoomById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
 
         return findStudy.getChatRooms().stream()
-                .map(chatRoom -> ChatRoomResponse.from(chatRoom))
+                .map(ChatRoomResponse::from)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<StudyResponse> findByUserId(Long userId) {
-        List<Study> findStudies = studyQueryRepository.findByUserId(userId);
-        return findStudies.stream()
-                .map(study -> StudyResponse.fromWithTag(study))
-                .collect(Collectors.toList());
+        return studyQueryRepository.findByStudyUserId(userId);
     }
 
     @Override
     public List<StudyResponse> findByWaitUserId(Long userId) {
-        List<Study> findStudies = studyQueryRepository.findWithWaitUserByUserId(userId);
-        return findStudies.stream()
-                .map(study -> StudyResponse.fromWithWaitUserAndTag(study))
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional
-    public void deleteStudyUserAndWaitUser(UserDeleteMessage userDeleteMessage) {
-        List<Study> findStudies = studyQueryRepository.findWithWaitUserByUserId(userDeleteMessage.getUserId());
-        findStudies.forEach(study -> {
-            study.deleteWaitUser(userDeleteMessage.getUserId());
-        });
-
-        findStudies = studyQueryRepository.findWithStudyUsersByUserId(userDeleteMessage.getUserId());
-        findStudies.forEach(study -> {
-            study.deleteStudyUser(userDeleteMessage.getUserId());
-        });
-    }
-
-    @Override
-    @Transactional
-    public void addTag(Long userId, Long studyId, TagCreateRequest request) {
-        Study findStudy = studyRepository.findWithStudyUserById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
-        findStudy.isStudyAdmin(userId);
-        findStudy.addTag(request.getContent());
-    }
-
-    @Override
-    public void deleteTag(Long userId, Long studyId, Long tagId) {
-        Study findStudy = studyRepository.findWithStudyUserById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
-
-        findStudy.isStudyAdmin(userId);
-        findStudy.deleteTag(tagId);
+        return studyQueryRepository.findByWaitUserId(userId);
     }
 
     @Override
     public StudyResponse findByChatRoomId(Long chatRoomId) {
-        Study findStudy = studyQueryRepository.findByChatRoomId(chatRoomId);
+        Study findStudy = studyRepository.findByChatRoomId(chatRoomId)
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
         return StudyResponse.from(findStudy);
     }
 
     @Override
     public ChatRoomResponse findChatRoomByIdAndChatRoomId(Long studyId, Long chatRoomId) {
         Study findStudy = studyRepository.findWithChatRoomById(studyId)
-                .orElseThrow(() -> new StudyNotFoundException(studyId + "는 존재하지 않는 스터디 ID 입니다."));
+                .orElseThrow(() -> new NotFoundException(STUDY_NOT_FOUND));
         return ChatRoomResponse.from(findStudy.getChatRoom(chatRoomId));
+    }
+
+    @Override
+    public String uploadImage(MultipartFile image) {
+        return awsClient.upload(image);
     }
 }
